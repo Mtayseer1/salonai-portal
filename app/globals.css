@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+/* ---------- Base ---------- */
+
+html,
+body {
+  background: #07070a;
+  color: white;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: rgba(216, 180, 254, 0.35);
+  color: white;
+}
+
+/* ---------- Layout ---------- */
+
+.page-bg {
+  @apply min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(192,132,252,0.15),transparent_34%),linear-gradient(135deg,#07070a_0%,#101014_48%,#07070a_100%)] text-white;
+}
+
+.page-wrap {
+  @apply px-4 py-6 sm:px-6;
+}
+
+.container-card {
+  @apply rounded-3xl border border-white/10 bg-white/[0.055] p-6 shadow-2xl shadow-black/25 backdrop-blur-xl;
+}
+
+/* ---------- Typography ---------- */
+
+.title-main {
+  @apply text-4xl sm:text-5xl font-semibold tracking-tight text-white;
+}
+
+.title-page {
+  @apply text-3xl font-semibold tracking-tight text-white;
+}
+
+.text-soft {
+  @apply text-zinc-400;
+}
+
+/* ---------- Inputs ---------- */
+
+.input-main {
+  @apply w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-white outline-none transition placeholder:text-zinc-600 focus:border-fuchsia-300/60 focus:bg-white/[0.06];
+}
+
+.select-main {
+  @apply w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-white outline-none transition focus:border-fuchsia-300/60 focus:bg-white/[0.06];
+}
+
+.textarea-main {
+  @apply w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-white outline-none transition placeholder:text-zinc-600 focus:border-fuchsia-300/60 focus:bg-white/[0.06];
+}
+
+/* ---------- Buttons ---------- */
+
+.btn-primary {
+  @apply w-full rounded-2xl bg-gradient-to-r from-fuchsia-200 via-white to-sky-100 py-3 font-bold text-zinc-950 shadow-lg shadow-fuchsia-950/30 transition hover:brightness-110;
+}
+
+.btn-dark {
+  @apply w-full rounded-2xl border border-white/10 bg-white/[0.06] py-3 font-semibold text-white transition hover:bg-white/[0.1];
+}
+
+.btn-danger {
+  @apply w-full rounded-2xl border border-red-400/20 bg-red-500/10 py-3 font-bold text-red-100 transition hover:bg-red-500/20;
+}
+
+/* ---------- Cards ---------- */
+
+.stat-card {
+  @apply rounded-3xl border border-white/10 bg-white/[0.055] p-5 shadow-2xl shadow-black/20 backdrop-blur-xl;
+}
+
+.menu-card {
+  @apply rounded-3xl border border-white/10 bg-white/[0.055] p-5 shadow-2xl shadow-black/20 backdrop-blur-xl transition hover:-translate-y-0.5 hover:bg-white/[0.08];
+}
