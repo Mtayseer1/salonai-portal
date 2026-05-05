@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion'
 import { usePathname, useRouter } from 'next/navigation'
-import { supabase } from '../../src/lib/supabase'
 
 type NavItem = {
   href: string
@@ -21,6 +20,7 @@ type AppShellProps = {
 
 export const salonNav: NavItem[] = [
   { href: '/dashboard', label: 'Dashboard', icon: 'D' },
+  { href: '/style', label: 'Style Session', icon: 'S' },
   { href: '/buy-package', label: 'Buy Credits', icon: 'C' },
 ]
 
@@ -49,115 +49,50 @@ export function AppShell({
   navItems,
   userLabel = 'Account',
 }: AppShellProps) {
+  void role
+  void navItems
+  void userLabel
+
   const pathname = usePathname()
   const router = useRouter()
+  const showBack = pathname !== '/dashboard'
+  const goBack = () => {
+    if (pathname === '/style/result') {
+      router.push('/dashboard')
+      return
+    }
 
-  const logout = async () => {
-    await supabase.auth.signOut()
-    router.replace('/')
+    router.back()
   }
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(192,132,252,0.16),transparent_34%),linear-gradient(135deg,#07070a_0%,#101014_48%,#07070a_100%)] text-white">
-      <div className="flex min-h-screen">
-        <aside className="hidden w-72 shrink-0 border-r border-white/10 bg-black/20 px-5 py-6 backdrop-blur-xl lg:block">
-          <Brand />
-          <nav className="mt-10 space-y-2">
-            {navItems.map((item) => {
-              const active = pathname === item.href
-              return (
-                <button
-                  key={item.href}
-                  onClick={() => router.push(item.href)}
-                  className={`group flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold transition ${
-                    active
-                      ? 'border border-fuchsia-300/30 bg-white/[0.08] text-white shadow-lg shadow-fuchsia-950/30'
-                      : 'text-zinc-400 hover:bg-white/[0.05] hover:text-white'
-                  }`}
-                >
-                  <span
-                    className={`grid h-9 w-9 place-items-center rounded-xl border text-xs ${
-                      active
-                        ? 'border-fuchsia-300/30 bg-fuchsia-300/15 text-fuchsia-100'
-                        : 'border-white/10 bg-white/[0.04] text-zinc-400 group-hover:text-white'
-                    }`}
-                  >
-                    {item.icon}
-                  </span>
-                  {item.label}
-                </button>
-              )
-            })}
-          </nav>
-        </aside>
-
-        <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-20 border-b border-white/10 bg-[#08080b]/80 px-4 py-4 backdrop-blur-xl sm:px-6">
-            <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-              <div className="lg:hidden">
-                <Brand compact />
-              </div>
-              <div className="hidden lg:block">
-                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-zinc-500">
-                  {role} portal
-                </p>
-                <h1 className="mt-1 text-2xl font-semibold tracking-tight text-white">
-                  {title}
-                </h1>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="hidden rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-2 text-right sm:block">
-                  <p className="text-xs text-zinc-500">{role}</p>
-                  <p className="text-sm font-semibold text-white">{userLabel}</p>
-                </div>
-                <button
-                  onClick={logout}
-                  className="rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-2 text-sm font-bold text-red-100 transition hover:bg-red-500/20"
-                >
-                  Logout
-                </button>
-              </div>
-            </div>
-            <div className="mx-auto mt-4 flex max-w-7xl gap-2 overflow-x-auto lg:hidden">
-              {navItems.map((item) => {
-                const active = pathname === item.href
-                return (
-                  <button
-                    key={item.href}
-                    onClick={() => router.push(item.href)}
-                    className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition ${
-                      active
-                        ? 'bg-white text-zinc-950'
-                        : 'border border-white/10 bg-white/[0.04] text-zinc-300'
-                    }`}
-                  >
-                    {item.label}
-                  </button>
-                )
-              })}
-            </div>
-          </header>
-
-          <motion.section
-            {...pageMotion}
-            className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 lg:py-8"
-          >
-            <div className="mb-6 lg:hidden">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-zinc-500">
-                {role} portal
-              </p>
-              <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">
-                {title}
-              </h1>
-              {subtitle && <p className="mt-2 text-sm text-zinc-400">{subtitle}</p>}
-            </div>
-            <div className="hidden lg:mb-8 lg:block">
-              {subtitle && <p className="max-w-2xl text-sm text-zinc-400">{subtitle}</p>}
-            </div>
-            {children}
-          </motion.section>
-        </div>
-      </div>
+      <motion.section
+        {...pageMotion}
+        className="mx-auto flex min-h-screen w-full max-w-[430px] flex-col px-4 py-5"
+      >
+        <header className="mb-5 flex min-h-12 items-center gap-3">
+          {showBack ? (
+            <button
+              type="button"
+              onClick={goBack}
+              className="grid h-11 w-11 place-items-center rounded-2xl border border-white/10 bg-white/[0.06] text-xl font-semibold text-white"
+              aria-label="Back"
+            >
+              ‹
+            </button>
+          ) : (
+            <Brand compact />
+          )}
+          <div className="min-w-0">
+            <h1 className="truncate text-xl font-semibold tracking-tight text-white">
+              {title}
+            </h1>
+            {subtitle && <p className="mt-1 line-clamp-1 text-xs text-zinc-500">{subtitle}</p>}
+          </div>
+        </header>
+        <div className="flex-1">{children}</div>
+      </motion.section>
     </main>
   )
 }
