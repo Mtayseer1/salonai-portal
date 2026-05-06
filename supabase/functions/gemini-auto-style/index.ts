@@ -1,10 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment, @typescript-eslint/no-explicit-any */
 // @ts-nocheck
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-// @ts-ignore Deno/Supabase Edge Functions require explicit .ts extensions.
-import { MEN_BEARD_OPTIONS } from "./men-beard-catalog.ts";
-// @ts-ignore Deno/Supabase Edge Functions require explicit .ts extensions.
-import { MEN_HAIR_OPTIONS } from "./men-hair-catalog.ts";
 
 /* ============================================================
    CONFIG
@@ -18,6 +14,297 @@ if (!GEMINI_API_KEY) {
 
 const GEMINI_URL =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent";
+
+/* ============================================================
+   EXPANDED MEN HAIR CATALOG PROMPTS
+============================================================ */
+
+type MenHairCategoryId =
+  | 'business'
+  | 'classic'
+  | 'fade'
+  | 'long'
+  | 'medium'
+  | 'slick'
+  | 'volume'
+  | 'curly'
+  | 'fringe'
+  | 'modern'
+  | 'afro'
+  | 'braids'
+  | 'mature'
+
+type MenHairOption = {
+  categoryId: MenHairCategoryId
+  categoryLabel: string
+  name: string
+  description: string
+  imagePath: string
+}
+
+const RAW_MEN_HAIR_OPTIONS = [
+  ['classic', 'Classic Short Cuts', 'Buzz Cut', 'Very short even haircut all over the head with clean masculine finish and natural hairline.'],
+  ['classic', 'Classic Short Cuts', 'Crew Cut', 'Short classic haircut with slightly longer hair on top and shorter sides, neat and masculine.'],
+  ['classic', 'Classic Short Cuts', 'Ivy League', 'Polished short haircut with enough length on top for a neat side part and refined finish.'],
+  ['classic', 'Classic Short Cuts', 'Caesar Cut', 'Short haircut with a small straight fringe across the forehead and clean masculine texture.'],
+  ['classic', 'Classic Short Cuts', 'French Crop', 'Short textured crop with a defined forward fringe and clean sides.'],
+  ['classic', 'Classic Short Cuts', 'Textured Crop', 'Short modern crop with choppy texture on top and neat sides.'],
+  ['classic', 'Classic Short Cuts', 'High and Tight', 'Military-inspired haircut with very short sides and a slightly longer top.'],
+  ['classic', 'Classic Short Cuts', 'Butch Cut', 'Uniform short haircut slightly longer than a buzz cut with simple masculine shape.'],
+  ['classic', 'Classic Short Cuts', 'Flat Top', 'Short sides with top hair shaped flat and squared, clean and structured.'],
+  ['classic', 'Classic Short Cuts', 'Short Taper Cut', 'Clean short haircut with gradually tapered sides and neckline while keeping natural top length.'],
+  ['fade', 'Fade Styles', 'Low Fade', 'Hair gradually fades low around the ears and neckline while keeping natural length on top.'],
+  ['fade', 'Fade Styles', 'Mid Fade', 'Balanced fade starting around the middle of the sides for a modern clean look.'],
+  ['fade', 'Fade Styles', 'High Fade', 'Fade starts high on the sides for a sharp bold appearance.'],
+  ['fade', 'Fade Styles', 'Skin Fade', 'Sides fade down to the skin with a clean sharp transition and natural top.'],
+  ['fade', 'Fade Styles', 'Low Skin Fade', 'Subtle skin fade starting low near the ears with clean barber finish.'],
+  ['fade', 'Fade Styles', 'Mid Skin Fade', 'Skin fade starting around the middle of the sides with balanced contrast.'],
+  ['fade', 'Fade Styles', 'High Skin Fade', 'Strong skin fade starting high on the sides with bold clean contrast.'],
+  ['fade', 'Fade Styles', 'Drop Fade', 'Fade curves downward behind the ear following the natural head shape.'],
+  ['fade', 'Fade Styles', 'Burst Fade', 'Rounded fade around the ear, often paired with textured or mohawk-inspired top.'],
+  ['fade', 'Fade Styles', 'Temple Fade', 'Fade focused around the temples with clean side edges and natural top.'],
+  ['fade', 'Fade Styles', 'Taper Fade', 'Gradual fade around sideburns and neckline while keeping natural side length.'],
+  ['fade', 'Fade Styles', 'Low Taper Fade', 'Subtle taper fade around the temples and neckline with clean natural finish.'],
+  ['fade', 'Fade Styles', 'Mid Taper Fade', 'Balanced taper fade with clean side transition and natural top volume.'],
+  ['fade', 'Fade Styles', 'High Taper Fade', 'More visible taper fade placed higher on the sides with clean edges.'],
+  ['fade', 'Fade Styles', 'Bald Fade', 'Very clean fade down to bald skin on the sides with sharp barber transition.'],
+  ['fade', 'Fade Styles', 'Shadow Fade', 'Soft fade that keeps some darkness and does not go fully skin-bald.'],
+  ['business', 'Business Styles', 'Classic Side Part', 'Traditional side-part haircut with clean combed styling and professional finish.'],
+  ['business', 'Business Styles', 'Modern Side Part', 'Updated side part with cleaner sides and more natural volume on top.'],
+  ['business', 'Business Styles', 'Hard Part', 'Side part hairstyle with a shaved razor line for sharp definition.'],
+  ['business', 'Business Styles', 'Business Cut', 'Professional neat haircut with controlled length and clean styling.'],
+  ['business', 'Business Styles', 'Executive Cut', 'Polished office-ready haircut with side part and refined finish.'],
+  ['business', 'Business Styles', 'Gentleman Cut', 'Elegant classic haircut with smooth styling and clean sides.'],
+  ['business', 'Business Styles', 'Comb Over', 'Hair combed to one side with a smooth professional finish.'],
+  ['business', 'Business Styles', 'Comb Over Fade', 'Side-combed top paired with faded sides for modern professional look.'],
+  ['business', 'Business Styles', 'Side Swept', 'Top hair swept naturally to one side with soft volume and movement.'],
+  ['business', 'Business Styles', 'Short Side Part Fade', 'Short side-part hairstyle combined with a clean fade.'],
+  ['volume', 'Volume Styles', 'Pompadour', 'Voluminous front hair swept upward and backward with clean sides.'],
+  ['volume', 'Volume Styles', 'Modern Pompadour', 'Contemporary pompadour with textured volume and faded sides.'],
+  ['volume', 'Volume Styles', 'Classic Pompadour', 'Smooth vintage pompadour with controlled shine and height.'],
+  ['volume', 'Volume Styles', 'Short Pompadour', 'Smaller pompadour with moderate height and neat finish.'],
+  ['volume', 'Volume Styles', 'Quiff', 'Front hair styled upward and slightly back with natural volume.'],
+  ['volume', 'Volume Styles', 'Textured Quiff', 'Quiff with messy texture and movement on top.'],
+  ['volume', 'Volume Styles', 'Short Quiff', 'Shorter version of quiff with clean everyday styling.'],
+  ['volume', 'Volume Styles', 'Messy Quiff', 'Relaxed quiff with loose textured volume and natural movement.'],
+  ['volume', 'Volume Styles', 'Side Quiff', 'Quiff styled slightly to one side for a modern look.'],
+  ['volume', 'Volume Styles', 'Volume Top', 'Haircut focused on height and fullness on top with cleaner sides.'],
+  ['slick', 'Slick Back Styles', 'Slick Back', 'Hair combed backward smoothly with a polished masculine finish.'],
+  ['slick', 'Slick Back Styles', 'Slick Back Fade', 'Slicked-back top paired with faded sides.'],
+  ['slick', 'Slick Back Styles', 'Classic Slick Back', 'Traditional smooth slick-back hairstyle with controlled shine.'],
+  ['slick', 'Slick Back Styles', 'Textured Slick Back', 'Slicked-back shape with more natural texture and movement.'],
+  ['slick', 'Slick Back Styles', 'Wet Look Slick Back', 'Glossy wet-look slicked-back hairstyle with realistic shine.'],
+  ['slick', 'Slick Back Styles', 'Brush Back', 'Hair brushed backward naturally without heavy shine.'],
+  ['slick', 'Slick Back Styles', 'Short Brush Back', 'Short neat brush-back style for everyday wear.'],
+  ['slick', 'Slick Back Styles', 'Disconnected Slick Back', 'Slicked-back top with strong contrast from shorter sides.'],
+  ['medium', 'Medium Length Styles', 'Medium Layered Hair', 'Medium-length hair with natural layers and movement.'],
+  ['medium', 'Medium Length Styles', 'Medium Flow', 'Medium-length hair flowing naturally backward or to the sides.'],
+  ['medium', 'Medium Length Styles', 'Bro Flow', 'Relaxed medium hairstyle swept back with natural movement.'],
+  ['medium', 'Medium Length Styles', 'Curtains', 'Medium hair parted in the center with curtain-like front sections.'],
+  ['medium', 'Medium Length Styles', 'Middle Part', 'Hair parted down the center with balanced sides and natural shape.'],
+  ['medium', 'Medium Length Styles', 'Side Part Medium', 'Medium-length hair with a soft side part and natural movement.'],
+  ['medium', 'Medium Length Styles', 'Surfer Hair', 'Relaxed medium hair with beachy texture and casual flow.'],
+  ['medium', 'Medium Length Styles', 'Layered Side Sweep', 'Medium hair with layers swept to one side.'],
+  ['medium', 'Medium Length Styles', 'Medium Messy Hair', 'Medium-length hair with loose messy texture.'],
+  ['medium', 'Medium Length Styles', 'Textured Medium Cut', 'Medium haircut with layered texture and natural shape.'],
+  ['long', 'Long Hair Styles', 'Long Layered Hair', 'Long male hairstyle with layers and natural movement.'],
+  ['long', 'Long Hair Styles', 'Shoulder Length Hair', 'Hair reaching around the shoulders with natural flow.'],
+  ['long', 'Long Hair Styles', 'Long Flow', 'Long hair flowing naturally backward with soft movement.'],
+  ['long', 'Long Hair Styles', 'Man Bun', 'Long hair tied into a bun at the back or crown.'],
+  ['long', 'Long Hair Styles', 'Top Knot', 'Hair tied into a small knot on top with shorter or cleaner sides.'],
+  ['long', 'Long Hair Styles', 'Half Up Man Bun', 'Long hair partly tied back while some hair remains down.'],
+  ['long', 'Long Hair Styles', 'Long Middle Part', 'Long hair parted in the center with balanced flow.'],
+  ['long', 'Long Hair Styles', 'Long Side Part', 'Long hair with a side part and natural sweeping movement.'],
+  ['long', 'Long Hair Styles', 'Long Wavy Hair', 'Long hair with natural waves and relaxed texture.'],
+  ['long', 'Long Hair Styles', 'Long Slick Back', 'Long hair combed back smoothly with controlled shape.'],
+  ['curly', 'Curly And Wavy Hair', 'Short Curly Hair', 'Short haircut that keeps natural curls defined and controlled.'],
+  ['curly', 'Curly And Wavy Hair', 'Curly Top Fade', 'Curly hair on top with clean faded sides.'],
+  ['curly', 'Curly And Wavy Hair', 'Curly Fringe', 'Curly hair styled forward with curls falling near the forehead.'],
+  ['curly', 'Curly And Wavy Hair', 'Medium Curly Hair', 'Medium-length curly hair with natural volume and definition.'],
+  ['curly', 'Curly And Wavy Hair', 'Long Curly Hair', 'Long curly hairstyle with natural curl pattern and movement.'],
+  ['curly', 'Curly And Wavy Hair', 'Wavy Crop', 'Short crop with natural wave texture.'],
+  ['curly', 'Curly And Wavy Hair', 'Wavy Side Part', 'Wavy hair styled with a clean side part.'],
+  ['curly', 'Curly And Wavy Hair', 'Wavy Slick Back', 'Wavy hair brushed back while keeping natural wave texture.'],
+  ['curly', 'Curly And Wavy Hair', 'Textured Waves', 'Wavy textured hairstyle with relaxed movement.'],
+  ['curly', 'Curly And Wavy Hair', 'Messy Waves', 'Loose messy wavy hair with casual styling.'],
+  ['fringe', 'Fringe Styles', 'Textured Fringe', 'Forward fringe with choppy texture and natural movement.'],
+  ['fringe', 'Fringe Styles', 'Short Fringe', 'Short front fringe with clean simple styling.'],
+  ['fringe', 'Fringe Styles', 'Long Fringe', 'Longer fringe falling forward for a modern look.'],
+  ['fringe', 'Fringe Styles', 'Angular Fringe', 'Fringe cut at an angle across the forehead.'],
+  ['fringe', 'Fringe Styles', 'Side Swept Fringe', 'Fringe swept to one side with soft texture.'],
+  ['fringe', 'Fringe Styles', 'Messy Fringe', 'Loose messy fringe with casual textured finish.'],
+  ['fringe', 'Fringe Styles', 'French Crop Fringe', 'Short textured crop with defined forward fringe.'],
+  ['fringe', 'Fringe Styles', 'Curly Fringe Style', 'Curly fringe falling naturally toward the forehead.'],
+  ['modern', 'Modern Edgy Styles', 'Undercut', 'Short or shaved sides with longer hair on top for strong contrast.'],
+  ['modern', 'Modern Edgy Styles', 'Disconnected Undercut', 'Strong separation between long top and short sides.'],
+  ['modern', 'Modern Edgy Styles', 'Modern Undercut', 'Clean undercut with contemporary textured top.'],
+  ['modern', 'Modern Edgy Styles', 'Faux Hawk', 'Hair styled upward toward the center without full mohawk shaving.'],
+  ['modern', 'Modern Edgy Styles', 'Mohawk', 'Central strip of longer hair with very short or shaved sides.'],
+  ['modern', 'Modern Edgy Styles', 'Burst Fade Mohawk', 'Mohawk-inspired style with burst fade around the ears.'],
+  ['modern', 'Modern Edgy Styles', 'Spiky Hair', 'Short hair styled upward into defined spikes.'],
+  ['modern', 'Modern Edgy Styles', 'Textured Spikes', 'Modern spiky hairstyle with softer texture and movement.'],
+  ['modern', 'Modern Edgy Styles', 'Messy Top Fade', 'Messy textured top paired with clean faded sides.'],
+  ['modern', 'Modern Edgy Styles', 'Disconnected Crop', 'Textured crop with strong contrast from shorter sides.'],
+  ['afro', 'Afro Coily Hair', 'Short Afro', 'Short rounded afro with natural coily texture.'],
+  ['afro', 'Afro Coily Hair', 'Medium Afro', 'Medium-size afro with rounded shape and natural volume.'],
+  ['afro', 'Afro Coily Hair', 'Afro Fade', 'Afro top paired with faded sides.'],
+  ['afro', 'Afro Coily Hair', 'High Top Fade', 'Tall structured afro top with clean faded sides.'],
+  ['afro', 'Afro Coily Hair', 'Low Afro Fade', 'Subtle fade with natural afro texture on top.'],
+  ['afro', 'Afro Coily Hair', 'Temple Fade Afro', 'Afro hairstyle with clean temple fade edges.'],
+  ['afro', 'Afro Coily Hair', 'Twist Out', 'Defined twist-out texture with natural volume.'],
+  ['afro', 'Afro Coily Hair', 'Short Twists', 'Short twisted hair sections with neat texture.'],
+  ['afro', 'Afro Coily Hair', 'Medium Twists', 'Medium-length twists with controlled shape.'],
+  ['afro', 'Afro Coily Hair', 'Sponge Twists', 'Short coily sponge-twist texture.'],
+  ['braids', 'Braids And Locs', 'Cornrows', 'Hair braided close to the scalp in neat straight rows.'],
+  ['braids', 'Braids And Locs', 'Box Braids', 'Individual square-section braids with clean parting.'],
+  ['braids', 'Braids And Locs', 'Short Braids', 'Short braided hairstyle with neat sections.'],
+  ['braids', 'Braids And Locs', 'Man Bun Braids', 'Braids gathered into a bun at the back or crown.'],
+  ['braids', 'Braids And Locs', 'Two Strand Twists', 'Two-strand twist hairstyle with defined texture.'],
+  ['braids', 'Braids And Locs', 'Dreadlocks', 'Loc hairstyle with natural locked sections.'],
+  ['braids', 'Braids And Locs', 'Short Locs', 'Short dreadlocks with neat shape.'],
+  ['braids', 'Braids And Locs', 'Medium Locs', 'Medium-length locs with natural movement.'],
+  ['braids', 'Braids And Locs', 'Loc Bun', 'Locs tied into a bun.'],
+  ['braids', 'Braids And Locs', 'Loc Fade', 'Locs on top with faded sides.'],
+  ['mature', 'Mature Receding Hairline', 'Receding Hairline Buzz Cut', 'Short buzz cut that works naturally with a receding hairline.'],
+  ['mature', 'Mature Receding Hairline', 'Short Taper For Receding Hairline', 'Short taper haircut that keeps a clean style while respecting a receding hairline.'],
+  ['mature', 'Mature Receding Hairline', 'Textured Crop For Receding Hairline', 'Textured forward crop that softens the appearance of a receding hairline.'],
+  ['mature', 'Mature Receding Hairline', 'Crew Cut For Receding Hairline', 'Classic short crew cut suitable for mature or receding hairlines.'],
+  ['mature', 'Mature Receding Hairline', 'Clean Shaved Head', 'Completely shaved head with smooth clean finish.'],
+  ['mature', 'Mature Receding Hairline', 'Bald With Fade Beard Blend', 'Shaved or bald head blended cleanly with existing facial hair if present.'],
+] as const
+
+const MEN_HAIR_OPTIONS: MenHairOption[] = RAW_MEN_HAIR_OPTIONS.map(
+  ([categoryId, categoryLabel, name, description]) => ({
+    categoryId,
+    categoryLabel,
+    name,
+    description,
+    imagePath: `/men_catalog/${categoryId}/${toHairFilename(name)}`,
+  }),
+)
+
+function toHairFilename(name: string) {
+  return `${name.replace(/[^a-z0-9]+/gi, '_').replace(/^_+|_+$/g, '')}.png`
+}
+
+
+/* ============================================================
+   EXPANDED MEN BEARD CATALOG PROMPTS
+============================================================ */
+
+type MenBeardCategoryId =
+  | 'clean'
+  | 'stubble'
+  | 'short'
+  | 'medium'
+  | 'full'
+  | 'goatee'
+  | 'mustache'
+  | 'jawline'
+  | 'faded'
+  | 'line'
+  | 'rugged'
+
+type MenBeardOption = {
+  categoryId: MenBeardCategoryId
+  categoryLabel: string
+  name: string
+  description: string
+}
+
+const RAW_MEN_BEARD_OPTIONS = [
+  ['clean', 'Clean And Minimal', 'Clean Shaven', 'Completely clean-shaven face with no visible beard or mustache, smooth realistic skin, and natural shaving shadow only if appropriate.'],
+  ['clean', 'Clean And Minimal', 'Fresh Shave', 'Freshly shaved look with extremely clean face, very slight natural skin texture, and no visible facial hair.'],
+  ['clean', 'Clean And Minimal', 'Light Shaving Shadow', 'Very subtle natural shaving shadow around the jaw, chin, and upper lip, with no actual beard length.'],
+  ['clean', 'Clean And Minimal', 'Five O Clock Shadow', 'Very short stubble shadow across the beard area, like facial hair beginning to grow back after shaving.'],
+  ['stubble', 'Stubble', 'Light Stubble', 'Short light stubble evenly covering the jawline, chin, cheeks, and upper lip with natural density.'],
+  ['stubble', 'Stubble', 'Medium Stubble', 'Medium-length stubble with visible facial hair texture and clean masculine grooming.'],
+  ['stubble', 'Stubble', 'Heavy Stubble', 'Thicker heavy stubble with stronger dark facial hair coverage while still short and controlled.'],
+  ['stubble', 'Stubble', 'Designer Stubble', 'Polished stubble with clean cheek line, defined neckline, and intentional barber-groomed shape.'],
+  ['stubble', 'Stubble', 'Short Boxed Stubble', 'Short boxed stubble with neat cheek line, clean neckline, and defined jawline coverage.'],
+  ['stubble', 'Stubble', 'Rugged Stubble', 'Slightly rougher masculine stubble with natural uneven density and realistic growth pattern.'],
+  ['short', 'Short Beards', 'Short Boxed Beard', 'Short full beard trimmed close to the face with clean cheek line, sharp neckline, and neat mustache connection.'],
+  ['short', 'Short Beards', 'Corporate Beard', 'Professional short beard with controlled length, clean edges, neat mustache, and polished business grooming.'],
+  ['short', 'Short Beards', 'Classic Short Beard', 'Classic short beard with balanced cheek coverage, defined jawline, and natural facial hair texture.'],
+  ['short', 'Short Beards', 'Rounded Short Beard', 'Short beard shaped with softer rounded edges around the chin and jaw for a clean approachable look.'],
+  ['short', 'Short Beards', 'Square Short Beard', 'Short beard with more squared jawline shaping and structured lower edge.'],
+  ['short', 'Short Beards', 'Sharp Line Short Beard', 'Short beard with crisp barber-defined cheek line and neckline while keeping realistic hair texture.'],
+  ['short', 'Short Beards', 'Natural Short Beard', 'Short beard with natural cheek line and softer neckline, less sharply groomed but still tidy.'],
+  ['short', 'Short Beards', 'Faded Short Beard', 'Short beard blended gradually into the sideburns with a clean barber fade effect.'],
+  ['medium', 'Medium Beards', 'Medium Full Beard', 'Medium-length full beard with natural density across cheeks, jaw, chin, and mustache.'],
+  ['medium', 'Medium Beards', 'Medium Boxed Beard', 'Medium beard with controlled rectangular shape, clean cheek line, and strong jaw definition.'],
+  ['medium', 'Medium Beards', 'Rounded Medium Beard', 'Medium-length beard shaped rounder at the chin and lower jaw, with natural fullness.'],
+  ['medium', 'Medium Beards', 'Tapered Medium Beard', 'Medium beard tapered gradually from sideburns down to fuller chin and jaw coverage.'],
+  ['medium', 'Medium Beards', 'Structured Medium Beard', 'Medium beard with precise barber shaping, defined edges, and full but controlled volume.'],
+  ['medium', 'Medium Beards', 'Natural Medium Beard', 'Medium-length beard with natural growth pattern, softer edges, and realistic density variation.'],
+  ['medium', 'Medium Beards', 'Dense Medium Beard', 'Thicker medium-length beard with strong density and full cheek coverage.'],
+  ['medium', 'Medium Beards', 'Soft Medium Beard', 'Medium beard with softer texture, natural edges, and less aggressive shaping.'],
+  ['full', 'Full Beards', 'Full Beard', 'Full beard with complete coverage across cheeks, jawline, chin, and mustache, naturally groomed.'],
+  ['full', 'Full Beards', 'Classic Full Beard', 'Traditional full beard with balanced density, connected mustache, and clean lower shape.'],
+  ['full', 'Full Beards', 'Thick Full Beard', 'Thick full beard with strong density and rich facial hair texture.'],
+  ['full', 'Full Beards', 'Long Full Beard', 'Longer full beard extending below the chin with natural volume and groomed shape.'],
+  ['full', 'Full Beards', 'Rounded Full Beard', 'Full beard shaped with rounded lower edge and natural cheek fullness.'],
+  ['full', 'Full Beards', 'Square Full Beard', 'Full beard shaped with a squared lower edge for a strong masculine jaw effect.'],
+  ['full', 'Full Beards', 'Tapered Full Beard', 'Full beard tapered at the sideburns and cheeks, fuller around chin and jaw.'],
+  ['full', 'Full Beards', 'Natural Full Beard', 'Full beard with natural edges and realistic density, less sharply lined.'],
+  ['goatee', 'Goatee Styles', 'Goatee', 'Facial hair focused on the chin with clean cheeks and minimal or no side beard.'],
+  ['goatee', 'Goatee Styles', 'Classic Goatee', 'Classic chin goatee with neat shape and realistic facial hair texture.'],
+  ['goatee', 'Goatee Styles', 'Full Goatee', 'Goatee connected with mustache around the mouth, forming a complete rounded shape.'],
+  ['goatee', 'Goatee Styles', 'Circle Beard', 'Mustache and chin beard connected in a circular frame around the mouth with clean cheeks.'],
+  ['goatee', 'Goatee Styles', 'Anchor Beard', 'Beard shaped like an anchor with mustache, chin beard, and pointed lower shape.'],
+  ['goatee', 'Goatee Styles', 'Extended Goatee', 'Goatee extended slightly along the jawline while cheeks remain mostly clean.'],
+  ['goatee', 'Goatee Styles', 'Van Dyke', 'Separated pointed chin beard and mustache with clean cheeks, classic refined style.'],
+  ['goatee', 'Goatee Styles', 'Balbo Beard', 'Separated mustache and beard with defined chin and lower cheek shaping, clean professional edges.'],
+  ['mustache', 'Mustache Styles', 'Mustache Only', 'Mustache without beard, clean-shaven cheeks and chin, natural masculine grooming.'],
+  ['mustache', 'Mustache Styles', 'Classic Mustache', 'Traditional medium mustache following the upper lip with clean grooming.'],
+  ['mustache', 'Mustache Styles', 'Thin Mustache', 'Thin neatly trimmed mustache with clean upper lip definition.'],
+  ['mustache', 'Mustache Styles', 'Thick Mustache', 'Thicker mustache with strong density and natural texture.'],
+  ['mustache', 'Mustache Styles', 'Chevron Mustache', 'Full thick mustache covering the upper lip area with classic masculine shape.'],
+  ['mustache', 'Mustache Styles', 'Handlebar Mustache', 'Mustache with ends styled outward and slightly curled, clean and realistic.'],
+  ['mustache', 'Mustache Styles', 'Pencil Mustache', 'Very thin precise mustache line above the upper lip with clean edges.'],
+  ['mustache', 'Mustache Styles', 'Horseshoe Mustache', 'Mustache extending downward along both sides of the mouth toward the chin.'],
+  ['jawline', 'Jawline And Chin', 'Chin Strap', 'Thin beard line following the jawline from sideburn to chin with clean cheeks.'],
+  ['jawline', 'Jawline And Chin', 'Thick Chin Strap', 'Thicker jawline beard following the lower face with stronger facial hair density.'],
+  ['jawline', 'Jawline And Chin', 'Jawline Beard', 'Beard focused along the jawline with clean cheeks and defined lower face structure.'],
+  ['jawline', 'Jawline And Chin', 'Chin Beard', 'Facial hair concentrated on the chin with cheeks and jaw mostly clean.'],
+  ['jawline', 'Jawline And Chin', 'Soul Patch', 'Small patch of facial hair below the lower lip with otherwise clean or minimal beard.'],
+  ['jawline', 'Jawline And Chin', 'Chin Curtain', 'Beard running along the jawline and chin without a mustache, clean upper lip.'],
+  ['jawline', 'Jawline And Chin', 'Amish Beard', 'Full beard along jaw and chin without mustache, natural and dense.'],
+  ['jawline', 'Jawline And Chin', 'Neckline Beard', 'Beard emphasized along the lower jaw and neckline with clean upper cheeks.'],
+  ['faded', 'Faded And Tapered', 'Beard Fade', 'Beard gradually faded from the sideburns into fuller jaw and chin hair.'],
+  ['faded', 'Faded And Tapered', 'Low Beard Fade', 'Subtle beard fade starting low near the jaw and sideburn area.'],
+  ['faded', 'Faded And Tapered', 'High Beard Fade', 'More dramatic beard fade starting higher at the sideburns and cheek area.'],
+  ['faded', 'Faded And Tapered', 'Temple Beard Fade', 'Beard blended cleanly at the temple and sideburn area with barber fade transition.'],
+  ['faded', 'Faded And Tapered', 'Tapered Beard', 'Beard gradually transitions from shorter sides to fuller chin and jaw.'],
+  ['faded', 'Faded And Tapered', 'Sideburn Blend Beard', 'Beard naturally blended into the sideburns with smooth length transition.'],
+  ['faded', 'Faded And Tapered', 'Sharp Beard Fade', 'Crisp beard fade with clean barber lines and precise sideburn transition.'],
+  ['faded', 'Faded And Tapered', 'Soft Beard Fade', 'Soft natural beard fade with gentle transition from sideburns to jaw.'],
+  ['line', 'Line And Shape', 'Sharp Cheek Line', 'Beard with a very clean sharp cheek line and polished barber grooming.'],
+  ['line', 'Line And Shape', 'Natural Cheek Line', 'Beard with natural softer cheek line and realistic growth pattern.'],
+  ['line', 'Line And Shape', 'Low Cheek Line', 'Beard cheek line placed lower for a cleaner cheek area and defined jaw focus.'],
+  ['line', 'Line And Shape', 'High Cheek Line', 'Beard cheek line placed higher for fuller cheek coverage.'],
+  ['line', 'Line And Shape', 'Sharp Neckline', 'Beard with a clean sharp neckline under the jaw and chin.'],
+  ['line', 'Line And Shape', 'Natural Neckline', 'Beard with softer natural neckline and less razor-sharp grooming.'],
+  ['line', 'Line And Shape', 'Rounded Beard Shape', 'Beard shaped with soft rounded lower outline around the chin and jaw.'],
+  ['line', 'Line And Shape', 'Square Beard Shape', 'Beard shaped with squared lower edge for stronger jaw appearance.'],
+  ['rugged', 'Long And Rugged', 'Rugged Beard', 'Natural rugged beard with slightly uneven density and masculine texture.'],
+  ['rugged', 'Long And Rugged', 'Lumberjack Beard', 'Thick longer full beard with strong natural density and rugged grooming.'],
+  ['rugged', 'Long And Rugged', 'Garibaldi Beard', 'Wide full beard with rounded bottom and natural volume.'],
+  ['rugged', 'Long And Rugged', 'Bandholz Beard', 'Large full natural beard with significant length and volume, groomed but bold.'],
+  ['rugged', 'Long And Rugged', 'Ducktail Beard', 'Full beard shaped into a pointed tapered chin, resembling a ducktail silhouette.'],
+  ['rugged', 'Long And Rugged', 'Viking Beard', 'Long thick beard with rugged masculine shape and natural heavy texture.'],
+  ['rugged', 'Long And Rugged', 'Pointed Beard', 'Beard shaped downward into a pointed chin-focused silhouette.'],
+  ['rugged', 'Long And Rugged', 'Long Tapered Beard', 'Long beard tapered neatly from cheeks into a fuller longer chin.'],
+] as const
+
+const MEN_BEARD_OPTIONS: MenBeardOption[] = RAW_MEN_BEARD_OPTIONS.map(
+  ([categoryId, categoryLabel, name, description]) => ({
+    categoryId,
+    categoryLabel,
+    name,
+    description,
+  }),
+)
 
 /* ============================================================
    LEGACY CATALOG PROMPT LIBRARIES
