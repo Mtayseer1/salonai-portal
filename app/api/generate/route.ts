@@ -9,6 +9,7 @@ type GenerateRequestBody = {
   beardLength?: string
   hairStyle?: string
   beardStyle?: string
+  haircutId?: string
   hairStyleId?: string
   hairColorId?: string
   makeup?: boolean
@@ -556,6 +557,7 @@ function createGenerationPayload(body: GenerateRequestBody) {
     src_file_url: body.imageUrl,
     gender: 'female',
     mode: 'catalog',
+    haircutId: body.haircutId,
     hairStyleId: body.hairStyleId,
     hairColorId: body.hairColorId,
     lipstick: body.lipstick,

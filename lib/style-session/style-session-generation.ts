@@ -269,6 +269,7 @@ function createGenerationRequest(session: StyleFlowSessionState, imageUrl: strin
     hairLength: session.hairLength,
     makeup: session.makeup,
     dye: session.dye,
+    haircutId: session.haircutId,
     hairStyleId: session.hairStyleId,
     hairColorId: session.hairColorId,
     lipstick: selectedLips.color?.name || session.lipColor || session.lipstick,
