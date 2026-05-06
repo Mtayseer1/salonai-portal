@@ -90,6 +90,7 @@ export default function MenCatalogReviewPage() {
             label="Beard"
             value={beard?.name}
             category={beard?.categoryLabel}
+            imagePath={beard?.imagePath}
             onClick={() => router.push('/style/men/catalog/beard')}
           />
         </div>

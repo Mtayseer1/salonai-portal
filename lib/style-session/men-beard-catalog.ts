@@ -21,6 +21,7 @@ export type MenBeardOption = {
   categoryLabel: string
   name: string
   description: string
+  imagePath: string
 }
 
 export const MEN_BEARD_CATEGORIES: MenBeardCategory[] = [
@@ -128,6 +129,7 @@ export const MEN_BEARD_OPTIONS: MenBeardOption[] = RAW_MEN_BEARD_OPTIONS.map(
     categoryLabel,
     name,
     description,
+    imagePath: `/men_catalog/beard/${categoryId}/${toFilename(name)}`,
   }),
 )
 
@@ -146,4 +148,8 @@ export function findMenBeardOption(
   return MEN_BEARD_OPTIONS.find(
     (option) => option.categoryId === categoryId && option.name === styleName,
   )
+}
+
+function toFilename(name: string) {
+  return `${name.replace(/[^a-z0-9]+/gi, '_').replace(/^_+|_+$/g, '')}.png`
 }

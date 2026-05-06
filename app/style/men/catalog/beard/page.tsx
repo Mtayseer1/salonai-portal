@@ -1,7 +1,11 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { CatalogStickyActions, useStyleSession } from '@/components/style-session'
+import {
+  CatalogOptionCard,
+  CatalogStickyActions,
+  useStyleSession,
+} from '@/components/style-session'
 import {
   MEN_BEARD_CATEGORIES,
   findMenBeardOption,
@@ -47,31 +51,24 @@ export default function MenBeardCatalogPage() {
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                {options.map((option) => {
-                  const active =
-                    session.beardCategory === option.categoryId &&
-                    session.beardStyle === option.name
-
-                  return (
-                    <button
-                      key={`${option.categoryId}-${option.name}`}
-                      type="button"
-                      onClick={() =>
-                        session.setMenOptions({
-                          beardCategory: option.categoryId,
-                          beardStyle: option.name,
-                        })
-                      }
-                      className={`min-h-20 rounded-2xl border p-3 text-left text-sm font-bold transition ${
-                        active
-                          ? 'scale-[1.015] border-fuchsia-300/60 bg-white text-zinc-950 shadow-xl shadow-fuchsia-950/20'
-                          : 'border-white/10 bg-white/[0.04] text-zinc-300 hover:bg-white/[0.08] hover:text-white'
-                      }`}
-                    >
-                      {option.name}
-                    </button>
-                  )
-                })}
+                {options.map((option) => (
+                  <CatalogOptionCard
+                    key={`${option.categoryId}-${option.name}`}
+                    label={option.name}
+                    imagePath={option.imagePath}
+                    selected={
+                      session.beardCategory === option.categoryId &&
+                      session.beardStyle === option.name
+                    }
+                    onClick={() =>
+                      session.setMenOptions({
+                        beardCategory: option.categoryId,
+                        beardStyle: option.name,
+                      })
+                    }
+                    imageClassName="aspect-[1.15]"
+                  />
+                ))}
               </div>
             </section>
           )
