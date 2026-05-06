@@ -47,6 +47,7 @@ export default function WomenColorCatalogPage() {
         )
       }
       continueDisabled={!session.hairColorId}
+      continueLabel={isReturningToReview() ? 'Done' : 'Continue'}
     />
   )
 }

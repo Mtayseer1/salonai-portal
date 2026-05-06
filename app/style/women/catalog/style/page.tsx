@@ -44,6 +44,7 @@ export default function WomenStyleCatalogPage() {
         )
       }
       continueDisabled={!session.hairStyleId}
+      continueLabel={isReturningToReview() ? 'Done' : 'Continue'}
     />
   )
 }

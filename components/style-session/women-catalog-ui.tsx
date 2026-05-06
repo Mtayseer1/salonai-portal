@@ -20,6 +20,7 @@ export function WomenCatalogStep({
   onBack,
   onContinue,
   continueDisabled,
+  continueLabel,
 }: {
   eyebrow: string
   title: string
@@ -30,6 +31,7 @@ export function WomenCatalogStep({
   onBack: () => void
   onContinue: () => void
   continueDisabled?: boolean
+  continueLabel?: string
 }) {
   const [visibleCount, setVisibleCount] = useState(20)
   const visibleOptions = useMemo(
@@ -79,6 +81,7 @@ export function WomenCatalogStep({
         onBack={onBack}
         onContinue={onContinue}
         continueDisabled={continueDisabled}
+        continueLabel={continueLabel}
       />
     </div>
   )
