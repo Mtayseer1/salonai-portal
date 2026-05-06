@@ -252,7 +252,7 @@ export async function POST(request: Request) {
     let response: Response
 
     try {
-      response = await fetch(`${SUPABASE_URL}/functions/v1/gemini-auto-style`, {
+      response = await fetch(`${SUPABASE_URL}/functions/v1/${getGenerationFunctionName(body)}`, {
         method: 'POST',
         cache: 'no-store',
         headers: {
@@ -584,4 +584,8 @@ function createGenerationPayload(body: GenerateRequestBody) {
     mascara: body.mascara,
     extensions: body.extensions,
   }
+}
+
+function getGenerationFunctionName(body: GenerateRequestBody) {
+  return body.gender === 'women' ? 'gemini-women-style' : 'gemini-auto-style'
 }
