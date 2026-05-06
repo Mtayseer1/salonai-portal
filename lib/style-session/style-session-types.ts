@@ -143,13 +143,31 @@ export type StyleSessionCustomerInfo = Partial<
 export type StyleSessionGenerationResult = {
   image_url?: string
   image_base64?: string
+  imageUrl?: string
+  imageBase64?: string
+  generated_image_url?: string
+  generatedImageUrl?: string
+  generated_image_base64?: string
+  generatedImageBase64?: string
   result?: {
     image_url?: string
     image_base64?: string
+    imageUrl?: string
+    imageBase64?: string
+    generated_image_url?: string
+    generatedImageUrl?: string
+    generated_image_base64?: string
+    generatedImageBase64?: string
   }
   data?: {
     image_url?: string
     image_base64?: string
+    imageUrl?: string
+    imageBase64?: string
+    generated_image_url?: string
+    generatedImageUrl?: string
+    generated_image_base64?: string
+    generatedImageBase64?: string
   }
   [key: string]: unknown
 }

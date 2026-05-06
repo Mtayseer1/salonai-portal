@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { Alert, Button, Card, EmptyState } from '@/app/components/ui'
 import { useStyleSession } from '@/components/style-session'
-import { logStyleSessionSuccess } from '@/lib/style-session/style-session-log'
 import { persistMenSessionImages } from '@/lib/style-session/style-session-upload'
 import { supabase } from '@/src/lib/supabase'
 
@@ -15,32 +14,34 @@ export default function StyleResultPage() {
   const [viewerOpen, setViewerOpen] = useState(false)
   const [message, setMessage] = useState('')
   const [saving, setSaving] = useState(false)
-  const finalizingResultIdsRef = useRef(new Set<string>())
+  const persistedMenResultIdsRef = useRef(new Set<string>())
   const resultImageSrc = getResultImageSrc(
     session.generatedImageUrl,
     session.generatedImageBase64,
   )
 
   useEffect(() => {
-    if (!resultImageSrc || !session.generationResultId) {
+    if (
+      !resultImageSrc ||
+      !session.generationResultId ||
+      session.gender !== 'men' ||
+      !session.imageFile
+    ) {
       return
     }
 
     const resultId = session.generationResultId
+    const originalImageFile = session.imageFile
 
-    if (session.creditDeductedForResultId === resultId) {
+    if (persistedMenResultIdsRef.current.has(resultId)) {
       return
     }
 
-    if (finalizingResultIdsRef.current.has(resultId)) {
-      return
-    }
-
-    finalizingResultIdsRef.current.add(resultId)
+    persistedMenResultIdsRef.current.add(resultId)
 
     let active = true
 
-    const finalizeSuccessfulResult = async () => {
+    const persistMenImages = async () => {
       const {
         data: { user },
       } = await supabase.auth.getUser()
@@ -49,55 +50,20 @@ export default function StyleResultPage() {
         return
       }
 
-      const { data: barber } = await supabase
-        .from('barbers')
-        .select('remaining_credits')
-        .eq('id', user.id)
-        .maybeSingle()
-
-      if (!active) {
-        return
-      }
-
-      const nextCredits = (barber?.remaining_credits || 0) - 1
-      const { error } = await supabase
-        .from('barbers')
-        .update({ remaining_credits: nextCredits })
-        .eq('id', user.id)
-
-      if (error || !active) {
-        finalizingResultIdsRef.current.delete(resultId)
-        return
-      }
-
-      void logStyleSessionSuccess({
-        userId: user.id,
-        gender: session.gender || 'unknown',
-        styleType: session.mode || 'unknown',
-        customerName: session.customerName,
-        customerPhone: session.customerPhone,
-      })
-
-      if (session.gender === 'men' && session.imageFile && resultImageSrc) {
-        try {
-          const generatedImageBlob = await imageSourceToBlob(resultImageSrc)
-          await persistMenSessionImages({
-            userId: user.id,
-            styleType: session.mode || 'unknown',
-            originalImageFile: session.imageFile,
-            generatedImageBlob,
-          })
-        } catch {
-          // Men image persistence is best-effort and should not block result UX.
-        }
-      }
-
-      if (active) {
-        session.markGenerationCreditDeducted(resultId)
+      try {
+        const generatedImageBlob = await imageSourceToBlob(resultImageSrc)
+        await persistMenSessionImages({
+          userId: user.id,
+          styleType: session.mode || 'unknown',
+          originalImageFile,
+          generatedImageBlob,
+        })
+      } catch {
+        // Men image persistence is best-effort and should not block result UX.
       }
     }
 
-    finalizeSuccessfulResult()
+    persistMenImages()
 
     return () => {
       active = false

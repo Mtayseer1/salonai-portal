@@ -355,19 +355,23 @@ function ReviewRow({
       className="flex w-full items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-4 text-left transition hover:bg-white/[0.08]"
     >
       <span className="text-sm text-zinc-500">{label}</span>
-      <span className="flex items-center gap-3 text-right text-sm font-semibold text-white">
+      <span className="flex min-h-14 items-center gap-3 text-right text-sm font-semibold text-white">
         {imagePath && (
-          <span className="relative block h-12 w-12 overflow-hidden rounded-xl bg-black/30">
+          <span className="relative block h-14 w-14 overflow-hidden rounded-xl bg-black/30 p-1">
             <Image
               src={imagePath}
               alt={value || label}
               fill
               unoptimized
-              className="object-cover"
+              className="object-contain p-1"
             />
           </span>
         )}
-        <span>{value || 'Not selected'}</span>
+        {!imagePath && (
+          <span className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-xs uppercase tracking-[0.18em] text-zinc-400">
+            {value === 'None' ? 'None' : 'Not selected'}
+          </span>
+        )}
       </span>
     </button>
   )

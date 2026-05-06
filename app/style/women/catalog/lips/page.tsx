@@ -1,10 +1,14 @@
 'use client'
 
-import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
 import { Button, Card } from '@/app/components/ui'
-import { isReturningToReview, useStyleSession } from '@/components/style-session'
+import {
+  CatalogOptionCard,
+  CatalogStickyActions,
+  isReturningToReview,
+  useStyleSession,
+} from '@/components/style-session'
 import {
   LIP_COLORS,
   LIP_FINISHES,
@@ -89,26 +93,11 @@ export default function WomenLipsCatalogPage() {
         </div>
       </Card>
 
-      <div className="sticky bottom-0 -mx-4 border-t border-white/10 bg-[#08080b]/90 px-4 py-4 backdrop-blur-xl">
-        <div className="mx-auto grid max-w-[430px] grid-cols-2 gap-3">
-          <Button
-            type="button"
-            variant="secondary"
-            className="h-14 w-full"
-            onClick={() => router.push('/style/women/catalog/color')}
-          >
-            Back
-          </Button>
-          <Button
-            type="button"
-            className="h-14 w-full"
-            onClick={continueToNext}
-            disabled={!canContinue}
-          >
-            Continue
-          </Button>
-        </div>
-      </div>
+      <CatalogStickyActions
+        onBack={() => router.push('/style/women/catalog/color')}
+        onContinue={continueToNext}
+        continueDisabled={!canContinue}
+      />
     </div>
   )
 }
@@ -140,41 +129,16 @@ function LipSection({
           const active = selected === option.id
 
           return (
-            <button
+            <CatalogOptionCard
               key={option.id}
-              type="button"
+              label={option.name}
+              description={option.description}
+              imagePath={option.imagePath}
+              selected={active}
               onClick={() => onSelect(option.id)}
-              className={`overflow-hidden rounded-2xl border text-left transition ${
-                layout === 'scroll' ? 'w-32 shrink-0' : ''
-              } ${
-                active
-                  ? 'border-fuchsia-300/50 bg-white text-zinc-950 shadow-xl shadow-fuchsia-950/20'
-                  : 'border-white/10 bg-white/[0.04] text-zinc-300 hover:bg-white/[0.08] hover:text-white'
-              }`}
-            >
-              {option.imagePath ? (
-                <span className="relative block aspect-square bg-black/25">
-                  <Image
-                    src={option.imagePath}
-                    alt={option.name}
-                    fill
-                    unoptimized
-                    loading="lazy"
-                    className="object-cover"
-                  />
-                </span>
-              ) : (
-                <span className="grid aspect-square place-items-center bg-black/25 px-3 text-center text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
-                  None
-                </span>
-              )}
-              <span className="block p-3">
-                <span className="block text-sm font-bold">{option.name}</span>
-                <span className="mt-1 block text-xs opacity-70">
-                  {option.description}
-                </span>
-              </span>
-            </button>
+              imageClassName="aspect-square"
+              className={layout === 'scroll' ? 'w-32 shrink-0' : ''}
+            />
           )
         })}
       </div>

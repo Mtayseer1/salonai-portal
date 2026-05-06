@@ -1,10 +1,9 @@
 'use client'
 
-import Image from 'next/image'
 import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button, Card } from '@/app/components/ui'
-import { useStyleSession } from '@/components/style-session'
+import { CatalogOptionCard, CatalogStickyActions, useStyleSession } from '@/components/style-session'
 import {
   HIGHLIGHT_FINISHES,
   HIGHLIGHT_INTENSITIES,
@@ -111,26 +110,11 @@ export default function WomenHighlightCatalogPage() {
         </div>
       </Card>
 
-      <div className="sticky bottom-0 -mx-4 border-t border-white/10 bg-[#08080b]/90 px-4 py-4 backdrop-blur-xl">
-        <div className="mx-auto grid max-w-[430px] grid-cols-2 gap-3">
-          <Button
-            type="button"
-            variant="secondary"
-            className="h-14 w-full"
-            onClick={() => router.push('/style/women/catalog/contour')}
-          >
-            Back
-          </Button>
-          <Button
-            type="button"
-            className="h-14 w-full"
-            onClick={() => router.push('/style/women/catalog/review')}
-            disabled={!canContinue}
-          >
-            Continue
-          </Button>
-        </div>
-      </div>
+      <CatalogStickyActions
+        onBack={() => router.push('/style/women/catalog/contour')}
+        onContinue={() => router.push('/style/women/catalog/review')}
+        continueDisabled={!canContinue}
+      />
     </div>
   )
 }
@@ -173,38 +157,14 @@ function HighlightCard({
   onSelect: () => void
 }) {
   return (
-    <button
-      type="button"
+    <CatalogOptionCard
+      label={option.name}
+      description={option.description}
+      imagePath={option.imagePath}
+      selected={selected}
       onClick={onSelect}
-      className={`overflow-hidden rounded-2xl border text-left transition ${
-        selected
-          ? 'scale-[1.015] border-fuchsia-300/60 bg-white text-zinc-950 shadow-xl shadow-fuchsia-950/20'
-          : 'border-white/10 bg-white/[0.04] text-zinc-300 hover:bg-white/[0.08] hover:text-white'
-      }`}
-    >
-      {option.imagePath ? (
-        <span className="relative block aspect-[4/5] bg-black/25">
-          <Image
-            src={option.imagePath}
-            alt={option.name}
-            fill
-            unoptimized
-            loading="lazy"
-            className="object-cover"
-          />
-        </span>
-      ) : (
-        <span className="grid aspect-[4/5] place-items-center bg-black/25 px-3 text-center text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
-          None
-        </span>
-      )}
-      <span className="block p-3">
-        <span className="block text-sm font-bold">{option.name}</span>
-        <span className="mt-1 block text-xs opacity-70">
-          {option.description}
-        </span>
-      </span>
-    </button>
+      imageClassName="aspect-[4/5]"
+    />
   )
 }
 

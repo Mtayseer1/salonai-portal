@@ -1,4 +1,5 @@
 import { uploadStyleImageAndCreateSignedUrl } from './style-session-upload'
+import { supabase } from '@/src/lib/supabase'
 import { getSelectedLipPrompt } from './lips-catalog'
 import {
   EYE_LASHES,
@@ -53,10 +54,18 @@ export async function generateStyleFromSession(
     session.imageFile,
     session.customerPhone,
   )
+  const {
+    data: { session: authSession },
+  } = await supabase.auth.getSession()
+
+  if (!authSession?.access_token) {
+    throw new Error('Sign in before generating.')
+  }
 
   const response = await fetch('/api/generate', {
     method: 'POST',
     headers: {
+      Authorization: `Bearer ${authSession.access_token}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(createGenerationRequest(session, imageUrl)),
@@ -128,6 +137,8 @@ function createGenerationRequest(session: StyleFlowSessionState, imageUrl: strin
       beardLength: session.beardLength,
       hairStyle: session.hairStyle,
       beardStyle: session.beardStyle,
+      customerName: session.customerName,
+      customerPhone: session.customerPhone,
     }
   }
 
@@ -210,6 +221,8 @@ function createGenerationRequest(session: StyleFlowSessionState, imageUrl: strin
     highlightFinish,
     mascara: eyeLashes || session.mascara,
     extensions: Boolean(session.extensions),
+    customerName: session.customerName,
+    customerPhone: session.customerPhone,
   }
 }
 

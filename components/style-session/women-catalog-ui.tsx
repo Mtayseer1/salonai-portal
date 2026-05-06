@@ -1,8 +1,8 @@
 'use client'
 
-import Image from 'next/image'
 import { useEffect, useMemo, useState } from 'react'
 import { Button, Card } from '@/app/components/ui'
+import { CatalogOptionCard, CatalogStickyActions } from './catalog-option-card'
 import {
   emptyWomenCatalog,
   loadWomenCatalogManifest,
@@ -38,7 +38,7 @@ export function WomenCatalogStep({
   )
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-24">
       <div>
         <p className="text-sm font-semibold uppercase tracking-[0.24em] text-zinc-500">
           {eyebrow}
@@ -52,34 +52,15 @@ export function WomenCatalogStep({
       <Card>
         <div className="grid grid-cols-2 gap-3">
           {visibleOptions.map((option) => (
-            <button
+            <CatalogOptionCard
               key={option.id}
-              type="button"
+              label={option.label}
+              description={option.description}
+              imagePath={option.imagePath}
+              selected={selected === option.id}
               onClick={() => onSelect(option.id)}
-              className={`overflow-hidden rounded-2xl border text-left transition ${
-                selected === option.id
-                  ? 'border-fuchsia-300/40 bg-white text-zinc-950'
-                  : 'border-white/10 bg-white/[0.04] text-zinc-300 hover:bg-white/[0.08] hover:text-white'
-              }`}
-            >
-              {option.imagePath && (
-                <span className="relative block aspect-square bg-black/25">
-                  <Image
-                    src={option.imagePath}
-                    alt={option.label}
-                    fill
-                    unoptimized
-                    className="object-cover"
-                  />
-                </span>
-              )}
-              <span className="block p-3 font-bold">{option.label}</span>
-              {option.description && (
-                <span className="block px-3 pb-3 text-sm opacity-70">
-                  {option.description}
-                </span>
-              )}
-            </button>
+              imageClassName="aspect-square"
+            />
           ))}
         </div>
         {options.length > visibleCount && (
@@ -94,14 +75,11 @@ export function WomenCatalogStep({
         )}
       </Card>
 
-      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
-        <Button type="button" variant="secondary" onClick={onBack}>
-          Back
-        </Button>
-        <Button type="button" onClick={onContinue} disabled={continueDisabled}>
-          Continue
-        </Button>
-      </div>
+      <CatalogStickyActions
+        onBack={onBack}
+        onContinue={onContinue}
+        continueDisabled={continueDisabled}
+      />
     </div>
   )
 }

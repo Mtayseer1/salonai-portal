@@ -108,9 +108,31 @@ export function StyleSessionProvider({ children }: { children: React.ReactNode }
 
   const setGenerationResult = useCallback((result: StyleSessionGenerationResult) => {
     const generatedImageUrl =
-      result.image_url || result.result?.image_url || result.data?.image_url
+      result.image_url ||
+      result.imageUrl ||
+      result.generated_image_url ||
+      result.generatedImageUrl ||
+      result.result?.image_url ||
+      result.result?.imageUrl ||
+      result.result?.generated_image_url ||
+      result.result?.generatedImageUrl ||
+      result.data?.image_url ||
+      result.data?.imageUrl ||
+      result.data?.generated_image_url ||
+      result.data?.generatedImageUrl
     const generatedImageBase64 =
-      result.image_base64 || result.result?.image_base64 || result.data?.image_base64
+      result.image_base64 ||
+      result.imageBase64 ||
+      result.generated_image_base64 ||
+      result.generatedImageBase64 ||
+      result.result?.image_base64 ||
+      result.result?.imageBase64 ||
+      result.result?.generated_image_base64 ||
+      result.result?.generatedImageBase64 ||
+      result.data?.image_base64 ||
+      result.data?.imageBase64 ||
+      result.data?.generated_image_base64 ||
+      result.data?.generatedImageBase64
 
     setState((current) => ({
       ...current,
