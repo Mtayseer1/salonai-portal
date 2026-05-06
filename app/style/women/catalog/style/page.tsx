@@ -3,7 +3,6 @@
 import { useRouter } from 'next/navigation'
 import {
   WomenCatalogStep,
-  isReturningToReview,
   useWomenCatalog,
   useStyleSession,
 } from '@/components/style-session'
@@ -35,16 +34,10 @@ export default function WomenStyleCatalogPage() {
           hairColorId: undefined,
         })
       }}
-      onBack={() => router.push('/style/women/options')}
-      onContinue={() =>
-        router.push(
-          isReturningToReview()
-            ? '/style/women/catalog/review'
-            : '/style/women/catalog/color',
-        )
-      }
+      onBack={() => router.push('/style/women/catalog/review')}
+      onContinue={() => router.push('/style/women/catalog/review')}
       continueDisabled={!session.hairStyleId}
-      continueLabel={isReturningToReview() ? 'Done' : 'Continue'}
+      continueLabel="Done"
     />
   )
 }
