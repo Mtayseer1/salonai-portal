@@ -4,7 +4,6 @@ import Image from 'next/image'
 
 export function CatalogOptionCard({
   label,
-  description,
   imagePath,
   selected,
   onClick,
@@ -53,9 +52,6 @@ export function CatalogOptionCard({
       {showText && (
         <span className="block p-3">
           <span className="block text-sm font-bold">{label}</span>
-          {description && (
-            <span className="mt-1 block text-xs opacity-70">{description}</span>
-          )}
         </span>
       )}
     </button>
