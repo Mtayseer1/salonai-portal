@@ -188,7 +188,13 @@ export default function StyleResultPage() {
           type="button"
           variant="secondary"
           className="h-14 w-full text-base"
-          onClick={() => router.push('/style/loading')}
+          onClick={() =>
+            router.push(
+              session.gender === 'women'
+                ? '/style/women/catalog/review'
+                : '/style/men/options',
+            )
+          }
           disabled={!session.imageFile}
         >
           Regenerate

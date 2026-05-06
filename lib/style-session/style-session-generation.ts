@@ -176,8 +176,6 @@ function validateGenerationSession(session: StyleFlowSessionState) {
 
   if (session.gender === 'women' && session.mode === 'catalog') {
     if (
-      !session.hairStyleId ||
-      !session.hairColorId ||
       !session.lipFinish ||
       !session.lipStyle ||
       !session.lipColor ||

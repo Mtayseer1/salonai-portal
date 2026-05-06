@@ -30,7 +30,7 @@ export default function StylePhotoPage() {
     }
 
     if (gender === 'women') {
-      router.push('/style/women/options')
+      router.push('/style/women/catalog/review')
       return
     }
 

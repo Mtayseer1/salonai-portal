@@ -2,162 +2,109 @@
 
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Alert, Button, Card } from '@/app/components/ui'
-import { useStyleSession, useWomenCatalog } from '@/components/style-session'
-import { generateStyleFromSession } from '@/lib/style-session/style-session-generation'
+import { CatalogOptionCard, useStyleSession, useWomenCatalog } from '@/components/style-session'
 import {
   LIP_COLORS,
   LIP_FINISHES,
   LIP_STYLES,
-  findLipOption,
 } from '@/lib/style-session/lips-catalog'
 import {
   EYE_LASHES,
   EYE_LINERS,
   EYE_SHADOWS,
-  findEyeOption,
 } from '@/lib/style-session/eyes-options'
-import { findBrowOption } from '@/lib/style-session/brow-options'
-import { findSkinOption } from '@/lib/style-session/skin-options'
+import { BROW_OPTIONS } from '@/lib/style-session/brow-options'
+import { SKIN_OPTIONS } from '@/lib/style-session/skin-options'
 import {
   BLUSH_COLORS,
   BLUSH_INTENSITIES,
   BLUSH_STYLES,
-  findBlushOption,
 } from '@/lib/style-session/blush-options'
 import {
   BRONZER_TONES,
   CONTOUR_INTENSITIES,
   CONTOUR_TYPES,
-  findContourOption,
 } from '@/lib/style-session/contour-options'
 import {
   HIGHLIGHT_FINISHES,
   HIGHLIGHT_INTENSITIES,
   HIGHLIGHT_PLACEMENTS,
   HIGHLIGHT_TONES,
-  findHighlightOption,
 } from '@/lib/style-session/highlight-options'
-import {
-  findWomenCatalogColor,
-  findWomenCatalogStyle,
-} from '@/lib/style-session/women-catalog'
+import { getWomenCatalogColors } from '@/lib/style-session/women-catalog'
+
+type ReviewOption = {
+  id: string
+  label: string
+  description?: string
+  imagePath?: string
+}
+
+const INITIAL_LIMIT = 12
 
 export default function WomenCatalogReviewPage() {
   const router = useRouter()
   const session = useStyleSession()
   const catalog = useWomenCatalog()
   const [message, setMessage] = useState('')
-  const [generating, setGenerating] = useState(false)
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({})
 
-  const hairstyle = findWomenCatalogStyle(
-    catalog,
-    session.hairStyleId,
-    session.haircutId,
-  )
-  const color = findWomenCatalogColor(
-    catalog,
-    session.hairColorId,
-    session.hairStyleId,
-    session.haircutId,
-  )
-  const lipFinish = findLipOption(LIP_FINISHES, session.lipFinish)
-  const lipStyle = findLipOption(LIP_STYLES, session.lipStyle)
-  const lipColor = findLipOption(LIP_COLORS, session.lipColor)
-  const eyeShadow = findEyeOption(EYE_SHADOWS, session.eyeShadow)
-  const eyeLiner = findEyeOption(EYE_LINERS, session.eyeLiner)
-  const eyeLashes = findEyeOption(EYE_LASHES, session.eyeLashes)
-  const brows = findBrowOption(session.browStyle)
-  const skin = findSkinOption(session.skinType)
-  const blushColor = findBlushOption(BLUSH_COLORS, session.blushColor)
-  const blushStyle = findBlushOption(BLUSH_STYLES, session.blushStyle)
-  const blushIntensity = findBlushOption(
-    BLUSH_INTENSITIES,
-    session.blushIntensity,
-  )
-  const contourType = findContourOption(CONTOUR_TYPES, session.contourType)
-  const bronzerTone = findContourOption(BRONZER_TONES, session.bronzerTone)
-  const contourIntensity = findContourOption(
-    CONTOUR_INTENSITIES,
-    session.contourIntensity,
-  )
-  const highlightPlacement = findHighlightOption(
-    HIGHLIGHT_PLACEMENTS,
-    session.highlightPlacement,
-  )
-  const highlightTone = findHighlightOption(
-    HIGHLIGHT_TONES,
-    session.highlightTone,
-  )
-  const highlightIntensity = findHighlightOption(
-    HIGHLIGHT_INTENSITIES,
-    session.highlightIntensity,
-  )
-  const highlightFinish = findHighlightOption(
-    HIGHLIGHT_FINISHES,
-    session.highlightFinish,
+  const colors = useMemo(
+    () =>
+      getWomenCatalogColors(catalog, session.hairStyleId, session.haircutId).map(
+        (option) => ({
+          id: option.id,
+          label: option.label,
+          imagePath: option.imagePath,
+        }),
+      ),
+    [catalog, session.hairStyleId, session.haircutId],
   )
 
-  const generateCatalogStyle = async () => {
-    if (
-      !session.hairStyleId ||
-      !session.hairColorId ||
-      !session.lipFinish ||
-      !session.lipStyle ||
-      !session.lipColor ||
-      !session.eyeShadow ||
-      !session.eyeLiner ||
-      !session.eyeLashes ||
-      !session.browStyle ||
-      !session.skinType ||
-      !session.blushColor ||
-      !session.blushStyle ||
-      !session.blushIntensity ||
-      !session.contourType ||
-      !session.bronzerTone ||
-      !session.contourIntensity ||
-      !session.highlightPlacement ||
-      !session.highlightTone ||
-      !session.highlightIntensity ||
-      !session.highlightFinish
-    ) {
-      setMessage('Complete all catalog selections before generating.')
-      return
-    }
-
+  const generateCatalogStyle = () => {
     if (!session.imageFile) {
       setMessage('Upload the client image again before generating.')
       return
     }
 
-    try {
-      setMessage('')
-      setGenerating(true)
-      session.setMode('catalog')
-      session.setGenerationError(undefined)
+    setMessage('')
+    session.setGenerationError(undefined)
+    session.setMode('catalog')
+    router.push('/style/loading')
+  }
 
-      const result = await generateStyleFromSession({
-        ...session,
-        gender: 'women',
-        mode: 'catalog',
-      })
-      session.setGenerationResult(result)
-      router.push('/style/result')
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Generation failed.'
-      session.setGenerationError(errorMessage)
-      setMessage(errorMessage)
-      setGenerating(false)
-    }
+  const toggleExpanded = (section: string) => {
+    setExpandedSections((current) => ({
+      ...current,
+      [section]: !current[section],
+    }))
   }
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
-      <Card className="h-fit">
-        <div className="space-y-5">
-          <h3 className="text-xl font-semibold text-white">Image</h3>
+    <div className="space-y-6 pb-28">
+      <Card className="p-4">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-zinc-500">
+                Review
+              </p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white">
+                Choose the look
+              </h2>
+            </div>
+            <Button
+              type="button"
+              variant="secondary"
+              className="px-4 py-2"
+              onClick={() => router.push('/style/photo')}
+            >
+              Photo
+            </Button>
+          </div>
+
           {session.imagePreviewUrl ? (
             <div className="relative h-80 overflow-hidden rounded-3xl border border-white/10 bg-black/30">
               <Image
@@ -165,6 +112,7 @@ export default function WomenCatalogReviewPage() {
                 alt="Selected client preview"
                 fill
                 unoptimized
+                priority
                 className="object-contain"
               />
             </div>
@@ -174,166 +122,251 @@ export default function WomenCatalogReviewPage() {
               onClick={() => router.push('/style/photo')}
               className="w-full rounded-3xl border border-dashed border-white/10 bg-white/[0.035] p-8 text-center text-sm text-zinc-500"
             >
-              No image selected
+              Upload a photo to start
             </button>
           )}
         </div>
       </Card>
 
-      <div className="space-y-6">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-zinc-500">
-            Women catalog
-          </p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">
-            Review selections
-          </h2>
-          <p className="mt-2 max-w-2xl text-sm text-zinc-400">
-            Select any section to edit it, then return here to generate.
-          </p>
-        </div>
+      {message && <Alert>{message}</Alert>}
 
-        {message && <Alert>{message}</Alert>}
+      <SelectionSection
+        id="hair-style"
+        title="Hair Style"
+        subtitle="Optional. Pick a hairstyle if the client wants hair changed."
+        options={catalog.styles.map((option) => ({
+          id: option.id,
+          label: option.label,
+          imagePath: option.imagePath,
+        }))}
+        selectedId={`${session.haircutId || ''}__${session.hairStyleId || ''}`}
+        expanded={Boolean(expandedSections['hair-style'])}
+        onToggleExpanded={() => toggleExpanded('hair-style')}
+        onSelect={(id) => {
+          const selected = catalog.styles.find((option) => option.id === id)
+          session.setWomenOptions({
+            haircutId: selected?.haircutId,
+            hairStyleId: selected?.hairStyleId,
+            hairColorId: undefined,
+          })
+        }}
+      />
 
-        <Card>
-          <div className="space-y-3">
-            <ReviewRow
-              label="Hairstyle"
-              value={hairstyle?.label}
-              imagePath={hairstyle?.imagePath}
-              onClick={() => router.push('/style/women/catalog/style?returnTo=review')}
-            />
-            <ReviewRow
-              label="Color"
-              value={color?.label}
-              imagePath={color?.imagePath}
-              onClick={() => router.push('/style/women/catalog/color?returnTo=review')}
-            />
-            <ReviewRow
-              label="Lip finish"
-              value={lipFinish?.name}
-              imagePath={lipFinish?.imagePath}
-              onClick={() => router.push('/style/women/catalog/lips?returnTo=review')}
-            />
-            <ReviewRow
-              label="Lip style"
-              value={lipStyle?.name}
-              imagePath={lipStyle?.imagePath}
-              onClick={() => router.push('/style/women/catalog/lips?returnTo=review')}
-            />
-            <ReviewRow
-              label="Lip color"
-              value={lipColor?.name}
-              imagePath={lipColor?.imagePath}
-              onClick={() => router.push('/style/women/catalog/lips?returnTo=review')}
-            />
-            <ReviewRow
-              label="Eye shadow"
-              value={eyeShadow?.name}
-              imagePath={eyeShadow?.imagePath}
-              onClick={() => router.push('/style/women/catalog/eyes?returnTo=review')}
-            />
-            <ReviewRow
-              label="Liner"
-              value={eyeLiner?.name}
-              imagePath={eyeLiner?.imagePath}
-              onClick={() => router.push('/style/women/catalog/eyes?returnTo=review')}
-            />
-            <ReviewRow
-              label="Lashes"
-              value={eyeLashes?.name}
-              imagePath={eyeLashes?.imagePath}
-              onClick={() => router.push('/style/women/catalog/eyes?returnTo=review')}
-            />
-            <ReviewRow
-              label="Brows"
-              value={brows?.name}
-              imagePath={brows?.imagePath}
-              onClick={() => router.push('/style/women/catalog/brows?returnTo=review')}
-            />
-            <ReviewRow
-              label="Skin"
-              value={skin?.name}
-              imagePath={skin?.imagePath}
-              onClick={() => router.push('/style/women/catalog/skin?returnTo=review')}
-            />
-            <ReviewRow
-              label="Blush color"
-              value={blushColor?.name}
-              imagePath={blushColor?.imagePath}
-              onClick={() => router.push('/style/women/catalog/blush?returnTo=review')}
-            />
-            <ReviewRow
-              label="Blush style"
-              value={blushStyle?.name}
-              imagePath={blushStyle?.imagePath}
-              onClick={() => router.push('/style/women/catalog/blush?returnTo=review')}
-            />
-            <ReviewRow
-              label="Blush intensity"
-              value={blushIntensity?.name}
-              imagePath={blushIntensity?.imagePath}
-              onClick={() => router.push('/style/women/catalog/blush?returnTo=review')}
-            />
-            <ReviewRow
-              label="Contour type"
-              value={contourType?.name}
-              imagePath={contourType?.imagePath}
-              onClick={() => router.push('/style/women/catalog/contour?returnTo=review')}
-            />
-            <ReviewRow
-              label="Bronzer tone"
-              value={bronzerTone?.name}
-              imagePath={bronzerTone?.imagePath}
-              onClick={() => router.push('/style/women/catalog/contour?returnTo=review')}
-            />
-            <ReviewRow
-              label="Contour intensity"
-              value={contourIntensity?.name}
-              imagePath={contourIntensity?.imagePath}
-              onClick={() => router.push('/style/women/catalog/contour?returnTo=review')}
-            />
-            <ReviewRow
-              label="Highlight placement"
-              value={highlightPlacement?.name}
-              imagePath={highlightPlacement?.imagePath}
-              onClick={() => router.push('/style/women/catalog/highlight?returnTo=review')}
-            />
-            <ReviewRow
-              label="Highlight tone"
-              value={highlightTone?.name}
-              imagePath={highlightTone?.imagePath}
-              onClick={() => router.push('/style/women/catalog/highlight?returnTo=review')}
-            />
-            <ReviewRow
-              label="Highlight intensity"
-              value={highlightIntensity?.name}
-              imagePath={highlightIntensity?.imagePath}
-              onClick={() => router.push('/style/women/catalog/highlight?returnTo=review')}
-            />
-            <ReviewRow
-              label="Highlight finish"
-              value={highlightFinish?.name}
-              imagePath={highlightFinish?.imagePath}
-              onClick={() => router.push('/style/women/catalog/highlight?returnTo=review')}
-            />
-          </div>
-        </Card>
+      <SelectionSection
+        id="hair-color"
+        title="Hair Color"
+        subtitle={
+          session.hairStyleId
+            ? 'Optional. Colors are based on the selected hairstyle.'
+            : 'Choose a hairstyle first if the client wants hair color.'
+        }
+        options={colors}
+        selectedId={`${session.haircutId || ''}__${session.hairStyleId || ''}__${session.hairColorId || ''}`}
+        expanded={Boolean(expandedSections['hair-color'])}
+        onToggleExpanded={() => toggleExpanded('hair-color')}
+        onSelect={(id) => {
+          const selected = catalog.colors.find((option) => option.id === id)
+          session.setWomenOptions({
+            haircutId: selected?.haircutId,
+            hairStyleId: selected?.hairStyleId,
+            hairColorId: selected?.hairColorId,
+          })
+        }}
+      />
 
-        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
+      <SelectionSection
+        id="lip-finish"
+        title="Lip Finish"
+        options={toOptions(LIP_FINISHES)}
+        selectedId={session.lipFinish}
+        expanded={Boolean(expandedSections['lip-finish'])}
+        onToggleExpanded={() => toggleExpanded('lip-finish')}
+        onSelect={(lipFinish) => session.setWomenOptions({ lipFinish })}
+      />
+      <SelectionSection
+        id="lip-style"
+        title="Lip Style"
+        options={toOptions(LIP_STYLES)}
+        selectedId={session.lipStyle}
+        expanded={Boolean(expandedSections['lip-style'])}
+        onToggleExpanded={() => toggleExpanded('lip-style')}
+        onSelect={(lipStyle) => session.setWomenOptions({ lipStyle })}
+      />
+      <SelectionSection
+        id="lip-color"
+        title="Lip Color"
+        options={toOptions(LIP_COLORS)}
+        selectedId={session.lipColor}
+        expanded={Boolean(expandedSections['lip-color'])}
+        onToggleExpanded={() => toggleExpanded('lip-color')}
+        onSelect={(lipColor) => session.setWomenOptions({ lipColor })}
+      />
+
+      <SelectionSection
+        id="eye-shadow"
+        title="Eye Shadow"
+        options={toOptions(EYE_SHADOWS)}
+        selectedId={session.eyeShadow}
+        expanded={Boolean(expandedSections['eye-shadow'])}
+        onToggleExpanded={() => toggleExpanded('eye-shadow')}
+        onSelect={(eyeShadow) => session.setWomenOptions({ eyeShadow })}
+      />
+      <SelectionSection
+        id="eye-liner"
+        title="Eye Liner"
+        options={toOptions(EYE_LINERS)}
+        selectedId={session.eyeLiner}
+        expanded={Boolean(expandedSections['eye-liner'])}
+        onToggleExpanded={() => toggleExpanded('eye-liner')}
+        onSelect={(eyeLiner) => session.setWomenOptions({ eyeLiner })}
+      />
+      <SelectionSection
+        id="eye-lashes"
+        title="Lashes"
+        options={toOptions(EYE_LASHES)}
+        selectedId={session.eyeLashes}
+        expanded={Boolean(expandedSections['eye-lashes'])}
+        onToggleExpanded={() => toggleExpanded('eye-lashes')}
+        onSelect={(eyeLashes) => session.setWomenOptions({ eyeLashes })}
+      />
+
+      <SelectionSection
+        id="brows"
+        title="Brows"
+        options={toOptions(BROW_OPTIONS)}
+        selectedId={session.browStyle}
+        expanded={Boolean(expandedSections.brows)}
+        onToggleExpanded={() => toggleExpanded('brows')}
+        onSelect={(browStyle) => session.setWomenOptions({ browStyle })}
+      />
+      <SelectionSection
+        id="skin"
+        title="Skin Base"
+        options={toOptions(SKIN_OPTIONS)}
+        selectedId={session.skinType}
+        expanded={Boolean(expandedSections.skin)}
+        onToggleExpanded={() => toggleExpanded('skin')}
+        onSelect={(skinType) => session.setWomenOptions({ skinType })}
+      />
+
+      <SelectionSection
+        id="blush-color"
+        title="Blush Color"
+        options={toOptions(BLUSH_COLORS)}
+        selectedId={session.blushColor}
+        expanded={Boolean(expandedSections['blush-color'])}
+        onToggleExpanded={() => toggleExpanded('blush-color')}
+        onSelect={(blushColor) => session.setWomenOptions({ blushColor })}
+      />
+      <SelectionSection
+        id="blush-style"
+        title="Blush Style"
+        options={toOptions(BLUSH_STYLES)}
+        selectedId={session.blushStyle}
+        expanded={Boolean(expandedSections['blush-style'])}
+        onToggleExpanded={() => toggleExpanded('blush-style')}
+        onSelect={(blushStyle) => session.setWomenOptions({ blushStyle })}
+      />
+      <SelectionSection
+        id="blush-intensity"
+        title="Blush Intensity"
+        options={toOptions(BLUSH_INTENSITIES)}
+        selectedId={session.blushIntensity}
+        expanded={Boolean(expandedSections['blush-intensity'])}
+        onToggleExpanded={() => toggleExpanded('blush-intensity')}
+        onSelect={(blushIntensity) => session.setWomenOptions({ blushIntensity })}
+      />
+
+      <SelectionSection
+        id="contour-type"
+        title="Contour"
+        options={toOptions(CONTOUR_TYPES)}
+        selectedId={session.contourType}
+        expanded={Boolean(expandedSections['contour-type'])}
+        onToggleExpanded={() => toggleExpanded('contour-type')}
+        onSelect={(contourType) => session.setWomenOptions({ contourType })}
+      />
+      <SelectionSection
+        id="bronzer-tone"
+        title="Bronzer Tone"
+        options={toOptions(BRONZER_TONES)}
+        selectedId={session.bronzerTone}
+        expanded={Boolean(expandedSections['bronzer-tone'])}
+        onToggleExpanded={() => toggleExpanded('bronzer-tone')}
+        onSelect={(bronzerTone) => session.setWomenOptions({ bronzerTone })}
+      />
+      <SelectionSection
+        id="contour-intensity"
+        title="Contour Intensity"
+        options={toOptions(CONTOUR_INTENSITIES)}
+        selectedId={session.contourIntensity}
+        expanded={Boolean(expandedSections['contour-intensity'])}
+        onToggleExpanded={() => toggleExpanded('contour-intensity')}
+        onSelect={(contourIntensity) =>
+          session.setWomenOptions({ contourIntensity })
+        }
+      />
+
+      <SelectionSection
+        id="highlight-placement"
+        title="Highlight Placement"
+        options={toOptions(HIGHLIGHT_PLACEMENTS)}
+        selectedId={session.highlightPlacement}
+        expanded={Boolean(expandedSections['highlight-placement'])}
+        onToggleExpanded={() => toggleExpanded('highlight-placement')}
+        onSelect={(highlightPlacement) =>
+          session.setWomenOptions({ highlightPlacement })
+        }
+      />
+      <SelectionSection
+        id="highlight-tone"
+        title="Highlight Tone"
+        options={toOptions(HIGHLIGHT_TONES)}
+        selectedId={session.highlightTone}
+        expanded={Boolean(expandedSections['highlight-tone'])}
+        onToggleExpanded={() => toggleExpanded('highlight-tone')}
+        onSelect={(highlightTone) => session.setWomenOptions({ highlightTone })}
+      />
+      <SelectionSection
+        id="highlight-intensity"
+        title="Highlight Intensity"
+        options={toOptions(HIGHLIGHT_INTENSITIES)}
+        selectedId={session.highlightIntensity}
+        expanded={Boolean(expandedSections['highlight-intensity'])}
+        onToggleExpanded={() => toggleExpanded('highlight-intensity')}
+        onSelect={(highlightIntensity) =>
+          session.setWomenOptions({ highlightIntensity })
+        }
+      />
+      <SelectionSection
+        id="highlight-finish"
+        title="Highlight Finish"
+        options={toOptions(HIGHLIGHT_FINISHES)}
+        selectedId={session.highlightFinish}
+        expanded={Boolean(expandedSections['highlight-finish'])}
+        onToggleExpanded={() => toggleExpanded('highlight-finish')}
+        onSelect={(highlightFinish) =>
+          session.setWomenOptions({ highlightFinish })
+        }
+      />
+
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-white/10 bg-[#08080b]/95 px-4 py-4 backdrop-blur-xl">
+        <div className="mx-auto grid max-w-[430px] grid-cols-[0.8fr_1.2fr] gap-3">
           <Button
             type="button"
             variant="secondary"
-            onClick={() => router.push('/style/women/catalog/highlight')}
+            className="h-14 w-full"
+            onClick={() => router.push('/style/photo')}
           >
             Back
           </Button>
           <Button
             type="button"
+            className="h-14 w-full"
             onClick={generateCatalogStyle}
-            disabled={generating}
+            disabled={!session.imageFile}
           >
-            {generating ? 'Generating...' : 'Generate'}
+            Generate
           </Button>
         </div>
       </div>
@@ -341,42 +374,81 @@ export default function WomenCatalogReviewPage() {
   )
 }
 
-function ReviewRow({
-  label,
-  value,
-  imagePath,
-  onClick,
+function SelectionSection({
+  id,
+  title,
+  subtitle,
+  options,
+  selectedId,
+  expanded,
+  onToggleExpanded,
+  onSelect,
 }: {
-  label: string
-  value?: string
-  imagePath?: string
-  onClick: () => void
+  id: string
+  title: string
+  subtitle?: string
+  options: ReviewOption[]
+  selectedId?: string
+  expanded: boolean
+  onToggleExpanded: () => void
+  onSelect: (id: string) => void
 }) {
+  const visibleOptions = expanded ? options : options.slice(0, INITIAL_LIMIT)
+
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="flex w-full items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-4 text-left transition hover:bg-white/[0.08]"
-    >
-      <span className="text-sm text-zinc-500">{label}</span>
-      <span className="flex min-h-14 items-center gap-3 text-right text-sm font-semibold text-white">
-        {imagePath && (
-          <span className="relative block h-14 w-14 overflow-hidden rounded-xl bg-black/30 p-1">
-            <Image
-              src={imagePath}
-              alt={value || label}
-              fill
-              unoptimized
-              className="object-contain p-1"
+    <Card className="p-4">
+      <div className="mb-4 flex items-end justify-between gap-4">
+        <div>
+          <h3 className="text-lg font-semibold text-white">{title}</h3>
+          {subtitle && <p className="mt-1 text-xs text-zinc-500">{subtitle}</p>}
+        </div>
+        {options.length > INITIAL_LIMIT && (
+          <button
+            type="button"
+            onClick={onToggleExpanded}
+            className="shrink-0 text-xs font-bold uppercase tracking-[0.16em] text-fuchsia-100"
+          >
+            {expanded ? 'Show Less' : 'Show More'}
+          </button>
+        )}
+      </div>
+
+      {options.length > 0 ? (
+        <div className="grid grid-cols-2 gap-3">
+          {visibleOptions.map((option) => (
+            <CatalogOptionCard
+              key={`${id}-${option.id}`}
+              label={option.label}
+              description={option.description}
+              imagePath={option.imagePath}
+              selected={selectedId === option.id}
+              onClick={() => onSelect(option.id)}
+              imageClassName="aspect-[1.15]"
             />
-          </span>
-        )}
-        {!imagePath && (
-          <span className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-xs uppercase tracking-[0.18em] text-zinc-400">
-            {value === 'None' ? 'None' : 'Not selected'}
-          </span>
-        )}
-      </span>
-    </button>
+          ))}
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.035] p-5 text-sm text-zinc-500">
+          No options available for this selection.
+        </div>
+      )}
+    </Card>
   )
+}
+
+function toOptions(
+  options: Array<{
+    id?: string
+    name?: string
+    label?: string
+    description?: string
+    imagePath?: string
+  }>,
+): ReviewOption[] {
+  return options.map((option) => ({
+    id: option.id || option.name || option.label || 'None',
+    label: option.label || option.name || option.id || 'None',
+    description: option.description,
+    imagePath: option.imagePath,
+  }))
 }
