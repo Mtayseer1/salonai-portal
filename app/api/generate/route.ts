@@ -133,12 +133,11 @@ export async function POST(request: Request) {
       )
     }
 
-    const supabaseAuth = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
     const supabaseAdmin = createServiceClient()
     const {
       data: { user },
       error: authError,
-    } = await supabaseAuth.auth.getUser(accessToken)
+    } = await supabaseAdmin.auth.getUser(accessToken)
 
     if (authError || !user) {
       logGenerationFailure(requestId, 'auth', authError)
