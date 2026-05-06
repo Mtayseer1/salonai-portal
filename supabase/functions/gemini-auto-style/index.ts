@@ -412,7 +412,7 @@ const HAIR_LIBRARY = createCatalogLibrary([
   ...MEN_HAIR_OPTIONS.map((option) => ({
     name: option.name,
     categoryLabel: option.categoryLabel,
-    description: option.description,
+    description: buildExpandedMenHairPrompt(option),
   })),
 ]);
 
@@ -498,6 +498,127 @@ function formatCatalogPromptOption(
     `${label}: ${selectedValue}${category}`,
     `${label} technical prompt: ${option.description}`,
   ].join("\n");
+}
+
+function buildExpandedMenHairPrompt(option: MenHairOption) {
+  const base = option.description;
+  const name = option.name;
+  const category = option.categoryLabel;
+  const key = normalizeKey(name);
+  const categoryKey = normalizeKey(category);
+
+  const sharedRules = [
+    `Selected style: ${name}.`,
+    `Catalog group: ${category}.`,
+    base,
+    "Preserve the customer's natural hairline, head shape, hair density, age, and facial identity.",
+    "The result must look like a real barber haircut on the same person, not a wig, helmet, cartoon, painted hair, or AI-stylized texture.",
+  ];
+
+  if (categoryKey.includes("fade")) {
+    sharedRules.push(
+      "Fade structure: define the correct fade height for this exact style. Low fades stay near the ears and nape, mid fades start around the middle of the side, high fades rise near the parietal ridge, drop fades curve lower behind the ear, burst fades radiate around the ear, and temple fades affect only the temple/sideburn zone.",
+      "Skin fade bases should start around 0-1 mm and blend smoothly through 1-3 mm into longer hair. Shadow fades should keep visible dark hair at about 2-4 mm instead of going bald.",
+      "Blend the sides and back smoothly into the top with no harsh banding, no accidental shelf, and no artificial painted edge unless a clean barber edge is naturally appropriate.",
+    );
+  }
+
+  if (categoryKey.includes("business")) {
+    sharedRules.push(
+      "Business/classic structure: polished professional silhouette with controlled top direction, usually 4-9 cm on top depending on the selected style.",
+      "Use scissors-over-comb or conservative clipper tapering on the sides and back, with natural low shine cream or pomade.",
+      "Keep the neckline tapered and tidy. Avoid trendy extreme fades, messy spikes, helmet hair, greasy shine, or an unnaturally sharp drawn hairline.",
+    );
+  }
+
+  if (categoryKey.includes("classic")) {
+    sharedRules.push(
+      "Classic short-cut structure: compact masculine shape with realistic short top length, clean side/back tapering, and a natural neckline.",
+      "Keep texture visible and proportional to the style. Avoid exaggerated volume, glossy gel, fake density, or overly sharp artificial lineups.",
+    );
+  }
+
+  if (categoryKey.includes("volume") || key.includes("quiff") || key.includes("pompadour")) {
+    sharedRules.push(
+      "Volume structure: keep the front/top longer than the crown, generally 6-12 cm depending on the specific style.",
+      "Lift the front upward first, then direct it backward or slightly angled only when the style requires it. Crown density must support the shape without collapsing.",
+      "Use matte clay, texture powder, or natural low-shine styling cream for flexible hold. Avoid stiff gel spikes, hollow cartoon height, artificial shine, or wig-like thickness.",
+    );
+  }
+
+  if (categoryKey.includes("slick") || key.includes("slick") || key.includes("brushback")) {
+    sharedRules.push(
+      "Slick/brush-back structure: direct the hair backward from the forehead with no forward fringe. Top length should look long enough to comb back naturally, usually 7-12 cm.",
+      "Sides and back should be tapered, faded, or disconnected according to the selected style while keeping realistic sideburn and neckline detail.",
+      "Use the correct finish: natural/matte for brush-back and textured slick-back, medium shine for classic slick-back, glossy controlled product for wet-look. Avoid greasy overload or plastic shine.",
+    );
+  }
+
+  if (categoryKey.includes("medium")) {
+    sharedRules.push(
+      "Medium-length structure: keep hair around 8-16 cm with layers that create natural movement around the ears, sides, and upper nape.",
+      "Shape the back and neckline lightly without making it look freshly faded unless the chosen style requires it.",
+      "Avoid fake extensions, bowl shape, flat panels, excessive product, or perfectly symmetrical wig-like flow.",
+    );
+  }
+
+  if (categoryKey.includes("long")) {
+    sharedRules.push(
+      "Long-hair structure: preserve realistic length and weight, with layers through mid-lengths and ends for masculine movement.",
+      "Hair may reach neck, shoulder, or longer only when believable from the source image and selected style. Respect gravity and natural density.",
+      "Avoid sudden impossible extensions, feminine blowout styling, plastic-perfect strands, or hiding the natural hairline.",
+    );
+  }
+
+  if (categoryKey.includes("curly") || key.includes("curly") || key.includes("wavy")) {
+    sharedRules.push(
+      "Curly/wavy structure: preserve the natural curl or wave pattern. Do not straighten curls unless the selected style explicitly implies it.",
+      "Define curls/waves with realistic variation, controlled volume, and hydrated low-shine texture. Shape sides/back with taper or fade only when appropriate.",
+      "Avoid fake identical ringlets, dry frizz, plastic curl repetition, or artificial hairline coloring.",
+    );
+  }
+
+  if (categoryKey.includes("fringe") || key.includes("fringe")) {
+    sharedRules.push(
+      "Fringe structure: direct the front/top forward according to the selected fringe type. Fringe length may range from short upper forehead to brow level, but must not hide the eyes unless naturally appropriate.",
+      "Texture the fringe with realistic separation and blend sides/back according to the style.",
+      "Avoid heavy bowl-cut shape, glossy gel, fake straight fringe lines, or covering the face unnaturally.",
+    );
+  }
+
+  if (categoryKey.includes("modern")) {
+    sharedRules.push(
+      "Modern/edgy structure: emphasize the correct contrast, disconnection, crop, spike, faux hawk, mohawk, or undercut shape for this exact style.",
+      "Use sharp but realistic barber structure. Sides/back can be tight or disconnected only when the selected style requires it.",
+      "Avoid impossible cartoon geometry, plastic spikes, fake scalp edges, or excessive artificial volume.",
+    );
+  }
+
+  if (categoryKey.includes("afro")) {
+    sharedRules.push(
+      "Afro/coily structure: preserve authentic coily texture, natural density variation, and realistic scalp/edge behavior.",
+      "Shape the afro, twists, or fade according to the selected style while keeping coils moisturized and believable.",
+      "Avoid straightening, plastic sponge texture, identical fake coils, overdrawn lineup, or painted hair density.",
+    );
+  }
+
+  if (categoryKey.includes("braids")) {
+    sharedRules.push(
+      "Braids/locs structure: preserve authentic sectioning, natural scalp visibility, realistic braid/loc thickness variation, and believable hair weight.",
+      "Parting should be clean but not impossibly perfect. Locs and braids must look textured, natural, and integrated with the customer's scalp.",
+      "Avoid synthetic plastic ropes, fake scalp grids, impossible length, excessive shine, or artificial hairline fill.",
+    );
+  }
+
+  if (categoryKey.includes("mature") || key.includes("receding") || key.includes("bald")) {
+    sharedRules.push(
+      "Mature/receding structure: respect the customer's natural mature or receding hairline. Do not fill temples, restore a juvenile hairline, or hide thinning unrealistically.",
+      "Natural scalp visibility is allowed where appropriate. The style should work with the existing hairline and density.",
+      "Avoid painted density, fake lineups, comb-over concealment, blurred scalp texture, or changing skull shape.",
+    );
+  }
+
+  return sharedRules.join(" ");
 }
 
 /* ============================================================
