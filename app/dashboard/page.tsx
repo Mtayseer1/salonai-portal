@@ -103,7 +103,7 @@ export default function DashboardPage() {
           <Button
             type="button"
             className="h-14 w-full text-base"
-            onClick={() => router.push('/style')}
+            onClick={() => router.push('/style?fresh=1')}
           >
             Start New Style
           </Button>

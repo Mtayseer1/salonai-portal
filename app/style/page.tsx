@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { useEffect, useRef } from 'react'
 import { Button, Card } from '@/app/components/ui'
 import { useStyleSession } from '@/components/style-session'
 import type { StyleSessionGender } from '@/lib/style-session/style-session-types'
@@ -24,7 +25,24 @@ const genderOptions: Array<{
 
 export default function StylePage() {
   const router = useRouter()
-  const { gender, setGender } = useStyleSession()
+  const freshSessionHandledRef = useRef(false)
+  const { gender, setGender, resetSession } = useStyleSession()
+
+  useEffect(() => {
+    if (freshSessionHandledRef.current) {
+      return
+    }
+
+    const searchParams = new URLSearchParams(window.location.search)
+
+    if (searchParams.get('fresh') !== '1') {
+      return
+    }
+
+    freshSessionHandledRef.current = true
+    resetSession()
+    router.replace('/style')
+  }, [resetSession, router])
 
   const selectGender = (value: StyleSessionGender) => {
     setGender(value)

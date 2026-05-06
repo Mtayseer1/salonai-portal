@@ -55,29 +55,104 @@ export async function generateStyleFromSession(
     session.customerPhone,
   )
   const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser()
+  const {
     data: { session: authSession },
+    error: sessionError,
   } = await supabase.auth.getSession()
 
-  if (!authSession?.access_token) {
-    throw new Error('Sign in before generating.')
+  if (userError || !user || sessionError || !authSession?.access_token) {
+    throw new Error(
+      [
+        'Sign in before generating.',
+        '',
+        'Client auth debug:',
+        stringifyDebug({
+          hasUser: Boolean(user),
+          userId: user?.id,
+          userError: userError?.message,
+          hasSession: Boolean(authSession),
+          sessionError: sessionError?.message,
+          hasAccessToken: Boolean(authSession?.access_token),
+        }),
+      ].join('\n'),
+    )
   }
 
   const response = await fetch('/api/generate', {
     method: 'POST',
+    cache: 'no-store',
     headers: {
       Authorization: `Bearer ${authSession.access_token}`,
+      'X-Supabase-Access-Token': authSession.access_token,
+      'X-Salon-User-Id': user.id,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(createGenerationRequest(session, imageUrl)),
   })
 
-  const result = await response.json()
+  const result = await parseGenerationResponse(response)
 
   if (!response.ok) {
-    throw new Error(result.error || 'Generation failed.')
+    throw new Error(formatGenerationError(response.status, result))
   }
 
   return result
+}
+
+async function parseGenerationResponse(response: Response) {
+  const contentType = response.headers.get('content-type') || ''
+
+  if (contentType.includes('application/json')) {
+    return response.json()
+  }
+
+  return {
+    error: 'Generation returned a non-JSON response.',
+    details: await response.text(),
+  }
+}
+
+function formatGenerationError(status: number, result: unknown) {
+  if (!result || typeof result !== 'object') {
+    return `Generation failed.\n\nStatus: ${status}\nResponse: ${String(result)}`
+  }
+
+  const errorResult = result as {
+    error?: string
+    code?: string
+    details?: unknown
+    debug?: unknown
+  }
+  const lines = [
+    errorResult.error || 'Generation failed.',
+    '',
+    `Status: ${status}`,
+  ]
+
+  if (errorResult.code) {
+    lines.push(`Code: ${errorResult.code}`)
+  }
+
+  if (errorResult.debug) {
+    lines.push('', 'Debug:', stringifyDebug(errorResult.debug))
+  }
+
+  if (errorResult.details) {
+    lines.push('', 'Details:', stringifyDebug(errorResult.details))
+  }
+
+  return lines.join('\n')
+}
+
+function stringifyDebug(value: unknown) {
+  try {
+    return JSON.stringify(value, null, 2)
+  } catch {
+    return String(value)
+  }
 }
 
 function validateGenerationSession(session: StyleFlowSessionState) {

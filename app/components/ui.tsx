@@ -220,7 +220,7 @@ export function Alert({
   }
 
   return (
-    <div className={`rounded-2xl border px-4 py-3 text-sm ${styles[tone]}`}>
+    <div className={`whitespace-pre-wrap break-words rounded-2xl border px-4 py-3 text-sm ${styles[tone]}`}>
       {children}
     </div>
   )

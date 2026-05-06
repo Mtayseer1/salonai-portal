@@ -51,6 +51,7 @@ export default function WomenOptionsPage() {
 
     try {
       setMessage('')
+      session.setGenerationError(undefined)
       setGenerating(true)
 
       const result = await generateStyleFromSession({
@@ -61,7 +62,10 @@ export default function WomenOptionsPage() {
       session.setGenerationResult(result)
       router.push('/style/result')
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Generation failed.')
+      const errorMessage =
+        error instanceof Error ? error.message : 'Generation failed.'
+      session.setGenerationError(errorMessage)
+      setMessage(errorMessage)
       setGenerating(false)
     }
   }

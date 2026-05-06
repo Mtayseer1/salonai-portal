@@ -50,8 +50,8 @@ export const womenCatalog = {
 } as const
 
 export async function loadWomenCatalogManifest(): Promise<WomenCatalogData> {
-  const response = await fetch('/women_catalog/manifest.json', {
-    cache: 'force-cache',
+  const response = await fetch(`/women_catalog/manifest.json?v=${Date.now()}`, {
+    cache: 'no-store',
   })
 
   if (!response.ok) {

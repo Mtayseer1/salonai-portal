@@ -139,6 +139,7 @@ export default function StyleResultPage() {
       </div>
 
       {message && <Alert tone="info">{message}</Alert>}
+      {session.generationError && <Alert>{session.generationError}</Alert>}
 
       {resultImageSrc ? (
         <Card className="p-3">
@@ -249,7 +250,7 @@ async function imageSourceToBlob(src: string) {
     return response.blob()
   }
 
-  const response = await fetch(src)
+  const response = await fetch(src, { cache: 'no-store' })
 
   if (!response.ok) {
     throw new Error('Could not load image.')

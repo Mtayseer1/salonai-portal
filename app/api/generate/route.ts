@@ -44,10 +44,27 @@ type GenerateRequestBody = {
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const SUPABASE_EDGE_ANON_KEY =
+  process.env.SUPABASE_EDGE_ANON_KEY || SUPABASE_ANON_KEY
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 const CREDIT_COST = 1
+const NO_STORE_HEADERS = {
+  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+  Pragma: 'no-cache',
+  Expires: '0',
+}
 
 type AdminSupabaseClient = ReturnType<typeof createServiceClient>
+
+function noStoreJson(body: unknown, init?: ResponseInit) {
+  return NextResponse.json(body, {
+    ...init,
+    headers: {
+      ...NO_STORE_HEADERS,
+      ...(init?.headers ? Object.fromEntries(new Headers(init.headers)) : {}),
+    },
+  })
+}
 
 export async function POST(request: Request) {
   const requestId = createRequestId()
@@ -56,22 +73,49 @@ export async function POST(request: Request) {
     const body = (await request.json()) as GenerateRequestBody
 
     if (!SUPABASE_URL) {
-      return NextResponse.json(
-        { error: 'Missing Supabase URL configuration.' },
+      return noStoreJson(
+        {
+          error: 'Missing Supabase URL configuration.',
+          debug: createDebug(requestId, 'config', {
+            missing: 'NEXT_PUBLIC_SUPABASE_URL',
+          }),
+        },
         { status: 500 },
       )
     }
 
     if (!SUPABASE_ANON_KEY) {
-      return NextResponse.json(
-        { error: 'Missing Supabase anon key configuration.' },
+      return noStoreJson(
+        {
+          error: 'Missing Supabase anon key configuration.',
+          debug: createDebug(requestId, 'config', {
+            missing: 'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+          }),
+        },
         { status: 500 },
       )
     }
 
     if (!SUPABASE_SERVICE_ROLE_KEY) {
-      return NextResponse.json(
-        { error: 'Missing Supabase service configuration.' },
+      return noStoreJson(
+        {
+          error: 'Missing Supabase service configuration.',
+          debug: createDebug(requestId, 'config', {
+            missing: 'SUPABASE_SERVICE_ROLE_KEY',
+          }),
+        },
+        { status: 500 },
+      )
+    }
+
+    if (!SUPABASE_EDGE_ANON_KEY) {
+      return noStoreJson(
+        {
+          error: 'Missing Supabase Edge Function key configuration.',
+          debug: createDebug(requestId, 'config', {
+            missing: 'SUPABASE_EDGE_ANON_KEY',
+          }),
+        },
         { status: 500 },
       )
     }
@@ -79,8 +123,12 @@ export async function POST(request: Request) {
     const accessToken = getBearerToken(request)
 
     if (!accessToken) {
-      return NextResponse.json(
-        { error: 'Sign in before generating.', code: 'unauthenticated' },
+      return noStoreJson(
+        {
+          error: 'Sign in before generating.',
+          code: 'unauthenticated',
+          debug: createDebug(requestId, 'auth', { reason: 'missing_bearer_token' }),
+        },
         { status: 401 },
       )
     }
@@ -95,15 +143,27 @@ export async function POST(request: Request) {
     if (authError || !user) {
       logGenerationFailure(requestId, 'auth', authError)
 
-      return NextResponse.json(
-        { error: 'Sign in before generating.', code: 'unauthenticated' },
+      return noStoreJson(
+        {
+          error: 'Sign in before generating.',
+          code: 'unauthenticated',
+          debug: createDebug(requestId, 'auth', {
+            authError: serializeLogDetails(authError),
+            hasToken: Boolean(accessToken),
+            tokenPrefix: accessToken.slice(0, 12),
+            clientUserId: request.headers.get('x-salon-user-id'),
+          }),
+        },
         { status: 401 },
       )
     }
 
     if (body.gender !== 'men' && body.gender !== 'women') {
-      return NextResponse.json(
-        { error: 'Invalid generation gender.' },
+      return noStoreJson(
+        {
+          error: 'Invalid generation gender.',
+          debug: createDebug(requestId, 'validation', { gender: body.gender }),
+        },
         { status: 400 },
       )
     }
@@ -113,15 +173,23 @@ export async function POST(request: Request) {
       body.mode !== 'catalog' &&
       body.mode !== 'bridal'
     ) {
-      return NextResponse.json(
-        { error: 'Invalid generation mode.' },
+      return noStoreJson(
+        {
+          error: 'Invalid generation mode.',
+          debug: createDebug(requestId, 'validation', { mode: body.mode }),
+        },
         { status: 400 },
       )
     }
 
     if (!body.imageUrl) {
-      return NextResponse.json(
-        { error: 'Missing source image URL.' },
+      return noStoreJson(
+        {
+          error: 'Missing source image URL.',
+          debug: createDebug(requestId, 'validation', {
+            hasImageUrl: Boolean(body.imageUrl),
+          }),
+        },
         { status: 400 },
       )
     }
@@ -134,8 +202,15 @@ export async function POST(request: Request) {
         reason: 'missing_or_inactive_barber',
       })
 
-      return NextResponse.json(
-        { error: 'Salon account not found.', code: 'missing_account' },
+      return noStoreJson(
+        {
+          error: 'Salon account not found.',
+          code: 'missing_account',
+          debug: createDebug(requestId, 'account', {
+            userId: user.id,
+            reason: 'missing_or_inactive_barber',
+          }),
+        },
         { status: 403 },
       )
     }
@@ -146,10 +221,15 @@ export async function POST(request: Request) {
         remainingCredits: barber.remaining_credits || 0,
       })
 
-      return NextResponse.json(
+      return noStoreJson(
         {
           error: 'Insufficient credits. Buy credits before generating.',
           code: 'insufficient_credits',
+          debug: createDebug(requestId, 'credits', {
+            userId: user.id,
+            remainingCredits: barber.remaining_credits || 0,
+            requiredCredits: CREDIT_COST,
+          }),
         },
         { status: 402 },
       )
@@ -167,10 +247,15 @@ export async function POST(request: Request) {
         expectedCredits: barber.remaining_credits,
       })
 
-      return NextResponse.json(
+      return noStoreJson(
         {
           error: 'Insufficient credits. Buy credits before generating.',
           code: 'insufficient_credits',
+          debug: createDebug(requestId, 'credit_reservation', {
+            userId: user.id,
+            expectedCredits: barber.remaining_credits,
+            requiredCredits: CREDIT_COST,
+          }),
         },
         { status: 402 },
       )
@@ -183,9 +268,10 @@ export async function POST(request: Request) {
     try {
       response = await fetch(`${SUPABASE_URL}/functions/v1/gemini-auto-style`, {
         method: 'POST',
+        cache: 'no-store',
         headers: {
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_EDGE_ANON_KEY}`,
+          apikey: SUPABASE_EDGE_ANON_KEY,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
@@ -194,16 +280,17 @@ export async function POST(request: Request) {
       await refundGenerationCredit(supabaseAdmin, user.id)
       logGenerationFailure(requestId, 'edge_fetch', error)
 
-      return NextResponse.json(
+      return noStoreJson(
         {
           error: 'Generation failed. No credit was used.',
           code: 'generation_failed',
+          debug: createDebug(requestId, 'edge_fetch', serializeLogDetails(error)),
         },
         { status: 502 },
       )
     }
 
-    const result = await response.json().catch(() => null)
+    const result = await parseEdgeResponse(response)
 
     if (!response.ok) {
       await refundGenerationCredit(supabaseAdmin, user.id)
@@ -212,30 +299,44 @@ export async function POST(request: Request) {
         result,
       })
 
-      return NextResponse.json(
+      return noStoreJson(
         {
           error: 'Generation failed. No credit was used.',
           code: 'generation_failed',
-          details: process.env.NODE_ENV === 'development' ? result : undefined,
+          details: result,
+          debug: createDebug(requestId, 'edge_response', {
+            status: response.status,
+            result,
+          }),
         },
         { status: response.status },
       )
     }
 
-    await logSuccessfulGeneration(supabaseAdmin, user.id, body)
-    await logCreditUsage(supabaseAdmin, user.id, body)
+    const logResults = await Promise.allSettled([
+      logSuccessfulGeneration(supabaseAdmin, user.id, body),
+      logCreditUsage(supabaseAdmin, user.id, body),
+    ])
 
-    return NextResponse.json(result)
+    for (const [index, logResult] of logResults.entries()) {
+      if (logResult.status === 'rejected') {
+        logGenerationFailure(
+          requestId,
+          index === 0 ? 'session_log' : 'credit_log',
+          logResult.reason,
+        )
+      }
+    }
+
+    return noStoreJson(result)
   } catch (error) {
     logGenerationFailure(requestId, 'unexpected', error)
 
-    return NextResponse.json(
+    return noStoreJson(
       {
         error: 'Unexpected generation error.',
-        details:
-          process.env.NODE_ENV === 'development' && error instanceof Error
-            ? error.message
-            : undefined,
+        details: serializeLogDetails(error),
+        debug: createDebug(requestId, 'unexpected', serializeLogDetails(error)),
       },
       { status: 500 },
     )
@@ -270,6 +371,28 @@ function serializeLogDetails(details: unknown) {
   return details
 }
 
+function createDebug(requestId: string, stage: string, details?: unknown) {
+  return {
+    requestId,
+    stage,
+    details,
+  }
+}
+
+async function parseEdgeResponse(response: Response) {
+  const contentType = response.headers.get('content-type') || ''
+
+  if (contentType.includes('application/json')) {
+    return response.json().catch(() => null)
+  }
+
+  return {
+    nonJsonResponse: true,
+    contentType,
+    body: await response.text().catch(() => ''),
+  }
+}
+
 function createServiceClient() {
   return createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
 }
@@ -277,11 +400,11 @@ function createServiceClient() {
 function getBearerToken(request: Request) {
   const header = request.headers.get('authorization')
 
-  if (!header?.startsWith('Bearer ')) {
-    return null
+  if (header?.startsWith('Bearer ')) {
+    return header.slice('Bearer '.length).trim()
   }
 
-  return header.slice('Bearer '.length).trim()
+  return request.headers.get('x-supabase-access-token')?.trim() || null
 }
 
 async function getBarberAccount(

@@ -135,6 +135,7 @@ export default function WomenCatalogReviewPage() {
       setMessage('')
       setGenerating(true)
       session.setMode('catalog')
+      session.setGenerationError(undefined)
 
       const result = await generateStyleFromSession({
         ...session,
@@ -144,7 +145,10 @@ export default function WomenCatalogReviewPage() {
       session.setGenerationResult(result)
       router.push('/style/result')
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Generation failed.')
+      const errorMessage =
+        error instanceof Error ? error.message : 'Generation failed.'
+      session.setGenerationError(errorMessage)
+      setMessage(errorMessage)
       setGenerating(false)
     }
   }
