@@ -29,6 +29,8 @@ export const styleSessionRouteOrder: StyleSessionRoute[] = [
   '/style',
   '/style/info',
   '/style/photo',
+  '/style/men/options',
+  '/style/men/catalog',
   '/style/women/options',
   '/style/women/catalog/style',
   '/style/women/catalog/color',

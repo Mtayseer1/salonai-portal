@@ -163,8 +163,15 @@ function validateGenerationSession(session: StyleFlowSessionState) {
   }
 
   if (session.gender === 'men' && session.mode === 'catalog') {
-    if (!session.hairStyle || !session.beardStyle) {
-      throw new Error('Select hair style and beard style before continuing.')
+    if (
+      !session.hairCategory ||
+      !session.hairStyle ||
+      !session.beardCategory ||
+      !session.beardStyle
+    ) {
+      throw new Error(
+        'Select hair category, hair style, beard category, and beard style before continuing.',
+      )
     }
   }
 

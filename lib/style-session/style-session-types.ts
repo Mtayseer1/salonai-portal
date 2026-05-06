@@ -21,6 +21,7 @@ export type StyleSessionRoute =
   | '/style/info'
   | '/style/photo'
   | '/style/men/options'
+  | '/style/men/catalog'
   | '/style/women/options'
   | '/style/women/catalog/style'
   | '/style/women/catalog/color'
@@ -62,7 +63,9 @@ export type StyleFlowSessionState = {
   generationError?: string
   hairLength?: string
   beardLength?: string
+  hairCategory?: string
   hairStyle?: string
+  beardCategory?: string
   beardStyle?: string
   haircutId?: string
   hairStyleId?: string
@@ -99,7 +102,12 @@ export type StyleFlowSessionPersistedState = Omit<StyleFlowSessionState, 'imageF
 export type MenStyleSessionOptions = Partial<
   Pick<
     StyleFlowSessionState,
-    'hairLength' | 'beardLength' | 'hairStyle' | 'beardStyle'
+    | 'hairLength'
+    | 'beardLength'
+    | 'hairCategory'
+    | 'hairStyle'
+    | 'beardCategory'
+    | 'beardStyle'
   >
 >
 
