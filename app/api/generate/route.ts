@@ -13,6 +13,28 @@ type GenerateRequestBody = {
   makeup?: boolean
   dye?: boolean
   lipstick?: string
+  lipFinish?: string
+  lipFinishDescription?: string
+  lipStyle?: string
+  lipStyleDescription?: string
+  lipColor?: string
+  lipColorDescription?: string
+  lipsPrompt?: string
+  eyeShadow?: string
+  eyeLiner?: string
+  eyeLashes?: string
+  browStyle?: string
+  skinType?: string
+  blushColor?: string
+  blushStyle?: string
+  blushIntensity?: string
+  contourType?: string
+  bronzerTone?: string
+  contourIntensity?: string
+  highlightPlacement?: string
+  highlightTone?: string
+  highlightIntensity?: string
+  highlightFinish?: string
   mascara?: string
   extensions?: boolean
 }
@@ -143,6 +165,28 @@ function createGenerationPayload(body: GenerateRequestBody) {
     hairStyleId: body.hairStyleId,
     hairColorId: body.hairColorId,
     lipstick: body.lipstick,
+    lipFinish: body.lipFinish,
+    lipFinishDescription: body.lipFinishDescription,
+    lipStyle: body.lipStyle,
+    lipStyleDescription: body.lipStyleDescription,
+    lipColor: body.lipColor,
+    lipColorDescription: body.lipColorDescription,
+    lipsPrompt: body.lipsPrompt,
+    eyeShadow: body.eyeShadow,
+    eyeLiner: body.eyeLiner,
+    eyeLashes: body.eyeLashes,
+    browStyle: body.browStyle,
+    skinType: body.skinType,
+    blushColor: body.blushColor,
+    blushStyle: body.blushStyle,
+    blushIntensity: body.blushIntensity,
+    contourType: body.contourType,
+    bronzerTone: body.bronzerTone,
+    contourIntensity: body.contourIntensity,
+    highlightPlacement: body.highlightPlacement,
+    highlightTone: body.highlightTone,
+    highlightIntensity: body.highlightIntensity,
+    highlightFinish: body.highlightFinish,
     mascara: body.mascara,
     extensions: body.extensions,
   }

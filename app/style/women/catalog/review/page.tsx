@@ -7,6 +7,39 @@ import { Alert, Button, Card } from '@/app/components/ui'
 import { useStyleSession, useWomenCatalog } from '@/components/style-session'
 import { generateStyleFromSession } from '@/lib/style-session/style-session-generation'
 import {
+  LIP_COLORS,
+  LIP_FINISHES,
+  LIP_STYLES,
+  findLipOption,
+} from '@/lib/style-session/lips-catalog'
+import {
+  EYE_LASHES,
+  EYE_LINERS,
+  EYE_SHADOWS,
+  findEyeOption,
+} from '@/lib/style-session/eyes-options'
+import { findBrowOption } from '@/lib/style-session/brow-options'
+import { findSkinOption } from '@/lib/style-session/skin-options'
+import {
+  BLUSH_COLORS,
+  BLUSH_INTENSITIES,
+  BLUSH_STYLES,
+  findBlushOption,
+} from '@/lib/style-session/blush-options'
+import {
+  BRONZER_TONES,
+  CONTOUR_INTENSITIES,
+  CONTOUR_TYPES,
+  findContourOption,
+} from '@/lib/style-session/contour-options'
+import {
+  HIGHLIGHT_FINISHES,
+  HIGHLIGHT_INTENSITIES,
+  HIGHLIGHT_PLACEMENTS,
+  HIGHLIGHT_TONES,
+  findHighlightOption,
+} from '@/lib/style-session/highlight-options'
+import {
   findWomenCatalogColor,
   findWomenCatalogStyle,
 } from '@/lib/style-session/women-catalog'
@@ -29,15 +62,65 @@ export default function WomenCatalogReviewPage() {
     session.hairStyleId,
     session.haircutId,
   )
-  const lipstick = findLabel(catalog.lipsticks, session.lipstick)
-  const mascara = findLabel(catalog.mascaras, session.mascara)
+  const lipFinish = findLipOption(LIP_FINISHES, session.lipFinish)
+  const lipStyle = findLipOption(LIP_STYLES, session.lipStyle)
+  const lipColor = findLipOption(LIP_COLORS, session.lipColor)
+  const eyeShadow = findEyeOption(EYE_SHADOWS, session.eyeShadow)
+  const eyeLiner = findEyeOption(EYE_LINERS, session.eyeLiner)
+  const eyeLashes = findEyeOption(EYE_LASHES, session.eyeLashes)
+  const brows = findBrowOption(session.browStyle)
+  const skin = findSkinOption(session.skinType)
+  const blushColor = findBlushOption(BLUSH_COLORS, session.blushColor)
+  const blushStyle = findBlushOption(BLUSH_STYLES, session.blushStyle)
+  const blushIntensity = findBlushOption(
+    BLUSH_INTENSITIES,
+    session.blushIntensity,
+  )
+  const contourType = findContourOption(CONTOUR_TYPES, session.contourType)
+  const bronzerTone = findContourOption(BRONZER_TONES, session.bronzerTone)
+  const contourIntensity = findContourOption(
+    CONTOUR_INTENSITIES,
+    session.contourIntensity,
+  )
+  const highlightPlacement = findHighlightOption(
+    HIGHLIGHT_PLACEMENTS,
+    session.highlightPlacement,
+  )
+  const highlightTone = findHighlightOption(
+    HIGHLIGHT_TONES,
+    session.highlightTone,
+  )
+  const highlightIntensity = findHighlightOption(
+    HIGHLIGHT_INTENSITIES,
+    session.highlightIntensity,
+  )
+  const highlightFinish = findHighlightOption(
+    HIGHLIGHT_FINISHES,
+    session.highlightFinish,
+  )
 
   const generateCatalogStyle = async () => {
     if (
       !session.hairStyleId ||
       !session.hairColorId ||
-      !session.lipstick ||
-      !session.mascara
+      !session.lipFinish ||
+      !session.lipStyle ||
+      !session.lipColor ||
+      !session.eyeShadow ||
+      !session.eyeLiner ||
+      !session.eyeLashes ||
+      !session.browStyle ||
+      !session.skinType ||
+      !session.blushColor ||
+      !session.blushStyle ||
+      !session.blushIntensity ||
+      !session.contourType ||
+      !session.bronzerTone ||
+      !session.contourIntensity ||
+      !session.highlightPlacement ||
+      !session.highlightTone ||
+      !session.highlightIntensity ||
+      !session.highlightFinish
     ) {
       setMessage('Complete all catalog selections before generating.')
       return
@@ -123,19 +206,112 @@ export default function WomenCatalogReviewPage() {
               onClick={() => router.push('/style/women/catalog/color?returnTo=review')}
             />
             <ReviewRow
-              label="Lipstick"
-              value={lipstick}
-              onClick={() => router.push('/style/women/catalog/makeup?returnTo=review')}
+              label="Lip finish"
+              value={lipFinish?.name}
+              imagePath={lipFinish?.imagePath}
+              onClick={() => router.push('/style/women/catalog/lips?returnTo=review')}
             />
             <ReviewRow
-              label="Mascara"
-              value={mascara}
-              onClick={() => router.push('/style/women/catalog/lashes?returnTo=review')}
+              label="Lip style"
+              value={lipStyle?.name}
+              imagePath={lipStyle?.imagePath}
+              onClick={() => router.push('/style/women/catalog/lips?returnTo=review')}
             />
             <ReviewRow
-              label="Extensions"
-              value={session.extensions ? 'On' : 'Off'}
-              onClick={() => router.push('/style/women/catalog/lashes?returnTo=review')}
+              label="Lip color"
+              value={lipColor?.name}
+              imagePath={lipColor?.imagePath}
+              onClick={() => router.push('/style/women/catalog/lips?returnTo=review')}
+            />
+            <ReviewRow
+              label="Eye shadow"
+              value={eyeShadow?.name}
+              imagePath={eyeShadow?.imagePath}
+              onClick={() => router.push('/style/women/catalog/eyes?returnTo=review')}
+            />
+            <ReviewRow
+              label="Liner"
+              value={eyeLiner?.name}
+              imagePath={eyeLiner?.imagePath}
+              onClick={() => router.push('/style/women/catalog/eyes?returnTo=review')}
+            />
+            <ReviewRow
+              label="Lashes"
+              value={eyeLashes?.name}
+              imagePath={eyeLashes?.imagePath}
+              onClick={() => router.push('/style/women/catalog/eyes?returnTo=review')}
+            />
+            <ReviewRow
+              label="Brows"
+              value={brows?.name}
+              imagePath={brows?.imagePath}
+              onClick={() => router.push('/style/women/catalog/brows?returnTo=review')}
+            />
+            <ReviewRow
+              label="Skin"
+              value={skin?.name}
+              imagePath={skin?.imagePath}
+              onClick={() => router.push('/style/women/catalog/skin?returnTo=review')}
+            />
+            <ReviewRow
+              label="Blush color"
+              value={blushColor?.name}
+              imagePath={blushColor?.imagePath}
+              onClick={() => router.push('/style/women/catalog/blush?returnTo=review')}
+            />
+            <ReviewRow
+              label="Blush style"
+              value={blushStyle?.name}
+              imagePath={blushStyle?.imagePath}
+              onClick={() => router.push('/style/women/catalog/blush?returnTo=review')}
+            />
+            <ReviewRow
+              label="Blush intensity"
+              value={blushIntensity?.name}
+              imagePath={blushIntensity?.imagePath}
+              onClick={() => router.push('/style/women/catalog/blush?returnTo=review')}
+            />
+            <ReviewRow
+              label="Contour type"
+              value={contourType?.name}
+              imagePath={contourType?.imagePath}
+              onClick={() => router.push('/style/women/catalog/contour?returnTo=review')}
+            />
+            <ReviewRow
+              label="Bronzer tone"
+              value={bronzerTone?.name}
+              imagePath={bronzerTone?.imagePath}
+              onClick={() => router.push('/style/women/catalog/contour?returnTo=review')}
+            />
+            <ReviewRow
+              label="Contour intensity"
+              value={contourIntensity?.name}
+              imagePath={contourIntensity?.imagePath}
+              onClick={() => router.push('/style/women/catalog/contour?returnTo=review')}
+            />
+            <ReviewRow
+              label="Highlight placement"
+              value={highlightPlacement?.name}
+              imagePath={highlightPlacement?.imagePath}
+              onClick={() => router.push('/style/women/catalog/highlight?returnTo=review')}
+            />
+            <ReviewRow
+              label="Highlight tone"
+              value={highlightTone?.name}
+              imagePath={highlightTone?.imagePath}
+              onClick={() => router.push('/style/women/catalog/highlight?returnTo=review')}
+            />
+            <ReviewRow
+              label="Highlight intensity"
+              value={highlightIntensity?.name}
+              imagePath={highlightIntensity?.imagePath}
+              onClick={() => router.push('/style/women/catalog/highlight?returnTo=review')}
+            />
+            <ReviewRow
+              label="Highlight finish"
+              value={highlightFinish?.name}
+              imagePath={highlightFinish?.imagePath}
+              onClick={() => router.push('/style/women/catalog/highlight?returnTo=review')}
             />
           </div>
         </Card>
@@ -144,7 +320,7 @@ export default function WomenCatalogReviewPage() {
           <Button
             type="button"
             variant="secondary"
-            onClick={() => router.push('/style/women/catalog/lashes')}
+            onClick={() => router.push('/style/women/catalog/highlight')}
           >
             Back
           </Button>
@@ -159,10 +335,6 @@ export default function WomenCatalogReviewPage() {
       </div>
     </div>
   )
-}
-
-function findLabel(options: Array<{ id: string; label: string }>, id?: string) {
-  return options.find((option) => option.id === id)?.label
 }
 
 function ReviewRow({

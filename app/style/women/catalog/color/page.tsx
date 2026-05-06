@@ -43,7 +43,7 @@ export default function WomenColorCatalogPage() {
         router.push(
           isReturningToReview()
             ? '/style/women/catalog/review'
-            : '/style/women/catalog/makeup',
+            : '/style/women/catalog/lips',
         )
       }
       continueDisabled={!session.hairColorId}

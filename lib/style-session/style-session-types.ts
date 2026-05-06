@@ -6,6 +6,13 @@ export type WomenCatalogCategory =
   | 'style'
   | 'color'
   | 'makeup'
+  | 'lips'
+  | 'eyes'
+  | 'brows'
+  | 'skin'
+  | 'blush'
+  | 'contour'
+  | 'highlight'
   | 'lashes'
   | 'review'
 
@@ -18,6 +25,13 @@ export type StyleSessionRoute =
   | '/style/women/catalog/style'
   | '/style/women/catalog/color'
   | '/style/women/catalog/makeup'
+  | '/style/women/catalog/lips'
+  | '/style/women/catalog/eyes'
+  | '/style/women/catalog/brows'
+  | '/style/women/catalog/skin'
+  | '/style/women/catalog/blush'
+  | '/style/women/catalog/contour'
+  | '/style/women/catalog/highlight'
   | '/style/women/catalog/lashes'
   | '/style/women/catalog/review'
   | '/style/loading'
@@ -56,6 +70,24 @@ export type StyleFlowSessionState = {
   makeup?: boolean
   dye?: boolean
   lipstick?: string
+  lipFinish?: string
+  lipStyle?: string
+  lipColor?: string
+  eyeShadow?: string
+  eyeLiner?: string
+  eyeLashes?: string
+  browStyle?: string
+  skinType?: string
+  blushColor?: string
+  blushStyle?: string
+  blushIntensity?: string
+  contourType?: string
+  bronzerTone?: string
+  contourIntensity?: string
+  highlightPlacement?: string
+  highlightTone?: string
+  highlightIntensity?: string
+  highlightFinish?: string
   mascara?: string
   extensions?: boolean
   customerName?: string
@@ -81,6 +113,24 @@ export type WomenStyleSessionOptions = Partial<
     | 'makeup'
     | 'dye'
     | 'lipstick'
+    | 'lipFinish'
+    | 'lipStyle'
+    | 'lipColor'
+    | 'eyeShadow'
+    | 'eyeLiner'
+    | 'eyeLashes'
+    | 'browStyle'
+    | 'skinType'
+    | 'blushColor'
+    | 'blushStyle'
+    | 'blushIntensity'
+    | 'contourType'
+    | 'bronzerTone'
+    | 'contourIntensity'
+    | 'highlightPlacement'
+    | 'highlightTone'
+    | 'highlightIntensity'
+    | 'highlightFinish'
     | 'mascara'
     | 'extensions'
   >

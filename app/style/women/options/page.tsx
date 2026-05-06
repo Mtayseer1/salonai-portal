@@ -94,7 +94,7 @@ export default function WomenOptionsPage() {
           />
           <ModeCard
             title="Catalog Style"
-            description="Choose style, color, lipstick, mascara, and extensions."
+            description="Choose hair, lips, eyes, liner, and lashes."
             active={activeMode === 'catalog'}
             disabled={generating}
             onClick={selectCatalog}
