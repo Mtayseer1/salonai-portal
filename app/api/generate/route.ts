@@ -55,6 +55,9 @@ const NO_STORE_HEADERS = {
 }
 
 type AdminSupabaseClient = ReturnType<typeof createServiceClient>
+type AuthenticatedUser = Awaited<
+  ReturnType<ReturnType<typeof createClient>['auth']['getUser']>
+>['data']['user']
 
 function noStoreJson(body: unknown, init?: ResponseInit) {
   return NextResponse.json(body, {
@@ -134,20 +137,18 @@ export async function POST(request: Request) {
     }
 
     const supabaseAdmin = createServiceClient()
-    const {
-      data: { user },
-      error: authError,
-    } = await supabaseAdmin.auth.getUser(accessToken)
+    const authResult = await getAuthenticatedUser(accessToken)
+    const user = authResult.user
 
-    if (authError || !user) {
-      logGenerationFailure(requestId, 'auth', authError)
+    if (!user) {
+      logGenerationFailure(requestId, 'auth', authResult.attempts)
 
       return noStoreJson(
         {
           error: 'Sign in before generating.',
           code: 'unauthenticated',
           debug: createDebug(requestId, 'auth', {
-            authError: serializeLogDetails(authError),
+            authAttempts: authResult.attempts,
             hasToken: Boolean(accessToken),
             tokenPrefix: accessToken.slice(0, 12),
             clientUserId: request.headers.get('x-salon-user-id'),
@@ -394,6 +395,43 @@ async function parseEdgeResponse(response: Response) {
 
 function createServiceClient() {
   return createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
+}
+
+async function getAuthenticatedUser(accessToken: string): Promise<{
+  user: AuthenticatedUser
+  attempts: Array<{ method: string; ok: boolean; error?: unknown }>
+}> {
+  const attempts: Array<{ method: string; ok: boolean; error?: unknown }> = []
+
+  const publicClient = createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!)
+  const publicResult = await publicClient.auth.getUser(accessToken)
+  attempts.push({
+    method: 'publishable_key_getUser',
+    ok: Boolean(publicResult.data.user) && !publicResult.error,
+    error: publicResult.error ? serializeLogDetails(publicResult.error) : undefined,
+  })
+
+  if (publicResult.data.user && !publicResult.error) {
+    return {
+      user: publicResult.data.user,
+      attempts,
+    }
+  }
+
+  const serviceClient = createServiceClient()
+  const serviceResult = await serviceClient.auth.getUser(accessToken)
+  attempts.push({
+    method: 'service_role_getUser',
+    ok: Boolean(serviceResult.data.user) && !serviceResult.error,
+    error: serviceResult.error
+      ? serializeLogDetails(serviceResult.error)
+      : undefined,
+  })
+
+  return {
+    user: serviceResult.data.user,
+    attempts,
+  }
 }
 
 function getBearerToken(request: Request) {
