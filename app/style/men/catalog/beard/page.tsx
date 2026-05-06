@@ -3,51 +3,51 @@
 import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/app/components/ui'
+import { CatalogStickyActions, useStyleSession } from '@/components/style-session'
 import {
-  CatalogOptionCard,
-  CatalogStickyActions,
-  useStyleSession,
-} from '@/components/style-session'
-import {
-  MEN_HAIR_CATEGORIES,
-  findMenHairOption,
-  getMenHairCategory,
-  getMenHairOptionsForCategory,
-  type MenHairCategoryId,
-} from '@/lib/style-session/men-hair-catalog'
+  MEN_BEARD_CATEGORIES,
+  findMenBeardOption,
+  getMenBeardCategory,
+  getMenBeardOptionsForCategory,
+  type MenBeardCategoryId,
+} from '@/lib/style-session/men-beard-catalog'
 
 const PAGE_SIZE = 20
 
-export default function MenCatalogPage() {
+export default function MenBeardCatalogPage() {
   const router = useRouter()
   const session = useStyleSession()
   const [selectedCategoryId, setSelectedCategoryId] =
-    useState<MenHairCategoryId | null>(
-      (getMenHairCategory(session.hairCategory)?.id as MenHairCategoryId | undefined) ||
-        null,
+    useState<MenBeardCategoryId | null>(
+      (getMenBeardCategory(session.beardCategory)?.id as
+        | MenBeardCategoryId
+        | undefined) || null,
     )
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
-  const selectedCategory = getMenHairCategory(selectedCategoryId)
-  const selectedOption = findMenHairOption(session.hairCategory, session.hairStyle)
+  const selectedCategory = getMenBeardCategory(selectedCategoryId)
+  const selectedOption = findMenBeardOption(
+    session.beardCategory,
+    session.beardStyle,
+  )
   const options = useMemo(
-    () => getMenHairOptionsForCategory(selectedCategoryId),
+    () => getMenBeardOptionsForCategory(selectedCategoryId),
     [selectedCategoryId],
   )
   const visibleOptions = options.slice(0, visibleCount)
 
-  const chooseCategory = (categoryId: MenHairCategoryId) => {
+  const chooseCategory = (categoryId: MenBeardCategoryId) => {
     setSelectedCategoryId(categoryId)
     setVisibleCount(PAGE_SIZE)
 
-    if (session.hairCategory !== categoryId) {
+    if (session.beardCategory !== categoryId) {
       session.setMenOptions({
-        hairCategory: categoryId,
-        hairStyle: undefined,
+        beardCategory: categoryId,
+        beardStyle: undefined,
       })
     }
   }
 
-  const returnToOptions = () => {
+  const returnToReview = () => {
     router.push('/style/men/catalog/review')
   }
 
@@ -59,19 +59,19 @@ export default function MenCatalogPage() {
             Men catalog
           </p>
           <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">
-            {selectedCategory ? selectedCategory.label : 'Choose hair category'}
+            {selectedCategory ? selectedCategory.label : 'Choose beard category'}
           </h2>
           <p className="mt-2 text-sm text-zinc-400">
             {selectedCategory
-              ? 'Pick one hair style, then return to review.'
-              : 'Start with the category that best matches the client.'}
+              ? 'Pick one beard style, then return to review.'
+              : 'Choose the grooming family first.'}
           </p>
         </div>
 
         {!selectedCategory ? (
           <div className="grid grid-cols-2 gap-3">
-            {MEN_HAIR_CATEGORIES.map((category) => {
-              const count = getMenHairOptionsForCategory(category.id).length
+            {MEN_BEARD_CATEGORIES.map((category) => {
+              const count = getMenBeardOptionsForCategory(category.id).length
 
               return (
                 <button
@@ -111,24 +111,34 @@ export default function MenCatalogPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              {visibleOptions.map((option) => (
-                <CatalogOptionCard
-                  key={`${option.categoryId}-${option.name}`}
-                  label={option.name}
-                  description={option.description}
-                  imagePath={option.imagePath}
-                  selected={
-                    session.hairCategory === option.categoryId &&
-                    session.hairStyle === option.name
-                  }
-                  onClick={() =>
-                    session.setMenOptions({
-                      hairCategory: option.categoryId,
-                      hairStyle: option.name,
-                    })
-                  }
-                />
-              ))}
+              {visibleOptions.map((option) => {
+                const active =
+                  session.beardCategory === option.categoryId &&
+                  session.beardStyle === option.name
+
+                return (
+                  <button
+                    key={`${option.categoryId}-${option.name}`}
+                    type="button"
+                    onClick={() =>
+                      session.setMenOptions({
+                        beardCategory: option.categoryId,
+                        beardStyle: option.name,
+                      })
+                    }
+                    className={`min-h-36 rounded-2xl border p-3 text-left transition ${
+                      active
+                        ? 'scale-[1.015] border-fuchsia-300/60 bg-white text-zinc-950 shadow-xl shadow-fuchsia-950/20'
+                        : 'border-white/10 bg-white/[0.04] text-zinc-300 hover:bg-white/[0.08] hover:text-white'
+                    }`}
+                  >
+                    <span className="block text-sm font-bold">{option.name}</span>
+                    <span className="mt-2 block text-xs leading-relaxed opacity-70">
+                      {option.description}
+                    </span>
+                  </button>
+                )
+              })}
             </div>
 
             {visibleCount < options.length && (
@@ -145,8 +155,8 @@ export default function MenCatalogPage() {
       </div>
 
       <CatalogStickyActions
-        onBack={returnToOptions}
-        onContinue={returnToOptions}
+        onBack={returnToReview}
+        onContinue={returnToReview}
         continueDisabled={Boolean(selectedCategory && !selectedOption)}
         continueLabel={selectedCategory ? 'Done' : 'Back'}
       />

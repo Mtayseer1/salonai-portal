@@ -9,7 +9,7 @@ import type { ChangeEvent } from 'react'
 
 export default function StylePhotoPage() {
   const router = useRouter()
-  const { gender, imageFile, imagePreviewUrl, setImage } = useStyleSession()
+  const { gender, mode, imageFile, imagePreviewUrl, setImage } = useStyleSession()
   const [message, setMessage] = useState('')
 
   const selectImage = (event: ChangeEvent<HTMLInputElement>) => {
@@ -25,7 +25,7 @@ export default function StylePhotoPage() {
     }
 
     if (gender === 'men') {
-      router.push('/style/men/options')
+      router.push(mode === 'smart' ? '/style/men/options' : '/style/men/catalog/review')
       return
     }
 

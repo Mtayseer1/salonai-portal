@@ -22,6 +22,8 @@ export type StyleSessionRoute =
   | '/style/photo'
   | '/style/men/options'
   | '/style/men/catalog'
+  | '/style/men/catalog/beard'
+  | '/style/men/catalog/review'
   | '/style/women/options'
   | '/style/women/catalog/style'
   | '/style/women/catalog/color'

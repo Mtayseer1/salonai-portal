@@ -192,7 +192,9 @@ export default function StyleResultPage() {
             router.push(
               session.gender === 'women'
                 ? '/style/women/catalog/review'
-                : '/style/men/options',
+                : session.mode === 'catalog'
+                  ? '/style/men/catalog/review'
+                  : '/style/men/options',
             )
           }
           disabled={!session.imageFile}

@@ -46,7 +46,7 @@ export default function StylePage() {
 
   const selectGender = (value: StyleSessionGender) => {
     setGender(value)
-    router.push('/style/info')
+    router.push(value === 'men' ? '/style/men/options' : '/style/info')
   }
 
   return (
