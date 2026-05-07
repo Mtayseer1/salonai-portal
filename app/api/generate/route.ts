@@ -669,5 +669,5 @@ function getGenerationFunctionName(body: GenerateRequestBody) {
     return 'openai-auto-style'
   }
 
-  return body.mode === 'smart' ? 'gemini-auto-style' : 'openai-auto-style'
+  return 'gemini-auto-style'
 }
