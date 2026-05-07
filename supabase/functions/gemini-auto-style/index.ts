@@ -572,16 +572,11 @@ function lookupCatalogOption(
 
 function formatCatalogPromptOption(
   label: string,
-  selectedValue: string,
   option: CatalogPromptOption,
 ) {
-  const category = option.categoryLabel ? ` (${option.categoryLabel})` : "";
   const description = option.description.replace(/\s+/g, " ").trim();
 
-  return [
-    `${label}: ${selectedValue}${category}`,
-    `${label} details: ${description}`,
-  ].join("\n");
+  return `${label} details: ${description}`;
 }
 
 function createSelectedOptions(body: Record<string, unknown>) {
@@ -749,9 +744,7 @@ Return final image only.
 }
 
 function buildCatalogPrompt(
-  hairStyle: string,
   hairOption: CatalogPromptOption,
-  beardStyle: string,
   beardOption: CatalogPromptOption,
   referenceImages: CatalogReferenceImage[],
 ) {
@@ -766,14 +759,13 @@ REFERENCE IMAGE RULE:
     : "";
 
   return `
-Never change the identity.
-Keep the same person.
-
 ${referenceRule}
 Apply the following styles:
-${formatCatalogPromptOption("Hairstyle", hairStyle, hairOption)}
 
-${formatCatalogPromptOption("Beard style", beardStyle, beardOption)}
+${formatCatalogPromptOption("Hairstyle", hairOption)}
+
+
+${formatCatalogPromptOption("Beard style", beardOption)}
 `;
 }
 
@@ -921,9 +913,7 @@ Deno.serve(async (req) => {
         beardStyleImageUrl,
       );
       prompt = buildCatalogPrompt(
-        hairStyle,
         hairOption,
-        beardStyle,
         beardOption,
         referenceImages,
       );
