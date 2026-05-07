@@ -12,6 +12,8 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 const GEMINI_MODEL = "gemini-3-pro-image-preview";
 const USE_CATALOG_REFERENCE_IMAGES =
   Deno.env.get("USE_CATALOG_REFERENCE_IMAGES") === "true";
+const USE_TWO_STEP_CATALOG_GENERATION =
+  Deno.env.get("USE_TWO_STEP_CATALOG_GENERATION") !== "false";
 
 if (!GEMINI_API_KEY) {
   throw new Error("Missing GEMINI_API_KEY");
@@ -760,6 +762,10 @@ REFERENCE IMAGE RULE:
 
   return `
 ${referenceRule}
+The uploaded image may be a clean grooming base from a previous edit.
+Apply only the selected scalp hairstyle and selected facial-hair style.
+Keep the same person, face, expression, pose, clothes, lighting, crop, and background.
+
 Apply the following styles:
 
 ${formatCatalogPromptOption("Hairstyle", hairOption)}
@@ -767,6 +773,45 @@ ${formatCatalogPromptOption("Hairstyle", hairOption)}
 
 ${formatCatalogPromptOption("Beard style", beardOption)}
 `;
+}
+
+function buildCleanBasePrompt() {
+  return `
+You are a professional photorealistic portrait retoucher.
+
+TASK:
+Create ONE clean grooming base image of the SAME PERSON.
+
+REMOVE ONLY:
+- Remove all visible scalp hair.
+- Remove the full beard, mustache, stubble, sideburn facial hair, chin hair, jaw hair, cheek hair, and neck hair.
+- Make the head look naturally clean-shaved/bald with realistic scalp skin texture.
+- Make the face clean-shaven with realistic skin texture and natural shaving shadow only if appropriate.
+
+PRESERVE EXACTLY:
+- Same identity, face shape, eyes, eyebrows, eyelashes, nose, lips, jawline, age, skin tone, expression, and natural imperfections.
+- Same camera angle, lens perspective, crop, framing, head position, pose, shoulders, body shape, clothes, accessories, lighting, shadows, exposure, color temperature, background, room, and objects.
+
+DO NOT:
+- Do not remove or alter eyebrows or eyelashes.
+- Do not beautify, smooth skin, slim face, widen face, change body, change clothes, change background, add makeup, add props, add studio lighting, or restage the photo.
+- Do not add any hairstyle or beard style in this step.
+
+FINAL CHECK:
+The output must look like the original photo with only scalp hair and facial hair removed.
+
+Return final image only.
+`;
+}
+
+function formatTwoStepPromptLog(cleanPrompt: string, stylePrompt: string) {
+  return [
+    "STEP 1 - CLEAN BASE PROMPT:",
+    cleanPrompt.trim(),
+    "",
+    "STEP 2 - STYLE APPLICATION PROMPT:",
+    stylePrompt.trim(),
+  ].join("\n");
 }
 
 /* ============================================================
@@ -777,10 +822,11 @@ async function callGemini(
   prompt: string,
   imageBase64: string,
   referenceImages: CatalogReferenceImage[] = [],
+  sourceMimeType = "image/jpeg",
 ) {
   const sourceImagePart = {
     inlineData: {
-      mimeType: "image/jpeg",
+      mimeType: sourceMimeType,
       data: imageBase64,
     },
   };
@@ -873,7 +919,9 @@ Deno.serve(async (req) => {
 
     const imageBase64 = await fetchImageBase64(src_file_url);
     let prompt = "";
+    let cleanBasePrompt = "";
     let referenceImages: CatalogReferenceImage[] = [];
+    let useTwoStepCatalogGeneration = false;
 
     if (isSmartStyle === true) {
       if (!hairLength || !beardLength) {
@@ -917,9 +965,17 @@ Deno.serve(async (req) => {
         beardOption,
         referenceImages,
       );
+      useTwoStepCatalogGeneration = USE_TWO_STEP_CATALOG_GENERATION;
+
+      if (useTwoStepCatalogGeneration) {
+        cleanBasePrompt = buildCleanBasePrompt();
+      }
     }
 
     const mode = isSmartStyle === true ? "smart" : "catalog";
+    const loggedPrompt = cleanBasePrompt
+      ? formatTwoStepPromptLog(cleanBasePrompt, prompt)
+      : prompt;
     const logContext = (log_context || {}) as GeminiLogContext;
     const logId = await insertGeminiCallLog({
       request_id: logContext.request_id || null,
@@ -930,8 +986,11 @@ Deno.serve(async (req) => {
       customer_name: logContext.customer_name || null,
       customer_phone: logContext.customer_phone || null,
       src_file_url,
-      selected_options: createSelectedOptions(body),
-      prompt,
+      selected_options: {
+        ...createSelectedOptions(body),
+        twoStepCatalogGeneration: useTwoStepCatalogGeneration,
+      },
+      prompt: loggedPrompt,
       gemini_model: GEMINI_MODEL,
       status: "started",
       started_at: new Date().toISOString(),
@@ -940,7 +999,17 @@ Deno.serve(async (req) => {
     let result;
 
     try {
-      result = await callGemini(prompt, imageBase64, referenceImages);
+      if (cleanBasePrompt) {
+        const cleanBase = await callGemini(cleanBasePrompt, imageBase64);
+        result = await callGemini(
+          prompt,
+          cleanBase.imageBase64,
+          referenceImages,
+          cleanBase.mimeType,
+        );
+      } else {
+        result = await callGemini(prompt, imageBase64, referenceImages);
+      }
       await updateGeminiCallLog(logId, {
         status: "success",
         generated_image_base64: result.imageBase64,
