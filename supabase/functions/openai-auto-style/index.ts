@@ -568,11 +568,16 @@ function lookupCatalogOption(
 
 function formatCatalogPromptOption(
   label: string,
+  selectedValue: string,
   option: CatalogPromptOption,
 ) {
   const description = option.description.replace(/\s+/g, " ").trim();
+  const category = option.categoryLabel ? ` (${option.categoryLabel})` : "";
 
-  return `${label} details: ${description}`;
+  return [
+    `${label}: ${selectedValue}${category}`,
+    `${label} technical prompt: ${description}`,
+  ].join("\n");
 }
 
 function createSelectedOptions(body: Record<string, unknown>) {
@@ -740,7 +745,9 @@ Return final image only.
 }
 
 function buildCatalogPrompt(
+  hairStyle: string,
   hairOption: CatalogPromptOption,
+  beardStyle: string,
   beardOption: CatalogPromptOption,
   referenceImages: CatalogReferenceImage[],
 ) {
@@ -755,13 +762,70 @@ REFERENCE IMAGE RULE:
     : "";
 
   return `
+You are a professional barber and photorealistic portrait editor.
+
+IDENTITY RULES:
+- Preserve exact facial identity.
+- Do NOT beautify.
+- Do NOT smooth skin.
+- Do NOT change age.
+- Do NOT modify facial structure.
+- Keep natural imperfections.
+
+${PRESERVE_SOURCE_RULES}
+
+CATALOG BEARD RULE:
+- Apply the selected beard style exactly as the requested facial-hair edit.
+- It is allowed to add facial hair only where the selected beard style requires it.
+- It is allowed to remove, shave, shorten, reshape, or clean existing facial hair where the selected beard style requires it.
+- Do not preserve the original beard density, cheek coverage, neckline, or mustache connection if it conflicts with the selected beard style.
+- Do not add facial hair outside the selected beard style.
+
+CAMERA:
+- Same angle as original.
+- Same lighting as original.
+- Same expression as original.
+- Same crop, framing, pose, clothes, shoulders, and background as original.
+- Same lens perspective, body position, visible outfit, accessories, objects, and room/location as original.
+
+QUALITY:
+- Match the source photo realism and resolution.
+- Keep original photo texture.
+- No filters.
+- No CGI.
+
+TASK:
+Generate ONE ultra-realistic portrait of the SAME PERSON.
+
+${formatCatalogPromptOption("Hairstyle", hairStyle, hairOption)}
+
+
+${formatCatalogPromptOption("Beard style", beardStyle, beardOption)}
+
 ${referenceRule}
-Apply the following styles:
 
-${formatCatalogPromptOption("Hairstyle", hairOption)}
+RULES:
+- Only ONE variation.
+- No grid.
+- No artistic effects.
+- Follow the selected catalog prompt text exactly.
+- Preserve realistic barber grooming and natural hair texture.
+- Only the selected hairstyle and selected beard style may change.
+- The selected hairstyle may change scalp hair only.
+- The selected beard style may change facial hair only, including adding/removing beard or mustache hair needed for that exact style.
+- Do not change the background, clothes, face, expression, pose, crop, lighting, accessories, or body.
 
+BACKGROUND:
+- Keep the exact original background from the uploaded image.
+- Never replace or stylize the background.
 
-${formatCatalogPromptOption("Beard style", beardOption)}
+FINAL CHECK:
+If identity changes, regenerate.
+If beautified, regenerate.
+If clothing, background, camera angle, pose, lighting, or unselected features change, regenerate.
+If the output looks like a restaged portrait instead of the same source photo with selected hair/beard edits, regenerate.
+
+Return final image only.
 `;
 }
 
@@ -888,7 +952,9 @@ Deno.serve(async (req) => {
         beardStyleImageUrl,
       );
       prompt = buildCatalogPrompt(
+        hairStyle,
         hairOption,
+        beardStyle,
         beardOption,
         referenceImages,
       );
