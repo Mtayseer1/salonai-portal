@@ -223,6 +223,7 @@ function createGenerationRequest(session: StyleFlowSessionState, imageUrl: strin
     return {
       gender: 'men',
       mode: session.mode,
+      generationProvider: getMenGenerationProvider(),
       imageUrl,
       hairLength: session.hairLength,
       beardLength: session.beardLength,
@@ -328,4 +329,15 @@ function formatPromptOption(option?: { name: string; description?: string }) {
   return option.description
     ? `${option.name}: ${option.description}`
     : option.name
+}
+
+function getMenGenerationProvider() {
+  if (typeof window === 'undefined') {
+    return undefined
+  }
+
+  return window.localStorage.getItem('salonai_men_generation_provider') ===
+    'openai'
+    ? 'openai'
+    : undefined
 }

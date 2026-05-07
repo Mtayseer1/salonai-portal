@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 type GenerateRequestBody = {
   gender?: string
   mode?: string
+  generationProvider?: 'gemini' | 'openai'
   imageUrl?: string
   hairLength?: string
   beardLength?: string
@@ -654,5 +655,11 @@ function createGenerationPayload(
 }
 
 function getGenerationFunctionName(body: GenerateRequestBody) {
-  return body.gender === 'women' ? 'gemini-women-style' : 'gemini-auto-style'
+  if (body.gender === 'women') {
+    return 'gemini-women-style'
+  }
+
+  return body.generationProvider === 'openai'
+    ? 'openai-auto-style'
+    : 'gemini-auto-style'
 }
