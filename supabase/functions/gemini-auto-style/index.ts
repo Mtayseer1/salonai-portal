@@ -11,7 +11,7 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 const GEMINI_MODEL = "gemini-3-pro-image-preview";
 const USE_CATALOG_REFERENCE_IMAGES =
-  Deno.env.get("USE_CATALOG_REFERENCE_IMAGES") !== "false";
+  Deno.env.get("USE_CATALOG_REFERENCE_IMAGES") === "true";
 
 if (!GEMINI_API_KEY) {
   throw new Error("Missing GEMINI_API_KEY");
@@ -796,23 +796,26 @@ async function callGemini(
   imageBase64: string,
   referenceImages: CatalogReferenceImage[] = [],
 ) {
-  const parts = [
-    { text: prompt },
-    {
-      text:
-        "CUSTOMER SOURCE IMAGE: edit this exact photo. Preserve identity, face, pose, crop, lighting, clothes, and background.",
+  const sourceImagePart = {
+    inlineData: {
+      mimeType: "image/jpeg",
+      data: imageBase64,
     },
-    {
-      inlineData: {
-        mimeType: "image/jpeg",
-        data: imageBase64,
-      },
-    },
-    ...referenceImages.flatMap((reference) => [
-      { text: reference.label },
-      { inlineData: reference.inlineData },
-    ]),
-  ];
+  };
+  const parts = referenceImages.length
+    ? [
+        { text: prompt },
+        {
+          text:
+            "CUSTOMER SOURCE IMAGE: edit this exact photo. Preserve identity, face, pose, crop, lighting, clothes, and background.",
+        },
+        sourceImagePart,
+        ...referenceImages.flatMap((reference) => [
+          { text: reference.label },
+          { inlineData: reference.inlineData },
+        ]),
+      ]
+    : [{ text: prompt }, sourceImagePart];
 
   const body = {
     contents: [
