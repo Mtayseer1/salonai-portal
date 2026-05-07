@@ -9,6 +9,8 @@ type GenerateRequestBody = {
   beardLength?: string
   hairStyle?: string
   beardStyle?: string
+  hairStyleImagePath?: string
+  beardStyleImagePath?: string
   haircutId?: string
   hairStyleId?: string
   hairColorId?: string
@@ -41,6 +43,12 @@ type GenerateRequestBody = {
   extensions?: boolean
   customerName?: string
   customerPhone?: string
+}
+
+type GenerationLogMetadata = {
+  requestId: string
+  userId: string
+  origin: string
 }
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -248,7 +256,11 @@ export async function POST(request: Request) {
       )
     }
 
-    const payload = createGenerationPayload(body)
+    const payload = createGenerationPayload(body, {
+      requestId,
+      userId: user.id,
+      origin: getRequestOrigin(request),
+    })
 
     let response: Response
 
@@ -431,6 +443,34 @@ function getBearerToken(request: Request) {
   return request.headers.get('x-supabase-access-token')?.trim() || null
 }
 
+function getRequestOrigin(request: Request) {
+  const appUrl = process.env.APP_URL?.trim()
+
+  if (appUrl) {
+    return appUrl.replace(/\/+$/, '')
+  }
+
+  return new URL(request.url).origin.replace(/\/+$/, '')
+}
+
+function toAbsolutePublicAssetUrl(path: string | undefined, origin: string) {
+  if (!path) {
+    return undefined
+  }
+
+  if (/^https?:\/\//i.test(path)) {
+    return path
+  }
+
+  if (!origin) {
+    return undefined
+  }
+
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`
+
+  return `${origin}${normalizedPath}`
+}
+
 async function getBarberAccount(
   supabaseAdmin: AdminSupabaseClient,
   userId: string,
@@ -515,45 +555,70 @@ async function logCreditUsage(
   })
 }
 
-function createGenerationPayload(body: GenerateRequestBody) {
+function createGenerationPayload(
+  body: GenerateRequestBody,
+  metadata: GenerationLogMetadata,
+) {
+  const logContext = {
+    request_id: metadata.requestId,
+    user_id: metadata.userId,
+    gender: body.gender || null,
+    mode: body.mode || null,
+    customer_name: body.customerName || null,
+    customer_phone: body.customerPhone?.trim() || null,
+  }
+
+  const withLogContext = <T extends Record<string, unknown>>(payload: T) => ({
+    ...payload,
+    log_context: logContext,
+  })
+
   if (body.gender === 'men') {
     return body.mode === 'smart'
-      ? {
+      ? withLogContext({
           src_file_url: body.imageUrl,
           gender: 'male',
           isSmartStyle: true,
           hairLength: body.hairLength,
           beardLength: body.beardLength,
-        }
-      : {
+        })
+      : withLogContext({
           src_file_url: body.imageUrl,
           gender: 'male',
           isSmartStyle: false,
           hairStyle: body.hairStyle,
           beardStyle: body.beardStyle,
-        }
+          hairStyleImageUrl: toAbsolutePublicAssetUrl(
+            body.hairStyleImagePath,
+            metadata.origin,
+          ),
+          beardStyleImageUrl: toAbsolutePublicAssetUrl(
+            body.beardStyleImagePath,
+            metadata.origin,
+          ),
+        })
   }
 
   if (body.mode === 'bridal') {
-    return {
+    return withLogContext({
       src_file_url: body.imageUrl,
       gender: 'female',
       mode: 'bridal',
-    }
+    })
   }
 
   if (body.mode === 'smart') {
-    return {
+    return withLogContext({
       src_file_url: body.imageUrl,
       gender: 'female',
       mode: 'smart',
       hairLength: body.hairLength,
       makeup: body.makeup,
       dye: body.dye,
-    }
+    })
   }
 
-  return {
+  return withLogContext({
     src_file_url: body.imageUrl,
     gender: 'female',
     mode: 'catalog',
@@ -585,7 +650,7 @@ function createGenerationPayload(body: GenerateRequestBody) {
     highlightFinish: body.highlightFinish,
     mascara: body.mascara,
     extensions: body.extensions,
-  }
+  })
 }
 
 function getGenerationFunctionName(body: GenerateRequestBody) {

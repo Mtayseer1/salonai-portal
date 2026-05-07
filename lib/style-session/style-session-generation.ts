@@ -28,6 +28,8 @@ import {
   HIGHLIGHT_TONES,
   findHighlightOption,
 } from './highlight-options'
+import { findMenHairOption } from './men-hair-catalog'
+import { findMenBeardOption } from './men-beard-catalog'
 import type {
   StyleFlowSessionState,
   StyleSessionGenerationResult,
@@ -209,6 +211,15 @@ function validateGenerationSession(session: StyleFlowSessionState) {
 
 function createGenerationRequest(session: StyleFlowSessionState, imageUrl: string) {
   if (session.gender === 'men') {
+    const hairOption =
+      session.mode === 'catalog'
+        ? findMenHairOption(session.hairCategory, session.hairStyle)
+        : undefined
+    const beardOption =
+      session.mode === 'catalog'
+        ? findMenBeardOption(session.beardCategory, session.beardStyle)
+        : undefined
+
     return {
       gender: 'men',
       mode: session.mode,
@@ -217,6 +228,8 @@ function createGenerationRequest(session: StyleFlowSessionState, imageUrl: strin
       beardLength: session.beardLength,
       hairStyle: session.hairStyle,
       beardStyle: session.beardStyle,
+      hairStyleImagePath: hairOption?.imagePath,
+      beardStyleImagePath: beardOption?.imagePath,
       customerName: session.customerName,
       customerPhone: session.customerPhone,
     }

@@ -7,13 +7,16 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 ============================================================ */
 
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+const GEMINI_MODEL = "gemini-3-pro-image-preview";
 
 if (!GEMINI_API_KEY) {
   throw new Error("Missing GEMINI_API_KEY");
 }
 
 const GEMINI_URL =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent";
+  `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 /* ============================================================
    HELPERS
@@ -111,6 +114,15 @@ type CatalogBeautyOptions = {
   highlightFinish?: string;
 };
 
+type GeminiLogContext = {
+  request_id?: string;
+  user_id?: string;
+  gender?: string;
+  mode?: string;
+  customer_name?: string | null;
+  customer_phone?: string | null;
+};
+
 function isNoneSelection(value?: string | null) {
   const normalized = normalizeKey(value);
   return (
@@ -148,6 +160,104 @@ function promptOptionalSelection(
 function compactLines(lines: string[]) {
   return lines.filter((line) => line.trim().length > 0).join("\n");
 }
+
+function createSelectedOptions(body: Record<string, unknown>) {
+  const excluded = new Set(["src_file_url", "log_context"]);
+
+  return Object.fromEntries(
+    Object.entries(body).filter(
+      ([key, value]) => !excluded.has(key) && value !== undefined,
+    ),
+  );
+}
+
+function serializeError(error: unknown) {
+  if (error instanceof Error) {
+    return {
+      name: error.name,
+      message: error.message,
+    };
+  }
+
+  return error;
+}
+
+async function insertGeminiCallLog(row: Record<string, unknown>) {
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+    console.warn("GEMINI LOG SKIPPED: missing Supabase service env");
+    return null;
+  }
+
+  try {
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/gemini_generation_logs`,
+      {
+        method: "POST",
+        headers: {
+          apikey: SUPABASE_SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+          "Content-Type": "application/json",
+          Prefer: "return=representation",
+        },
+        body: JSON.stringify(row),
+      },
+    );
+
+    if (!response.ok) {
+      console.error("GEMINI LOG INSERT FAILED:", {
+        status: response.status,
+        body: await response.text().catch(() => ""),
+      });
+      return null;
+    }
+
+    const data = await response.json().catch(() => []);
+    return Array.isArray(data) ? data[0]?.id ?? null : null;
+  } catch (error) {
+    console.error("GEMINI LOG INSERT ERROR:", serializeError(error));
+    return null;
+  }
+}
+
+async function updateGeminiCallLog(id: string | null, patch: Record<string, unknown>) {
+  if (!id || !SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) return;
+
+  try {
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/gemini_generation_logs?id=eq.${encodeURIComponent(id)}`,
+      {
+        method: "PATCH",
+        headers: {
+          apikey: SUPABASE_SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+          "Content-Type": "application/json",
+          Prefer: "return=minimal",
+        },
+        body: JSON.stringify(patch),
+      },
+    );
+
+    if (!response.ok) {
+      console.error("GEMINI LOG UPDATE FAILED:", {
+        status: response.status,
+        body: await response.text().catch(() => ""),
+      });
+    }
+  } catch (error) {
+    console.error("GEMINI LOG UPDATE ERROR:", serializeError(error));
+  }
+}
+
+const SOURCE_PRESERVATION_RULES = `
+SOURCE PRESERVATION RULES (MANDATORY):
+- Only change the selected hair, makeup, brow, skin base, blush, contour, highlight, lashes, lips, or bridal styling requested in this prompt.
+- Preserve the exact camera angle, crop, framing, head position, body pose, shoulders, and perspective from the uploaded image.
+- Preserve the exact background, room/location, objects, lighting direction, shadows, exposure, and color temperature from the uploaded image.
+- Preserve the exact clothing, outfit, collar, neckline, accessories, jewelry, glasses, and visible body details unless a selected option explicitly changes a hair or beauty accessory.
+- Do not change expression, face shape, eye shape, nose, lips shape, jawline, body shape, age, skin tone, clothes, background, or unselected facial features.
+- Do not add salon/studio scenery, bridal dress, luxury room, veil, jewelry, props, retouching, smoothing, or editorial lighting unless that exact item is part of the selected styling request.
+- Final result must look like the same photo with only the selected beauty changes applied.
+`.trim();
 
 /* ============================================================
    FEMALE CATALOG PROMPT LIBRARY
@@ -255,8 +365,9 @@ ABSOLUTE RULES:
 - No beautification.
 - No AI identity drift.
 - Ultra realistic photography.
-- Salon lighting.
 - Clear numbering 1–20 in corner.
+
+${SOURCE_PRESERVATION_RULES}
 
 STRUCTURE:
 
@@ -276,6 +387,7 @@ Include professional makeup variations: ${makeup === false ? "No" : "Yes"}.
 Include hair dye variations: ${dye === false ? "No" : "Yes"}.
 
 Result must look like premium salon board.
+Every grid cell must keep the same original background, clothing, camera angle, pose, crop, and lighting.
 
 Reference image:
 ${img}
@@ -436,6 +548,8 @@ ABSOLUTE RULES:
 - The customer identity comes ONLY from the uploaded customer image.
 - No catalog reference image is provided. Follow the selected catalog prompt text exactly.
 
+${SOURCE_PRESERVATION_RULES}
+
 REQUESTED STYLE:
 - Haircut family: ${selectedHaircut}
 - Haircut technical prompt: ${haircutDescription ?? selectedHaircut}
@@ -455,9 +569,7 @@ MAKEUP APPLICATION RULES:
 - Do not over-smooth skin, enlarge lips, enlarge eyes, or change identity.
 
 LIGHTING:
-- Premium salon lighting.
-- Warm professional finish.
-- Keep the background close to the source image.
+- Keep the exact original lighting, shadows, exposure, background, crop, pose, and clothing from the source image.
 
 Reference image:
 ${img}
@@ -479,6 +591,8 @@ ABSOLUTE RULES:
 - No different person.
 - Ultra-realistic photography only.
 - Clear numbering 1–6 on each variation.
+
+${SOURCE_PRESERVATION_RULES}
 
 STYLE THEME:
 Luxury Middle Eastern / Arabic bridal beauty.
@@ -507,23 +621,23 @@ JEWELRY & DETAILS:
 - Arabic-inspired hair ornaments
 - Luxury bridal earrings
 - Optional delicate headpiece
-- image should show parts of white dress
+- Do not change the customer's clothing or outfit into a bridal dress.
+- Do not add a veil unless it can be added as a hair accessory without changing the clothing or covering the original outfit.
 
 LIGHTING:
-- High-end wedding studio lighting
-- Soft warm tones
-- Magazine-quality illumination
-- Cinemematic softness
+- Keep the exact original lighting direction, shadows, exposure, and color temperature from the source image.
+- Do not convert the photo into wedding studio lighting if the source image was not shot that way.
 
 BACKGROUND:
-- Keep it as is.
-- NEVER cahnge background.
+- Keep the exact original background from the uploaded image in every grid cell.
+- NEVER change, replace, blur, stylize, or remove the background.
 
 FINAL OUTPUT:
 - Must look like a premium Arabic bridal portfolio
 - High-end wedding magazine quality
 - Ultra-realistic DSLR photography
 - No CGI, no illustration, no painting
+- If clothing, background, camera angle, pose, lighting, or unselected features change, regenerate.
 
 Reference image:
 ${img}
@@ -578,7 +692,10 @@ async function callGemini(prompt: string, imageBase64: string) {
     throw new Error("No image returned from Gemini");
   }
 
-  return resultBase64;
+  return {
+    imageBase64: resultBase64,
+    mimeType: part?.inlineData?.mimeType || "image/png",
+  };
 }
 
 /* ============================================================
@@ -630,6 +747,7 @@ Deno.serve(async (req) => {
       highlightFinish,
       mascara,
       extensions,
+      log_context,
     } = body;
 
     if (!src_file_url) {
@@ -705,7 +823,42 @@ Deno.serve(async (req) => {
        Call Gemini
     =============================== */
 
-    const image = await callGemini(prompt, imageBase64);
+    const logContext = (log_context || {}) as GeminiLogContext;
+    const logId = await insertGeminiCallLog({
+      request_id: logContext.request_id || null,
+      user_id: logContext.user_id || null,
+      edge_function: "gemini-women-style",
+      gender: logContext.gender || "women",
+      mode: logContext.mode || finalMode,
+      customer_name: logContext.customer_name || null,
+      customer_phone: logContext.customer_phone || null,
+      src_file_url,
+      selected_options: createSelectedOptions(body),
+      prompt,
+      gemini_model: GEMINI_MODEL,
+      status: "started",
+      started_at: new Date().toISOString(),
+    });
+
+    let result;
+
+    try {
+      result = await callGemini(prompt, imageBase64);
+      await updateGeminiCallLog(logId, {
+        status: "success",
+        generated_image_base64: result.imageBase64,
+        generated_image_mime_type: result.mimeType,
+        completed_at: new Date().toISOString(),
+      });
+    } catch (error) {
+      await updateGeminiCallLog(logId, {
+        status: "error",
+        error_message: error instanceof Error ? error.message : String(error),
+        error_details: serializeError(error),
+        completed_at: new Date().toISOString(),
+      });
+      throw error;
+    }
 
     /* ===============================
        Return result
@@ -714,7 +867,7 @@ Deno.serve(async (req) => {
     return json(200, {
       ok: true,
       mode: finalMode,
-      image_base64: image,
+      image_base64: result.imageBase64,
     });
   } catch (e) {
     console.error("WOMEN EDGE ERROR:", e);
