@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { usePathname, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 type NavItem = {
   href: string
@@ -227,14 +228,40 @@ export function Alert({
 }
 
 export function LoadingScreen({ label = 'Loading workspace...' }: { label?: string }) {
+  const elapsedSeconds = useElapsedSeconds()
+
   return (
     <main className="page-bg flex items-center justify-center px-4">
       <div className="w-full max-w-sm rounded-3xl border border-white/10 bg-white/[0.055] p-8 text-center shadow-2xl shadow-black/30 backdrop-blur-xl">
         <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-zinc-700 border-t-fuchsia-300" />
         <p className="mt-4 text-sm text-zinc-400">{label}</p>
+        <p className="mt-2 font-mono text-xs text-zinc-600">
+          {formatElapsedTime(elapsedSeconds)}
+        </p>
       </div>
     </main>
   )
+}
+
+function useElapsedSeconds() {
+  const [elapsedSeconds, setElapsedSeconds] = useState(0)
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setElapsedSeconds((seconds) => seconds + 1)
+    }, 1000)
+
+    return () => window.clearInterval(intervalId)
+  }, [])
+
+  return elapsedSeconds
+}
+
+function formatElapsedTime(totalSeconds: number) {
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 }
 
 export function EmptyState({

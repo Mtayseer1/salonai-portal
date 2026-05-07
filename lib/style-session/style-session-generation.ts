@@ -223,7 +223,8 @@ function createGenerationRequest(session: StyleFlowSessionState, imageUrl: strin
     return {
       gender: 'men',
       mode: session.mode,
-      generationProvider: getMenGenerationProvider(),
+      generationProvider:
+        session.mode === 'smart' ? 'gemini' : getMenGenerationProvider(),
       imageUrl,
       hairLength: session.hairLength,
       beardLength: session.beardLength,

@@ -51,6 +51,8 @@ export default function StyleLoadingPage() {
 }
 
 function GenerationLoadingScreen() {
+  const elapsedSeconds = useElapsedSeconds()
+
   return (
     <main className="flex min-h-[calc(100vh-120px)] items-center justify-center px-2">
       <div className="relative w-full overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.055] p-8 text-center shadow-2xl shadow-black/30 backdrop-blur-xl">
@@ -71,6 +73,9 @@ function GenerationLoadingScreen() {
         <p className="mt-3 text-sm leading-6 text-zinc-400">
           Mixing the selected salon details into a fresh AI preview.
         </p>
+        <p className="mt-2 font-mono text-xs text-zinc-600">
+          {formatElapsedTime(elapsedSeconds)}
+        </p>
         <div className="mt-7 grid grid-cols-3 gap-2">
           {['Reading photo', 'Styling', 'Rendering'].map((label, index) => (
             <div
@@ -90,4 +95,25 @@ function GenerationLoadingScreen() {
       </div>
     </main>
   )
+}
+
+function useElapsedSeconds() {
+  const [elapsedSeconds, setElapsedSeconds] = useState(0)
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setElapsedSeconds((seconds) => seconds + 1)
+    }, 1000)
+
+    return () => window.clearInterval(intervalId)
+  }, [])
+
+  return elapsedSeconds
+}
+
+function formatElapsedTime(totalSeconds: number) {
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 }

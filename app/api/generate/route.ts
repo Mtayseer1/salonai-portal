@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
+export const maxDuration = 120
+
 type GenerateRequestBody = {
   gender?: string
   mode?: string
@@ -659,7 +661,13 @@ function getGenerationFunctionName(body: GenerateRequestBody) {
     return 'gemini-women-style'
   }
 
-  return body.generationProvider === 'gemini'
-    ? 'gemini-auto-style'
-    : 'openai-auto-style'
+  if (body.generationProvider === 'gemini') {
+    return 'gemini-auto-style'
+  }
+
+  if (body.generationProvider === 'openai') {
+    return 'openai-auto-style'
+  }
+
+  return body.mode === 'smart' ? 'gemini-auto-style' : 'openai-auto-style'
 }
