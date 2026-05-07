@@ -832,7 +832,7 @@ Deno.serve(async (req) => {
       mode: logContext.mode || finalMode,
       customer_name: logContext.customer_name || null,
       customer_phone: logContext.customer_phone || null,
-      src_file_url,
+      src_file_url: null,
       selected_options: createSelectedOptions(body),
       prompt,
       gemini_model: GEMINI_MODEL,
@@ -846,7 +846,6 @@ Deno.serve(async (req) => {
       result = await callGemini(prompt, imageBase64);
       await updateGeminiCallLog(logId, {
         status: "success",
-        generated_image_base64: result.imageBase64,
         generated_image_mime_type: result.mimeType,
         completed_at: new Date().toISOString(),
       });

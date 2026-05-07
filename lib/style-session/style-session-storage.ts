@@ -70,6 +70,12 @@ export function saveStyleFlowSessionState(state: StyleFlowSessionState) {
   const { imageFile, ...persistedState } = state
   void imageFile
 
+  if (persistedState.gender === 'women') {
+    persistedState.generatedImageUrl = undefined
+    persistedState.generatedImageBase64 = undefined
+    persistedState.generationResponse = undefined
+  }
+
   window.localStorage.setItem(FLOW_STORAGE_KEY, JSON.stringify(persistedState))
 }
 

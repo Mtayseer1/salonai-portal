@@ -6,6 +6,18 @@ export async function uploadStyleImageAndCreateSignedUrl(
   imageFile: File,
   customerPhone?: string,
 ) {
+  const { signedUrl } = await uploadStyleImageForGeneration(
+    imageFile,
+    customerPhone,
+  )
+
+  return signedUrl
+}
+
+export async function uploadStyleImageForGeneration(
+  imageFile: File,
+  customerPhone?: string,
+) {
   const filePath = createFlutterUploadPath(imageFile, customerPhone)
   const { error: uploadError } = await supabase.storage
     .from(CUSTOMER_IMAGES_BUCKET)
@@ -27,7 +39,20 @@ export async function uploadStyleImageAndCreateSignedUrl(
     throw new Error(signedUrlError?.message || 'Could not create image URL.')
   }
 
-  return data.signedUrl
+  return {
+    path: filePath,
+    signedUrl: data.signedUrl,
+  }
+}
+
+export async function removeUploadedStyleImage(path: string) {
+  const { error } = await supabase.storage
+    .from(CUSTOMER_IMAGES_BUCKET)
+    .remove([path])
+
+  if (error) {
+    throw new Error(error.message)
+  }
 }
 
 export async function persistMenSessionImages({

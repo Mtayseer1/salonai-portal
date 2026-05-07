@@ -1,4 +1,7 @@
-import { uploadStyleImageAndCreateSignedUrl } from './style-session-upload'
+import {
+  removeUploadedStyleImage,
+  uploadStyleImageForGeneration,
+} from './style-session-upload'
 import { supabase } from '@/src/lib/supabase'
 import { getSelectedLipPrompt } from './lips-catalog'
 import {
@@ -52,56 +55,65 @@ export async function generateStyleFromSession(
 
   validateGenerationSession(session)
 
-  const imageUrl = await uploadStyleImageAndCreateSignedUrl(
+  const uploadedImage = await uploadStyleImageForGeneration(
     session.imageFile,
     session.customerPhone,
   )
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser()
-  const {
-    data: { session: authSession },
-    error: sessionError,
-  } = await supabase.auth.getSession()
 
-  if (userError || !user || sessionError || !authSession?.access_token) {
-    throw new Error(
-      [
-        'Sign in before generating.',
-        '',
-        'Client auth debug:',
-        stringifyDebug({
-          hasUser: Boolean(user),
-          userId: user?.id,
-          userError: userError?.message,
-          hasSession: Boolean(authSession),
-          sessionError: sessionError?.message,
-          hasAccessToken: Boolean(authSession?.access_token),
-        }),
-      ].join('\n'),
-    )
+  try {
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser()
+    const {
+      data: { session: authSession },
+      error: sessionError,
+    } = await supabase.auth.getSession()
+
+    if (userError || !user || sessionError || !authSession?.access_token) {
+      throw new Error(
+        [
+          'Sign in before generating.',
+          '',
+          'Client auth debug:',
+          stringifyDebug({
+            hasUser: Boolean(user),
+            userId: user?.id,
+            userError: userError?.message,
+            hasSession: Boolean(authSession),
+            sessionError: sessionError?.message,
+            hasAccessToken: Boolean(authSession?.access_token),
+          }),
+        ].join('\n'),
+      )
+    }
+
+    const response = await fetch('/api/generate', {
+      method: 'POST',
+      cache: 'no-store',
+      headers: {
+        Authorization: `Bearer ${authSession.access_token}`,
+        'X-Supabase-Access-Token': authSession.access_token,
+        'X-Salon-User-Id': user.id,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(createGenerationRequest(session, uploadedImage.signedUrl)),
+    })
+
+    const result = await parseGenerationResponse(response)
+
+    if (!response.ok) {
+      throw new Error(formatGenerationError(response.status, result))
+    }
+
+    return result
+  } finally {
+    if (session.gender === 'women') {
+      await removeUploadedStyleImage(uploadedImage.path).catch(() => {
+        // Women source uploads are temporary generation inputs.
+      })
+    }
   }
-
-  const response = await fetch('/api/generate', {
-    method: 'POST',
-    cache: 'no-store',
-    headers: {
-      Authorization: `Bearer ${authSession.access_token}`,
-      'X-Supabase-Access-Token': authSession.access_token,
-      'X-Salon-User-Id': user.id,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(createGenerationRequest(session, imageUrl)),
-  })
-
-  const result = await parseGenerationResponse(response)
-
-  if (!response.ok) {
-    throw new Error(formatGenerationError(response.status, result))
-  }
-
-  return result
 }
 
 async function parseGenerationResponse(response: Response) {
