@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Alert, Button, Card } from '@/app/components/ui'
 import { useStyleSession } from '@/components/style-session'
-import { generateStyleFromSession } from '@/lib/style-session/style-session-generation'
 
 const lengthOptions = ['Random', 'Short', 'Medium', 'Long']
 
@@ -13,7 +12,6 @@ export default function MenOptionsPage() {
   const router = useRouter()
   const session = useStyleSession()
   const [message, setMessage] = useState('')
-  const [generating, setGenerating] = useState(false)
   const showSmartControls =
     session.mode === 'smart' && Boolean(session.imageFile || session.imagePreviewUrl)
 
@@ -29,7 +27,7 @@ export default function MenOptionsPage() {
     router.push('/style/info')
   }
 
-  const generateSmartStyle = async () => {
+  const generateSmartStyle = () => {
     if (!session.hairLength || !session.beardLength) {
       setMessage('Select hair length and beard length before continuing.')
       return
@@ -40,25 +38,10 @@ export default function MenOptionsPage() {
       return
     }
 
-    try {
-      setMessage('')
-      session.setGenerationError(undefined)
-      setGenerating(true)
-
-      const result = await generateStyleFromSession({
-        ...session,
-        gender: 'men',
-        mode: 'smart',
-      })
-      session.setGenerationResult(result)
-      router.push('/style/result')
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Generation failed.'
-      session.setGenerationError(errorMessage)
-      setMessage(errorMessage)
-      setGenerating(false)
-    }
+    setMessage('')
+    session.setGenerationError(undefined)
+    session.setMode('smart')
+    router.push('/style/loading')
   }
 
   return (
@@ -132,9 +115,8 @@ export default function MenOptionsPage() {
                   type="button"
                   className="h-14 w-full"
                   onClick={generateSmartStyle}
-                  disabled={generating}
                 >
-                  {generating ? 'Generating...' : 'Generate'}
+                  Generate
                 </Button>
               </div>
             </div>
