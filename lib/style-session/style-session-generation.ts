@@ -336,8 +336,7 @@ function getMenGenerationProvider() {
     return undefined
   }
 
-  return window.localStorage.getItem('salonai_men_generation_provider') ===
-    'openai'
-    ? 'openai'
-    : undefined
+  const provider = window.localStorage.getItem('salonai_men_generation_provider')
+
+  return provider === 'gemini' || provider === 'openai' ? provider : undefined
 }

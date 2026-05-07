@@ -659,7 +659,7 @@ function getGenerationFunctionName(body: GenerateRequestBody) {
     return 'gemini-women-style'
   }
 
-  return body.generationProvider === 'openai'
-    ? 'openai-auto-style'
-    : 'gemini-auto-style'
+  return body.generationProvider === 'gemini'
+    ? 'gemini-auto-style'
+    : 'openai-auto-style'
 }
