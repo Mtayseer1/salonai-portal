@@ -766,24 +766,14 @@ REFERENCE IMAGE RULE:
     : "";
 
   return `
-Edit the uploaded photo directly. Do not create a new portrait.
-
-KEEP UNCHANGED:
-- Identity, face, skin texture, age, expression, pose, camera angle, crop, lighting, background, clothes, body, and accessories.
+Never change the identity.
+Keep the same person.
 
 ${referenceRule}
-APPLY ONLY THESE TWO EDITS:
+Apply the following styles:
 ${formatCatalogPromptOption("Hairstyle", hairStyle, hairOption)}
 
 ${formatCatalogPromptOption("Beard style", beardStyle, beardOption)}
-
-BEARD EDIT RULE:
-- Apply the selected beard exactly, even if this requires adding, removing, shaving, or reshaping facial hair.
-- Do not add facial hair outside the selected beard style.
-
-OUTPUT:
-- One realistic edited image only.
-- Same source photo, only hair and beard changed.
 `;
 }
 
