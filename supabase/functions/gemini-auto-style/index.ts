@@ -9,11 +9,9 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-const GEMINI_MODEL = "gemini-3-pro-image-preview";
+const GEMINI_MODEL = "gemini-3.1-flash-image-preview";
 const USE_CATALOG_REFERENCE_IMAGES =
   Deno.env.get("USE_CATALOG_REFERENCE_IMAGES") === "true";
-const USE_TWO_STEP_CATALOG_GENERATION =
-  Deno.env.get("USE_TWO_STEP_CATALOG_GENERATION") !== "false";
 
 if (!GEMINI_API_KEY) {
   throw new Error("Missing GEMINI_API_KEY");
@@ -574,11 +572,16 @@ function lookupCatalogOption(
 
 function formatCatalogPromptOption(
   label: string,
+  selectedValue: string,
   option: CatalogPromptOption,
 ) {
   const description = option.description.replace(/\s+/g, " ").trim();
+  const category = option.categoryLabel ? ` (${option.categoryLabel})` : "";
 
-  return `${label} details: ${description}`;
+  return [
+    `${label}: ${selectedValue}${category}`,
+    `${label} exact style requirements: ${description}`,
+  ].join("\n");
 }
 
 function createSelectedOptions(body: Record<string, unknown>) {
@@ -746,7 +749,9 @@ Return final image only.
 }
 
 function buildCatalogPrompt(
+  hairStyle: string,
   hairOption: CatalogPromptOption,
+  beardStyle: string,
   beardOption: CatalogPromptOption,
   referenceImages: CatalogReferenceImage[],
 ) {
@@ -761,57 +766,46 @@ REFERENCE IMAGE RULE:
     : "";
 
   return `
+You are a professional barber and photorealistic portrait editor.
+
+EDITING TASK:
+Edit the uploaded photo of the customer. Do not create a new portrait.
+Apply the selected scalp hairstyle and selected facial-hair style as the only grooming changes.
+
+STYLE ACCURACY RULES:
+- The selected hairstyle and beard descriptions are exact barber specifications, not loose inspiration.
+- The final result must visibly match the selected descriptions.
+- Do not produce a generic attractive haircut, generic fade, generic beard, or generic goatee.
+- Do not keep the customer's original hair or beard if it conflicts with the selected style.
+- It is allowed and required to cut, shorten, lengthen, reshape, shave, add, remove, fade, taper, part, fringe, slick, curl, or redirect scalp hair wherever the selected hairstyle requires it.
+- It is allowed and required to add, remove, shave, shorten, lengthen, reshape, separate, connect, fade, or define facial hair wherever the selected beard style requires it.
+- Do not add scalp hair outside the selected hairstyle.
+- Do not add facial hair outside the selected beard style.
+- If the beard style requires clean-shaven cheeks, jawline, neckline, or separation, those areas must be clean.
+- If the beard style requires a disconnected mustache, chin focus, cheek coverage, jaw coverage, neckline placement, sideburn blend, or specific lower outline, follow that exactly.
+- If the hairstyle requires a specific fade height, taper height, top length, fringe direction, parting, slick-back direction, curl pattern, volume, or silhouette, follow that exactly.
+
+SOURCE PRESERVATION RULES:
+- Keep the same person and exact identity.
+- Keep the same face, facial expression, age, skin tone, eyes, eyebrows, nose, lips, jawline, face shape, and natural skin texture.
+- Keep the same camera angle, lens perspective, crop, framing, head position, body pose, shoulders, clothes, accessories, lighting, shadows, exposure, background, room/location, and objects.
+- Do not beautify, smooth skin, change body, change clothes, change background, add props, add makeup, add filters, or restage the image.
+
+SELECTED STYLE SPECIFICATION:
+${formatCatalogPromptOption("Hairstyle", hairStyle, hairOption)}
+
+
+${formatCatalogPromptOption("Beard style", beardStyle, beardOption)}
+
 ${referenceRule}
-The uploaded image may be a clean grooming base from a previous edit.
-Apply only the selected scalp hairstyle and selected facial-hair style.
-Keep the same person, face, expression, pose, clothes, lighting, crop, and background.
 
-Apply the following styles:
-
-${formatCatalogPromptOption("Hairstyle", hairOption)}
-
-
-${formatCatalogPromptOption("Beard style", beardOption)}
+OUTPUT RULES:
+- One image only.
+- No grid.
+- No labels or text in the image.
+- No artistic effects.
+- Return final image only.
 `;
-}
-
-function buildCleanBasePrompt() {
-  return `
-You are a professional photorealistic portrait retoucher.
-
-TASK:
-Create ONE clean grooming base image of the SAME PERSON.
-
-REMOVE ONLY:
-- Remove all visible scalp hair.
-- Remove the full beard, mustache, stubble, sideburn facial hair, chin hair, jaw hair, cheek hair, and neck hair.
-- Make the head look naturally clean-shaved/bald with realistic scalp skin texture.
-- Make the face clean-shaven with realistic skin texture and natural shaving shadow only if appropriate.
-
-PRESERVE EXACTLY:
-- Same identity, face shape, eyes, eyebrows, eyelashes, nose, lips, jawline, age, skin tone, expression, and natural imperfections.
-- Same camera angle, lens perspective, crop, framing, head position, pose, shoulders, body shape, clothes, accessories, lighting, shadows, exposure, color temperature, background, room, and objects.
-
-DO NOT:
-- Do not remove or alter eyebrows or eyelashes.
-- Do not beautify, smooth skin, slim face, widen face, change body, change clothes, change background, add makeup, add props, add studio lighting, or restage the photo.
-- Do not add any hairstyle or beard style in this step.
-
-FINAL CHECK:
-The output must look like the original photo with only scalp hair and facial hair removed.
-
-Return final image only.
-`;
-}
-
-function formatTwoStepPromptLog(cleanPrompt: string, stylePrompt: string) {
-  return [
-    "STEP 1 - CLEAN BASE PROMPT:",
-    cleanPrompt.trim(),
-    "",
-    "STEP 2 - STYLE APPLICATION PROMPT:",
-    stylePrompt.trim(),
-  ].join("\n");
 }
 
 /* ============================================================
@@ -822,11 +816,10 @@ async function callGemini(
   prompt: string,
   imageBase64: string,
   referenceImages: CatalogReferenceImage[] = [],
-  sourceMimeType = "image/jpeg",
 ) {
   const sourceImagePart = {
     inlineData: {
-      mimeType: sourceMimeType,
+      mimeType: "image/jpeg",
       data: imageBase64,
     },
   };
@@ -919,9 +912,7 @@ Deno.serve(async (req) => {
 
     const imageBase64 = await fetchImageBase64(src_file_url);
     let prompt = "";
-    let cleanBasePrompt = "";
     let referenceImages: CatalogReferenceImage[] = [];
-    let useTwoStepCatalogGeneration = false;
 
     if (isSmartStyle === true) {
       if (!hairLength || !beardLength) {
@@ -961,21 +952,15 @@ Deno.serve(async (req) => {
         beardStyleImageUrl,
       );
       prompt = buildCatalogPrompt(
+        hairStyle,
         hairOption,
+        beardStyle,
         beardOption,
         referenceImages,
       );
-      useTwoStepCatalogGeneration = USE_TWO_STEP_CATALOG_GENERATION;
-
-      if (useTwoStepCatalogGeneration) {
-        cleanBasePrompt = buildCleanBasePrompt();
-      }
     }
 
     const mode = isSmartStyle === true ? "smart" : "catalog";
-    const loggedPrompt = cleanBasePrompt
-      ? formatTwoStepPromptLog(cleanBasePrompt, prompt)
-      : prompt;
     const logContext = (log_context || {}) as GeminiLogContext;
     const logId = await insertGeminiCallLog({
       request_id: logContext.request_id || null,
@@ -986,11 +971,8 @@ Deno.serve(async (req) => {
       customer_name: logContext.customer_name || null,
       customer_phone: logContext.customer_phone || null,
       src_file_url,
-      selected_options: {
-        ...createSelectedOptions(body),
-        twoStepCatalogGeneration: useTwoStepCatalogGeneration,
-      },
-      prompt: loggedPrompt,
+      selected_options: createSelectedOptions(body),
+      prompt,
       gemini_model: GEMINI_MODEL,
       status: "started",
       started_at: new Date().toISOString(),
@@ -999,17 +981,7 @@ Deno.serve(async (req) => {
     let result;
 
     try {
-      if (cleanBasePrompt) {
-        const cleanBase = await callGemini(cleanBasePrompt, imageBase64);
-        result = await callGemini(
-          prompt,
-          cleanBase.imageBase64,
-          referenceImages,
-          cleanBase.mimeType,
-        );
-      } else {
-        result = await callGemini(prompt, imageBase64, referenceImages);
-      }
+      result = await callGemini(prompt, imageBase64, referenceImages);
       await updateGeminiCallLog(logId, {
         status: "success",
         generated_image_base64: result.imageBase64,
