@@ -59,21 +59,12 @@ export default function StyleInfoPage() {
   return (
     <Card className="max-w-2xl">
       <div className="space-y-6">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-zinc-500">
-            Client info
-          </p>
-          <h2 className="mt-3 text-2xl font-semibold tracking-tight text-white">
-            Add optional customer details
-          </h2>
-          <p className="mt-2 text-sm text-zinc-400">
-            These details stay with the current style session while moving through
-            the flow.
-          </p>
-        </div>
+        <h1 className="text-3xl font-semibold tracking-tight text-white">
+          CLIENT INFO
+        </h1>
 
         <div className="space-y-4">
-          <Field label="Customer Name" hint="Optional">
+          <Field label="Customer Name">
             <input
               className={inputClass}
               value={name}
@@ -83,7 +74,7 @@ export default function StyleInfoPage() {
             />
           </Field>
 
-          <Field label="Customer Phone" hint="Optional">
+          <Field label="Customer Phone">
             <input
               className={inputClass}
               value={phone}
