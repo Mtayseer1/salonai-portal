@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Alert, Button, Card } from '@/app/components/ui'
 import { useStyleSession } from '@/components/style-session'
 
@@ -10,18 +10,40 @@ const lengthOptions = ['Random', 'Short', 'Medium', 'Long']
 export default function MenOptionsPage() {
   const router = useRouter()
   const session = useStyleSession()
+  const freshSessionHandledRef = useRef(false)
+  const [handlingFreshSession, setHandlingFreshSession] = useState(() => {
+    if (typeof window === 'undefined') {
+      return false
+    }
+
+    return new URLSearchParams(window.location.search).get('fresh') === '1'
+  })
   const [message, setMessage] = useState('')
   const showSmartControls =
     session.mode === 'smart' && Boolean(session.imageFile || session.imagePreviewUrl)
 
+  useEffect(() => {
+    if (!handlingFreshSession || freshSessionHandledRef.current) {
+      return
+    }
+
+    freshSessionHandledRef.current = true
+    session.resetSession()
+    session.setGender('men')
+    router.replace('/style/men/options')
+    setHandlingFreshSession(false)
+  }, [handlingFreshSession, router, session])
+
   const selectSmart = () => {
     setMessage('')
+    session.setGender('men')
     session.setMode('smart')
     router.push('/style/info')
   }
 
   const selectCatalog = () => {
     setMessage('')
+    session.setGender('men')
     session.setMode('catalog')
     router.push('/style/info')
   }
@@ -41,6 +63,16 @@ export default function MenOptionsPage() {
     session.setGenerationError(undefined)
     session.setMode('smart')
     router.push('/style/loading')
+  }
+
+  if (handlingFreshSession) {
+    return (
+      <div className="space-y-6">
+        <h1 className="text-3xl font-semibold tracking-tight text-white">
+          MEN STYLE
+        </h1>
+      </div>
+    )
   }
 
   return (

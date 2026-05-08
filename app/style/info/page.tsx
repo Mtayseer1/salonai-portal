@@ -1,15 +1,44 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button, Card, Field, inputClass } from '@/app/components/ui'
 import { useStyleSession } from '@/components/style-session'
 
 export default function StyleInfoPage() {
   const router = useRouter()
-  const { customerName, customerPhone, setCustomerInfo } = useStyleSession()
+  const session = useStyleSession()
+  const { customerName, customerPhone, gender, setCustomerInfo } = session
+  const freshSessionHandledRef = useRef(false)
+  const [handlingFreshSession, setHandlingFreshSession] = useState(() => {
+    if (typeof window === 'undefined') {
+      return false
+    }
+
+    return new URLSearchParams(window.location.search).get('fresh') === '1'
+  })
   const [name, setName] = useState(customerName ?? '')
   const [phone, setPhone] = useState(customerPhone ?? '')
+
+  useEffect(() => {
+    if (!handlingFreshSession || freshSessionHandledRef.current) {
+      return
+    }
+
+    freshSessionHandledRef.current = true
+    const genderParam = new URLSearchParams(window.location.search).get('gender')
+
+    session.resetSession()
+    setName('')
+    setPhone('')
+
+    if (genderParam === 'men' || genderParam === 'women') {
+      session.setGender(genderParam)
+    }
+
+    router.replace('/style/info')
+    setHandlingFreshSession(false)
+  }, [handlingFreshSession, router, session])
 
   const continueToPhoto = () => {
     setCustomerInfo({
@@ -17,6 +46,14 @@ export default function StyleInfoPage() {
       customerPhone: phone.trim() || undefined,
     })
     router.push('/style/photo')
+  }
+
+  const goBack = () => {
+    router.push(gender === 'men' ? '/style/men/options' : '/dashboard')
+  }
+
+  if (handlingFreshSession) {
+    return null
   }
 
   return (
@@ -62,7 +99,7 @@ export default function StyleInfoPage() {
           <Button
             type="button"
             variant="secondary"
-            onClick={() => router.push('/style')}
+            onClick={goBack}
           >
             Back
           </Button>
