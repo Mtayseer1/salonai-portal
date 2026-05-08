@@ -9,6 +9,16 @@ body {
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
+html[dir="rtl"] body {
+  font-family: Arial, Tahoma, sans-serif;
+}
+
+html[dir="rtl"] input,
+html[dir="rtl"] textarea,
+html[dir="rtl"] select {
+  text-align: right;
+}
+
 * {
   box-sizing: border-box;
 }
