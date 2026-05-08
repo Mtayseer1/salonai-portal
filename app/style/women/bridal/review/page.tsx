@@ -15,14 +15,6 @@ const styleOriginOptions = [
   'Moroccan style',
 ]
 
-const dressColorOptions = [
-  'White dress',
-  'Ivory dress',
-  'Red dress',
-  'Gold dress',
-  'Blush pink dress',
-]
-
 const accessoryOptions = [
   'Veil',
   'Tiara',
@@ -52,15 +44,6 @@ const makeupOptions = [
   'Dewy glow',
 ]
 
-const dressShapeOptions = [
-  'Modest dress',
-  'Off-shoulder',
-  'Long sleeve',
-  'Strapless',
-  'Ball gown',
-  'Mermaid',
-]
-
 const moodOptions = [
   'Elegant',
   'Luxury',
@@ -72,11 +55,9 @@ const moodOptions = [
 
 type BridalSelectionKey =
   | 'bridalStyleOrigin'
-  | 'bridalDressColor'
   | 'bridalAccessories'
   | 'bridalHair'
   | 'bridalMakeup'
-  | 'bridalDressShape'
   | 'bridalMood'
 
 export default function WomenBridalReviewPage() {
@@ -85,11 +66,9 @@ export default function WomenBridalReviewPage() {
   const [message, setMessage] = useState('')
 
   const selectedStyleOrigins = toSelectionArray(session.bridalStyleOrigin)
-  const selectedDressColors = toSelectionArray(session.bridalDressColor)
   const selectedAccessories = toSelectionArray(session.bridalAccessories)
   const selectedHair = toSelectionArray(session.bridalHair)
   const selectedMakeup = toSelectionArray(session.bridalMakeup)
-  const selectedDressShapes = toSelectionArray(session.bridalDressShape)
   const selectedMoods = toSelectionArray(session.bridalMood)
 
   const toggleSelection = (
@@ -172,15 +151,6 @@ export default function WomenBridalReviewPage() {
       />
 
       <MultiOptionGroup
-        title="Dress Color"
-        options={dressColorOptions}
-        selected={selectedDressColors}
-        onToggle={(value) =>
-          toggleSelection('bridalDressColor', selectedDressColors, value)
-        }
-      />
-
-      <MultiOptionGroup
         title="Accessories"
         options={accessoryOptions}
         selected={selectedAccessories}
@@ -202,15 +172,6 @@ export default function WomenBridalReviewPage() {
         selected={selectedMakeup}
         onToggle={(value) =>
           toggleSelection('bridalMakeup', selectedMakeup, value)
-        }
-      />
-
-      <MultiOptionGroup
-        title="Dress Shape"
-        options={dressShapeOptions}
-        selected={selectedDressShapes}
-        onToggle={(value) =>
-          toggleSelection('bridalDressShape', selectedDressShapes, value)
         }
       />
 

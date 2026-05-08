@@ -116,11 +116,9 @@ type CatalogBeautyOptions = {
 
 type BridalOptions = {
   styleOrigin?: string[];
-  dressColor?: string[];
   accessories?: string[];
   hair?: string[];
   makeup?: string[];
-  dressShape?: string[];
   mood?: string[];
 };
 
@@ -263,9 +261,9 @@ SOURCE PRESERVATION RULES (MANDATORY):
 - Only change the selected hair, makeup, brow, skin base, blush, contour, highlight, lashes, lips, or bridal styling requested in this prompt.
 - Preserve the exact camera angle, crop, framing, head position, body pose, shoulders, and perspective from the uploaded image.
 - Preserve the exact background, room/location, objects, lighting direction, shadows, exposure, and color temperature from the uploaded image.
-- Preserve the exact clothing, outfit, collar, neckline, accessories, jewelry, glasses, and visible body details unless a selected bridal outfit or accessory option, or bridal randomization rule, explicitly changes them.
-- Do not change expression, face shape, eye shape, nose, lips shape, jawline, body shape, age, skin tone, background, or unselected facial features. Do not change clothes unless a selected bridal dress option or bridal randomization rule requires it.
-- Do not add salon/studio scenery, luxury room, retouching, smoothing, or editorial lighting. Do not add bridal dress, veil, jewelry, or props unless that item is selected or the related bridal category is empty and randomized.
+- Preserve the exact clothing, outfit, collar, neckline, fabric color, fabric texture, glasses, and visible body details.
+- Do not change expression, face shape, eye shape, nose, lips shape, jawline, body shape, age, skin tone, background, clothing, or unselected facial features.
+- Do not add salon/studio scenery, luxury room, retouching, smoothing, editorial lighting, bridal dress, outfit changes, or props.
 - Final result must look like the same photo with only the selected beauty changes applied.
 `.trim();
 
@@ -626,11 +624,9 @@ Luxury bridal beauty guided by the selected bridal options below.
 
 SELECTED BRIDAL OPTIONS:
 - Style / Origin: ${formatBridalSelections(bridal.styleOrigin)}
-- Dress color: ${formatBridalSelections(bridal.dressColor)}
 - Accessories: ${formatBridalSelections(bridal.accessories)}
 - Hair: ${formatBridalSelections(bridal.hair)}
 - Makeup: ${formatBridalSelections(bridal.makeup)}
-- Dress shape: ${formatBridalSelections(bridal.dressShape)}
 - Mood: ${formatBridalSelections(bridal.mood)}
 
 SELECTION RULES:
@@ -638,19 +634,20 @@ SELECTION RULES:
 - Treat every selected value as an active request, not as a label only.
 - Spread multiple selected values across the 9 variations as evenly as possible.
 - If multiple origins are selected, some variations must visibly follow each selected origin. For example, if Indian style and Middle Eastern style are selected, include both styles across the 9 cells.
-- Apply the same distribution logic to dress color, accessories, hair, makeup, dress shape, and mood.
+- Apply the same distribution logic to accessories, hair, makeup, and mood.
 - Each selected value in every category must appear in at least one grid cell when possible.
 - Repeat selected values as needed to fill all 9 cells.
 - If a category has 0 selected values, randomize that category with tasteful luxury bridal choices.
 - If Hair has 0 selected values, use varied random bridal hairstyles across the 9 cells.
 - Do not add unselected accessory types unless the Accessories category has 0 selected values.
-- If dress color or dress shape is selected, transform only the visible outfit area needed for that exact bridal dress request while preserving body shape, pose, crop, and identity.
-- If dress color or dress shape has 0 selected values, use tasteful random bridal dress colors and shapes across the 9 cells.
+- Never change the dress, outfit, neckline, shoulder area, body, or clothing color.
 
 GRID VARIATION PLAN:
 - Make all 9 cells different but compatible with the selected categories.
-- Do not make all 9 cells the same origin, same dress, same hair, same makeup, or same mood when multiple values are selected.
+- Do not make all 9 cells the same origin, same hair, same makeup, or same mood when multiple values are selected.
 - If a category is random, vary that category naturally across cells.
+- Keep the visual attention on the face, hairline, brows, eyes, lips, cheeks, skin texture, and accessories around the head and neck.
+- Do not restyle the visible outfit to create bridal dress variations.
 
 MAKEUP STYLE:
 - Follow the selected makeup choices when provided.
@@ -660,9 +657,10 @@ MAKEUP STYLE:
 
 JEWELRY & DETAILS:
 - Use the selected accessories exactly where possible.
-- Keep jewelry and accessories premium, realistic, and proportional.
+- Keep jewelry and accessories premium, realistic, proportional, and face-focused.
 - Do not add a veil unless Veil is selected or Accessories has 0 selected values.
 - Do not add a nose ring unless Nose ring is selected or Accessories has 0 selected values.
+- Do not add or change the dress, sleeves, bodice, or garment shape.
 
 LIGHTING:
 - Keep the exact original lighting direction, shadows, exposure, and color temperature from the source image.
@@ -677,7 +675,7 @@ FINAL OUTPUT:
 - High-end wedding magazine quality
 - Ultra-realistic DSLR photography
 - No CGI, no illustration, no painting
-- If background, camera angle, pose, lighting, identity, or unselected features change, regenerate. Clothing may change only to satisfy selected bridal dress options or randomized bridal dress categories when no dress option is selected.
+- If background, camera angle, pose, lighting, identity, clothing, body, or unselected features change, regenerate.
 
 Reference image:
 ${img}
@@ -788,11 +786,9 @@ Deno.serve(async (req) => {
       mascara,
       extensions,
       bridalStyleOrigin,
-      bridalDressColor,
       bridalAccessories,
       bridalHair,
       bridalMakeup,
-      bridalDressShape,
       bridalMood,
       log_context,
     } = body;
@@ -825,11 +821,9 @@ Deno.serve(async (req) => {
       finalMode === "bridal"
         ? buildBridalPrompt(src_file_url, {
             styleOrigin: bridalStyleOrigin,
-            dressColor: bridalDressColor,
             accessories: bridalAccessories,
             hair: bridalHair,
             makeup: bridalMakeup,
-            dressShape: bridalDressShape,
             mood: bridalMood,
           })
         : finalMode === "catalog"
