@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Alert, Button, Card } from '@/app/components/ui'
@@ -45,117 +44,81 @@ export default function MenOptionsPage() {
   }
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
-      <div className="space-y-6">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-zinc-500">
-            Men style
-          </p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">
-            Choose a styling mode
-          </h2>
-          <p className="mt-2 max-w-2xl text-sm text-zinc-400">
-            Smart creates random barber variations. Catalog lets you choose hair
-            and beard from the full men catalog.
-          </p>
+    <div className="space-y-6">
+      <h1 className="text-3xl font-semibold tracking-tight text-white">
+        MEN STYLE
+      </h1>
+
+      {message && <Alert>{message}</Alert>}
+
+      {!showSmartControls && (
+        <div className="grid gap-4 sm:grid-cols-2">
+          <ModeCard
+            title="Smart Style"
+            active={session.mode === 'smart'}
+            onClick={selectSmart}
+          />
+          <ModeCard
+            title="Catalog Style"
+            active={session.mode === 'catalog'}
+            onClick={selectCatalog}
+          />
         </div>
+      )}
 
-        {message && <Alert>{message}</Alert>}
+      {showSmartControls && (
+        <Card>
+          <div className="space-y-6">
+            <OptionGroup
+              title="Hair Length"
+              options={lengthOptions}
+              selected={session.hairLength}
+              onSelect={(hairLength) => {
+                setMessage('')
+                session.setMenOptions({ hairLength })
+              }}
+            />
 
-        {!showSmartControls && (
-          <div className="grid gap-4 sm:grid-cols-2">
-            <ModeCard
-              title="Smart Style"
-              description="Pick hair and beard lengths, then generate random looks."
-              active={session.mode === 'smart'}
-              onClick={selectSmart}
+            <OptionGroup
+              title="Beard Length"
+              options={lengthOptions}
+              selected={session.beardLength}
+              onSelect={(beardLength) => {
+                setMessage('')
+                session.setMenOptions({ beardLength })
+              }}
             />
-            <ModeCard
-              title="Catalog Style"
-              description="Take a photo, then choose hair and beard from the catalog."
-              active={session.mode === 'catalog'}
-              onClick={selectCatalog}
-            />
+
+            <div className="grid grid-cols-[0.8fr_1.2fr] gap-3">
+              <Button
+                type="button"
+                variant="secondary"
+                className="h-14 w-full"
+                onClick={() => router.push('/style/photo')}
+              >
+                Back
+              </Button>
+              <Button
+                type="button"
+                className="h-14 w-full"
+                onClick={generateSmartStyle}
+              >
+                Generate
+              </Button>
+            </div>
           </div>
-        )}
-
-        {showSmartControls && (
-          <Card>
-            <div className="space-y-6">
-              <OptionGroup
-                title="Hair Length"
-                options={lengthOptions}
-                selected={session.hairLength}
-                onSelect={(hairLength) => {
-                  setMessage('')
-                  session.setMenOptions({ hairLength })
-                }}
-              />
-
-              <OptionGroup
-                title="Beard Length"
-                options={lengthOptions}
-                selected={session.beardLength}
-                onSelect={(beardLength) => {
-                  setMessage('')
-                  session.setMenOptions({ beardLength })
-                }}
-              />
-
-              <div className="grid grid-cols-[0.8fr_1.2fr] gap-3">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  className="h-14 w-full"
-                  onClick={() => router.push('/style/photo')}
-                >
-                  Back
-                </Button>
-                <Button
-                  type="button"
-                  className="h-14 w-full"
-                  onClick={generateSmartStyle}
-                >
-                  Generate
-                </Button>
-              </div>
-            </div>
-          </Card>
-        )}
-      </div>
-
-      <Card className="h-fit">
-        <div className="space-y-5">
-          <h3 className="text-xl font-semibold text-white">Preview</h3>
-          {session.imagePreviewUrl ? (
-            <div className="relative h-72 overflow-hidden rounded-3xl border border-white/10 bg-black/30">
-              <Image
-                src={session.imagePreviewUrl}
-                alt="Selected client preview"
-                fill
-                unoptimized
-                className="object-contain"
-              />
-            </div>
-          ) : (
-            <div className="rounded-3xl border border-dashed border-white/10 bg-white/[0.035] p-8 text-center text-sm text-zinc-500">
-              No image selected
-            </div>
-          )}
-        </div>
-      </Card>
+        </Card>
+      )}
     </div>
   )
 }
 
 function ModeCard({
   title,
-  description,
   active,
   onClick,
 }: {
   title: string
-  description: string
   active: boolean
   onClick: () => void
 }) {
@@ -163,16 +126,13 @@ function ModeCard({
     <button
       type="button"
       onClick={onClick}
-      className={`min-h-48 rounded-3xl border p-5 text-left transition ${
+      className={`grid min-h-40 place-items-center rounded-3xl border p-5 text-center transition ${
         active
           ? 'border-fuchsia-300/40 bg-white/[0.08]'
           : 'border-white/10 bg-white/[0.04] hover:bg-white/[0.08]'
       }`}
     >
       <span className="text-xl font-semibold text-white">{title}</span>
-      <span className="mt-3 block text-sm leading-6 text-zinc-400">
-        {description}
-      </span>
     </button>
   )
 }
