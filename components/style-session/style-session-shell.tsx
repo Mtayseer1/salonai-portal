@@ -44,6 +44,7 @@ export const styleSessionRouteOrder: StyleSessionRoute[] = [
   '/style/women/catalog/contour',
   '/style/women/catalog/highlight',
   '/style/women/catalog/review',
+  '/style/women/bridal/review',
   '/style/loading',
   '/style/result',
 ]

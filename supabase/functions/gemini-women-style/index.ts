@@ -114,6 +114,16 @@ type CatalogBeautyOptions = {
   highlightFinish?: string;
 };
 
+type BridalOptions = {
+  styleOrigin?: string;
+  dressColor?: string;
+  accessories?: string[];
+  hair?: string;
+  makeup?: string;
+  dressShape?: string;
+  mood?: string;
+};
+
 type GeminiLogContext = {
   request_id?: string;
   user_id?: string;
@@ -253,8 +263,8 @@ SOURCE PRESERVATION RULES (MANDATORY):
 - Only change the selected hair, makeup, brow, skin base, blush, contour, highlight, lashes, lips, or bridal styling requested in this prompt.
 - Preserve the exact camera angle, crop, framing, head position, body pose, shoulders, and perspective from the uploaded image.
 - Preserve the exact background, room/location, objects, lighting direction, shadows, exposure, and color temperature from the uploaded image.
-- Preserve the exact clothing, outfit, collar, neckline, accessories, jewelry, glasses, and visible body details unless a selected option explicitly changes a hair or beauty accessory.
-- Do not change expression, face shape, eye shape, nose, lips shape, jawline, body shape, age, skin tone, clothes, background, or unselected facial features.
+- Preserve the exact clothing, outfit, collar, neckline, accessories, jewelry, glasses, and visible body details unless a selected bridal outfit or accessory option explicitly changes them.
+- Do not change expression, face shape, eye shape, nose, lips shape, jawline, body shape, age, skin tone, background, or unselected facial features. Do not change clothes unless a selected bridal dress option requires it.
 - Do not add salon/studio scenery, bridal dress, luxury room, veil, jewelry, props, retouching, smoothing, or editorial lighting unless that exact item is part of the selected styling request.
 - Final result must look like the same photo with only the selected beauty changes applied.
 `.trim();
@@ -576,7 +586,15 @@ ${img}
 `.trim();
 }
 
-function buildBridalPrompt(img: string) {
+function formatBridalAccessories(accessories?: string[]) {
+  if (!Array.isArray(accessories) || accessories.length === 0) {
+    return "Not selected";
+  }
+
+  return accessories.join(", ");
+}
+
+function buildBridalPrompt(img: string, bridal: BridalOptions = {}) {
   return `
 Create ONE single ultra-high-resolution image arranged in a 3x2 grid (6 variations).
 
@@ -595,9 +613,26 @@ ABSOLUTE RULES:
 ${SOURCE_PRESERVATION_RULES}
 
 STYLE THEME:
-Luxury Middle Eastern / Arabic bridal beauty.
+Luxury bridal beauty guided by the selected bridal options below.
 
-Each variation must show a different Arabic bridal hairstyle and look:
+SELECTED BRIDAL OPTIONS:
+- Style / Origin: ${bridal.styleOrigin ?? "Not selected"}
+- Dress color: ${bridal.dressColor ?? "Not selected"}
+- Accessories: ${formatBridalAccessories(bridal.accessories)}
+- Hair: ${bridal.hair ?? "Not selected"}
+- Makeup: ${bridal.makeup ?? "Not selected"}
+- Dress shape: ${bridal.dressShape ?? "Not selected"}
+- Mood: ${bridal.mood ?? "Not selected"}
+
+SELECTION RULES:
+- Apply every selected bridal option clearly and consistently across all 6 variations.
+- Selected options override the generic variation list below.
+- If a category is not selected, choose a tasteful luxury bridal default that fits the selected origin and mood.
+- Do not add unselected accessory types unless they are extremely subtle and necessary for realism.
+- If dress color or dress shape is selected, transform only the visible outfit area needed for that exact bridal dress request while preserving body shape, pose, crop, and identity.
+- If hair is selected, every variation must follow that hair direction, with only small accessory or finish differences.
+
+Each variation may show subtle differences within the selected direction:
 
 1) Royal low bun with gold accessories and veil  
 2) Soft glamorous waves with Arabic bridal crown  
@@ -617,12 +652,10 @@ MAKEUP STYLE:
 - No plastic skin
 
 JEWELRY & DETAILS:
-- Subtle gold or diamond bridal accessories
-- Arabic-inspired hair ornaments
-- Luxury bridal earrings
-- Optional delicate headpiece
-- Do not change the customer's clothing or outfit into a bridal dress.
-- Do not add a veil unless it can be added as a hair accessory without changing the clothing or covering the original outfit.
+- Use the selected accessories exactly where possible.
+- Keep jewelry and accessories premium, realistic, and proportional.
+- Do not add a veil unless Veil is selected.
+- Do not add a nose ring unless Nose ring is selected.
 
 LIGHTING:
 - Keep the exact original lighting direction, shadows, exposure, and color temperature from the source image.
@@ -637,7 +670,7 @@ FINAL OUTPUT:
 - High-end wedding magazine quality
 - Ultra-realistic DSLR photography
 - No CGI, no illustration, no painting
-- If clothing, background, camera angle, pose, lighting, or unselected features change, regenerate.
+- If background, camera angle, pose, lighting, identity, or unselected features change, regenerate. Clothing may change only to satisfy selected bridal dress options.
 
 Reference image:
 ${img}
@@ -747,6 +780,13 @@ Deno.serve(async (req) => {
       highlightFinish,
       mascara,
       extensions,
+      bridalStyleOrigin,
+      bridalDressColor,
+      bridalAccessories,
+      bridalHair,
+      bridalMakeup,
+      bridalDressShape,
+      bridalMood,
       log_context,
     } = body;
 
@@ -776,7 +816,15 @@ Deno.serve(async (req) => {
 
     const prompt =
       finalMode === "bridal"
-        ? buildBridalPrompt(src_file_url)
+        ? buildBridalPrompt(src_file_url, {
+            styleOrigin: bridalStyleOrigin,
+            dressColor: bridalDressColor,
+            accessories: bridalAccessories,
+            hair: bridalHair,
+            makeup: bridalMakeup,
+            dressShape: bridalDressShape,
+            mood: bridalMood,
+          })
         : finalMode === "catalog"
         ? buildCatalogPrompt(
             src_file_url,

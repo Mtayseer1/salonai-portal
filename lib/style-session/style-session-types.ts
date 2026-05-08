@@ -37,6 +37,7 @@ export type StyleSessionRoute =
   | '/style/women/catalog/highlight'
   | '/style/women/catalog/lashes'
   | '/style/women/catalog/review'
+  | '/style/women/bridal/review'
   | '/style/loading'
   | '/style/result'
 
@@ -95,6 +96,13 @@ export type StyleFlowSessionState = {
   highlightFinish?: string
   mascara?: string
   extensions?: boolean
+  bridalStyleOrigin?: string
+  bridalDressColor?: string
+  bridalAccessories?: string[]
+  bridalHair?: string
+  bridalMakeup?: string
+  bridalDressShape?: string
+  bridalMood?: string
   customerName?: string
   customerPhone?: string
 }
@@ -143,6 +151,13 @@ export type WomenStyleSessionOptions = Partial<
     | 'highlightFinish'
     | 'mascara'
     | 'extensions'
+    | 'bridalStyleOrigin'
+    | 'bridalDressColor'
+    | 'bridalAccessories'
+    | 'bridalHair'
+    | 'bridalMakeup'
+    | 'bridalDressShape'
+    | 'bridalMood'
   >
 >
 

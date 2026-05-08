@@ -328,6 +328,13 @@ function createGenerationRequest(session: StyleFlowSessionState, imageUrl: strin
     highlightFinish,
     mascara: eyeLashes || session.mascara,
     extensions: Boolean(session.extensions),
+    bridalStyleOrigin: session.bridalStyleOrigin,
+    bridalDressColor: session.bridalDressColor,
+    bridalAccessories: session.bridalAccessories,
+    bridalHair: session.bridalHair,
+    bridalMakeup: session.bridalMakeup,
+    bridalDressShape: session.bridalDressShape,
+    bridalMood: session.bridalMood,
     customerName: session.customerName,
     customerPhone: session.customerPhone,
   }

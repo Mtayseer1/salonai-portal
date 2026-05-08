@@ -35,7 +35,12 @@ export default function StylePhotoPage() {
         return
       }
 
-      if (mode === 'bridal' || (mode === 'smart' && imageFile)) {
+      if (mode === 'bridal') {
+        router.push('/style/women/bridal/review')
+        return
+      }
+
+      if (mode === 'smart' && imageFile) {
         router.push('/style/loading')
         return
       }
