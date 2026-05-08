@@ -41,8 +41,16 @@ export default function StylePage() {
 
     freshSessionHandledRef.current = true
     resetSession()
+    const genderParam = searchParams.get('gender')
+
+    if (genderParam === 'men' || genderParam === 'women') {
+      setGender(genderParam)
+      router.replace(getGenderStartRoute(genderParam))
+      return
+    }
+
     router.replace('/style')
-  }, [resetSession, router])
+  }, [resetSession, router, setGender])
 
   const selectGender = (value: StyleSessionGender) => {
     setGender(value)
@@ -98,4 +106,8 @@ export default function StylePage() {
       </div>
     </div>
   )
+}
+
+function getGenderStartRoute(value: StyleSessionGender) {
+  return value === 'men' ? '/style/men/options' : '/style/info'
 }
