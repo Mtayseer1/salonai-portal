@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Alert, Button, Card } from '@/app/components/ui'
 import { useStyleSession } from '@/components/style-session'
 import { generateStyleFromSession } from '@/lib/style-session/style-session-generation'
@@ -18,19 +18,35 @@ export default function WomenOptionsPage() {
   const activeMode: StyleSessionMode =
     session.mode === 'catalog' || session.mode === 'bridal' ? session.mode : 'smart'
 
+  useEffect(() => {
+    if (session.gender !== 'women') {
+      session.setGender('women')
+    }
+  }, [session])
+
   const selectSmart = () => {
     setMessage('')
+    session.setGender('women')
     session.setMode('smart')
   }
 
   const selectCatalog = () => {
     setMessage('')
+    session.setGender('women')
     session.setMode('catalog')
     router.push('/style/women/catalog/style')
   }
 
   const selectBridal = async () => {
+    setMessage('')
+    session.setGender('women')
     session.setMode('bridal')
+
+    if (!session.imageFile) {
+      router.push('/style/photo')
+      return
+    }
+
     await generateWomenStyle('bridal')
   }
 
@@ -45,7 +61,8 @@ export default function WomenOptionsPage() {
     }
 
     if (!session.imageFile) {
-      setMessage('Upload the client image again before generating.')
+      session.setMode(mode)
+      router.push('/style/photo')
       return
     }
 

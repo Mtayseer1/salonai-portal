@@ -45,6 +45,12 @@ export default function StyleInfoPage() {
       customerName: name.trim() || undefined,
       customerPhone: phone.trim() || undefined,
     })
+
+    if (gender === 'women') {
+      router.push('/style/women/options')
+      return
+    }
+
     router.push('/style/photo')
   }
 

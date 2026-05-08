@@ -30,7 +30,17 @@ export default function StylePhotoPage() {
     }
 
     if (gender === 'women') {
-      router.push('/style/women/catalog/review')
+      if (mode === 'catalog') {
+        router.push('/style/women/catalog/review')
+        return
+      }
+
+      if (mode === 'bridal' || (mode === 'smart' && imageFile)) {
+        router.push('/style/loading')
+        return
+      }
+
+      router.push('/style/women/options')
       return
     }
 
@@ -83,7 +93,9 @@ export default function StylePhotoPage() {
           <Button
             type="button"
             variant="secondary"
-            onClick={() => router.push('/style/info')}
+            onClick={() =>
+              router.push(gender === 'women' ? '/style/women/options' : '/style/info')
+            }
           >
             Back
           </Button>
