@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { supabase } from '../../src/lib/supabase'
 
 type NavItem = {
   href: string
@@ -72,29 +73,97 @@ export function AppShell({
         {...pageMotion}
         className="mx-auto flex min-h-screen w-full max-w-[430px] flex-col px-4 py-5"
       >
-        <header className="mb-5 flex min-h-12 items-center gap-3">
-          {showBack ? (
-            <button
-              type="button"
-              onClick={goBack}
-              className="grid h-11 w-11 place-items-center rounded-2xl border border-white/10 bg-white/[0.06] text-xl font-semibold text-white"
-              aria-label="Back"
-            >
-              ‹
-            </button>
-          ) : (
-            <Brand compact />
-          )}
-          <div className="min-w-0">
-            <h1 className="truncate text-xl font-semibold tracking-tight text-white">
-              {title}
-            </h1>
-            {subtitle && <p className="mt-1 line-clamp-1 text-xs text-zinc-500">{subtitle}</p>}
-          </div>
-        </header>
+        <AppBar title={title} subtitle={subtitle} showBack={showBack} onBack={goBack} />
         <div className="flex-1">{children}</div>
       </motion.section>
     </main>
+  )
+}
+
+export function AppBar({
+  title,
+  subtitle,
+  showBack = false,
+  onBack,
+}: {
+  title: string
+  subtitle?: string
+  showBack?: boolean
+  onBack?: () => void
+}) {
+  const router = useRouter()
+  const [loggingOut, setLoggingOut] = useState(false)
+  const [lang, setLang] = useState<'en' | 'ar'>(() => {
+    if (typeof window === 'undefined') {
+      return 'en'
+    }
+
+    return localStorage.getItem('salon_lang') === 'ar' ? 'ar' : 'en'
+  })
+
+  const changeLang = (value: 'en' | 'ar') => {
+    setLang(value)
+    localStorage.setItem('salon_lang', value)
+  }
+
+  const logout = async () => {
+    setLoggingOut(true)
+    await supabase.auth.signOut()
+    router.replace('/')
+  }
+
+  return (
+    <header className="mb-5 flex min-h-12 items-center justify-between gap-3">
+      <div className="flex min-w-0 items-center gap-3">
+        {showBack ? (
+          <button
+            type="button"
+            onClick={onBack}
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-white/10 bg-white/[0.06] text-xl font-semibold text-white"
+            aria-label="Back"
+          >
+            {'<'}
+          </button>
+        ) : (
+          <Brand compact />
+        )}
+        <div className="min-w-0">
+          <h1 className="truncate text-xl font-semibold tracking-tight text-white">
+            {title}
+          </h1>
+          {subtitle && (
+            <p className="mt-1 line-clamp-1 text-xs text-zinc-500">{subtitle}</p>
+          )}
+        </div>
+      </div>
+
+      <div className="flex shrink-0 items-center gap-2">
+        <div className="grid grid-cols-2 rounded-2xl border border-white/10 bg-black/25 p-1">
+          {(['en', 'ar'] as const).map((value) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => changeLang(value)}
+              className={`h-9 min-w-9 rounded-xl text-xs font-bold transition ${
+                lang === value
+                  ? 'bg-white text-zinc-950'
+                  : 'text-zinc-400 hover:bg-white/[0.08] hover:text-white'
+              }`}
+            >
+              {value.toUpperCase()}
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={logout}
+          disabled={loggingOut}
+          className="h-11 rounded-2xl border border-red-400/20 bg-red-500/10 px-3 text-xs font-bold text-red-100 transition hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {loggingOut ? '...' : 'Logout'}
+        </button>
+      </div>
+    </header>
   )
 }
 

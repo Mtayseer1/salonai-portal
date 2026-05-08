@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Alert, Button, Card, LoadingScreen } from '../components/ui'
+import { Alert, AppShell, Button, Card, LoadingScreen, salonNav } from '../components/ui'
 import { supabase } from '../../src/lib/supabase'
 
 function PaymentSuccessContent() {
@@ -85,7 +85,8 @@ function PaymentSuccessContent() {
   }, [orderId, responseCode])
 
   return (
-    <main className="page-bg flex items-center justify-center px-4 py-8">
+    <AppShell title="Payment Status" role="Salon" navItems={salonNav}>
+      <div className="flex min-h-[calc(100vh-140px)] items-center justify-center">
       <Card className="w-full max-w-md text-center">
         <div
           className={`mx-auto grid h-14 w-14 place-items-center rounded-2xl border ${
@@ -111,7 +112,8 @@ function PaymentSuccessContent() {
           </Button>
         )}
       </Card>
-    </main>
+      </div>
+    </AppShell>
   )
 }
 

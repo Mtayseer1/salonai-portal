@@ -8,7 +8,6 @@ import { supabase } from '../../src/lib/supabase'
 export default function PartnerPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
-  const [loggingOut, setLoggingOut] = useState(false)
   const [totalCustomers, setTotalCustomers] = useState(0)
 
   useEffect(() => {
@@ -47,12 +46,6 @@ export default function PartnerPage() {
     checkAccess()
   }, [router])
 
-  const logout = async () => {
-    setLoggingOut(true)
-    await supabase.auth.signOut()
-    router.replace('/')
-  }
-
   if (loading) {
     return <LoadingScreen />
   }
@@ -80,21 +73,13 @@ export default function PartnerPage() {
                 Add new salon customers, review credit status, and keep payout activity visible.
               </p>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-3">
               <Button onClick={() => router.push('/partner/add-customer')}>Add Customer</Button>
               <Button variant="secondary" onClick={() => router.push('/partner/customers')}>
                 View Customers
               </Button>
               <Button variant="secondary" onClick={() => router.push('/partner/payments')}>
                 Payments
-              </Button>
-              <Button
-                type="button"
-                variant="danger"
-                onClick={logout}
-                disabled={loggingOut}
-              >
-                {loggingOut ? 'Logging out...' : 'Logout'}
               </Button>
             </div>
           </div>
