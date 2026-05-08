@@ -96,13 +96,13 @@ export type StyleFlowSessionState = {
   highlightFinish?: string
   mascara?: string
   extensions?: boolean
-  bridalStyleOrigin?: string
-  bridalDressColor?: string
+  bridalStyleOrigin?: string[]
+  bridalDressColor?: string[]
   bridalAccessories?: string[]
-  bridalHair?: string
-  bridalMakeup?: string
-  bridalDressShape?: string
-  bridalMood?: string
+  bridalHair?: string[]
+  bridalMakeup?: string[]
+  bridalDressShape?: string[]
+  bridalMood?: string[]
   customerName?: string
   customerPhone?: string
 }

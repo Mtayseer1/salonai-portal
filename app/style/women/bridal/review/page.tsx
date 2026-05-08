@@ -70,20 +70,39 @@ const moodOptions = [
   'Modern',
 ]
 
+type BridalSelectionKey =
+  | 'bridalStyleOrigin'
+  | 'bridalDressColor'
+  | 'bridalAccessories'
+  | 'bridalHair'
+  | 'bridalMakeup'
+  | 'bridalDressShape'
+  | 'bridalMood'
+
 export default function WomenBridalReviewPage() {
   const router = useRouter()
   const session = useStyleSession()
   const [message, setMessage] = useState('')
 
-  const selectedAccessories = session.bridalAccessories ?? []
+  const selectedStyleOrigins = toSelectionArray(session.bridalStyleOrigin)
+  const selectedDressColors = toSelectionArray(session.bridalDressColor)
+  const selectedAccessories = toSelectionArray(session.bridalAccessories)
+  const selectedHair = toSelectionArray(session.bridalHair)
+  const selectedMakeup = toSelectionArray(session.bridalMakeup)
+  const selectedDressShapes = toSelectionArray(session.bridalDressShape)
+  const selectedMoods = toSelectionArray(session.bridalMood)
 
-  const toggleAccessory = (value: string) => {
+  const toggleSelection = (
+    key: BridalSelectionKey,
+    selectedValues: string[],
+    value: string,
+  ) => {
     setMessage('')
-    const nextAccessories = selectedAccessories.includes(value)
-      ? selectedAccessories.filter((item) => item !== value)
-      : [...selectedAccessories, value]
+    const nextValues = selectedValues.includes(value)
+      ? selectedValues.filter((item) => item !== value)
+      : [...selectedValues, value]
 
-    session.setWomenOptions({ bridalAccessories: nextAccessories })
+    session.setWomenOptions({ [key]: nextValues })
   }
 
   const generateBridalStyle = () => {
@@ -143,71 +162,63 @@ export default function WomenBridalReviewPage() {
 
       {message && <Alert>{message}</Alert>}
 
-      <OptionGroup
+      <MultiOptionGroup
         title="Style / Origin"
         options={styleOriginOptions}
-        selected={session.bridalStyleOrigin}
-        onSelect={(bridalStyleOrigin) => {
-          setMessage('')
-          session.setWomenOptions({ bridalStyleOrigin })
-        }}
+        selected={selectedStyleOrigins}
+        onToggle={(value) =>
+          toggleSelection('bridalStyleOrigin', selectedStyleOrigins, value)
+        }
       />
 
-      <OptionGroup
+      <MultiOptionGroup
         title="Dress Color"
         options={dressColorOptions}
-        selected={session.bridalDressColor}
-        onSelect={(bridalDressColor) => {
-          setMessage('')
-          session.setWomenOptions({ bridalDressColor })
-        }}
+        selected={selectedDressColors}
+        onToggle={(value) =>
+          toggleSelection('bridalDressColor', selectedDressColors, value)
+        }
       />
 
       <MultiOptionGroup
         title="Accessories"
         options={accessoryOptions}
         selected={selectedAccessories}
-        onToggle={toggleAccessory}
+        onToggle={(value) =>
+          toggleSelection('bridalAccessories', selectedAccessories, value)
+        }
       />
 
-      <OptionGroup
+      <MultiOptionGroup
         title="Hair"
         options={hairOptions}
-        selected={session.bridalHair}
-        onSelect={(bridalHair) => {
-          setMessage('')
-          session.setWomenOptions({ bridalHair })
-        }}
+        selected={selectedHair}
+        onToggle={(value) => toggleSelection('bridalHair', selectedHair, value)}
       />
 
-      <OptionGroup
+      <MultiOptionGroup
         title="Makeup"
         options={makeupOptions}
-        selected={session.bridalMakeup}
-        onSelect={(bridalMakeup) => {
-          setMessage('')
-          session.setWomenOptions({ bridalMakeup })
-        }}
+        selected={selectedMakeup}
+        onToggle={(value) =>
+          toggleSelection('bridalMakeup', selectedMakeup, value)
+        }
       />
 
-      <OptionGroup
+      <MultiOptionGroup
         title="Dress Shape"
         options={dressShapeOptions}
-        selected={session.bridalDressShape}
-        onSelect={(bridalDressShape) => {
-          setMessage('')
-          session.setWomenOptions({ bridalDressShape })
-        }}
+        selected={selectedDressShapes}
+        onToggle={(value) =>
+          toggleSelection('bridalDressShape', selectedDressShapes, value)
+        }
       />
 
-      <OptionGroup
+      <MultiOptionGroup
         title="Mood"
         options={moodOptions}
-        selected={session.bridalMood}
-        onSelect={(bridalMood) => {
-          setMessage('')
-          session.setWomenOptions({ bridalMood })
-        }}
+        selected={selectedMoods}
+        onToggle={(value) => toggleSelection('bridalMood', selectedMoods, value)}
       />
 
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-white/10 bg-[#08080b]/95 px-4 py-4 backdrop-blur-xl">
@@ -230,34 +241,6 @@ export default function WomenBridalReviewPage() {
         </div>
       </div>
     </div>
-  )
-}
-
-function OptionGroup({
-  title,
-  options,
-  selected,
-  onSelect,
-}: {
-  title: string
-  options: string[]
-  selected?: string
-  onSelect: (value: string) => void
-}) {
-  return (
-    <Card className="p-4">
-      <h2 className="text-lg font-semibold text-white">{title}</h2>
-      <div className="mt-4 grid grid-cols-2 gap-3">
-        {options.map((option) => (
-          <OptionButton
-            key={option}
-            label={option}
-            active={selected === option}
-            onClick={() => onSelect(option)}
-          />
-        ))}
-      </div>
-    </Card>
   )
 }
 
@@ -287,6 +270,14 @@ function MultiOptionGroup({
       </div>
     </Card>
   )
+}
+
+function toSelectionArray(value?: string | string[]) {
+  if (Array.isArray(value)) {
+    return value
+  }
+
+  return value ? [value] : []
 }
 
 function OptionButton({

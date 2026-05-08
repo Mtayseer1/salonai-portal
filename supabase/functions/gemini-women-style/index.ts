@@ -115,13 +115,13 @@ type CatalogBeautyOptions = {
 };
 
 type BridalOptions = {
-  styleOrigin?: string;
-  dressColor?: string;
+  styleOrigin?: string[];
+  dressColor?: string[];
   accessories?: string[];
-  hair?: string;
-  makeup?: string;
-  dressShape?: string;
-  mood?: string;
+  hair?: string[];
+  makeup?: string[];
+  dressShape?: string[];
+  mood?: string[];
 };
 
 type GeminiLogContext = {
@@ -263,9 +263,9 @@ SOURCE PRESERVATION RULES (MANDATORY):
 - Only change the selected hair, makeup, brow, skin base, blush, contour, highlight, lashes, lips, or bridal styling requested in this prompt.
 - Preserve the exact camera angle, crop, framing, head position, body pose, shoulders, and perspective from the uploaded image.
 - Preserve the exact background, room/location, objects, lighting direction, shadows, exposure, and color temperature from the uploaded image.
-- Preserve the exact clothing, outfit, collar, neckline, accessories, jewelry, glasses, and visible body details unless a selected bridal outfit or accessory option explicitly changes them.
-- Do not change expression, face shape, eye shape, nose, lips shape, jawline, body shape, age, skin tone, background, or unselected facial features. Do not change clothes unless a selected bridal dress option requires it.
-- Do not add salon/studio scenery, bridal dress, luxury room, veil, jewelry, props, retouching, smoothing, or editorial lighting unless that exact item is part of the selected styling request.
+- Preserve the exact clothing, outfit, collar, neckline, accessories, jewelry, glasses, and visible body details unless a selected bridal outfit or accessory option, or bridal randomization rule, explicitly changes them.
+- Do not change expression, face shape, eye shape, nose, lips shape, jawline, body shape, age, skin tone, background, or unselected facial features. Do not change clothes unless a selected bridal dress option or bridal randomization rule requires it.
+- Do not add salon/studio scenery, luxury room, retouching, smoothing, or editorial lighting. Do not add bridal dress, veil, jewelry, or props unless that item is selected or the related bridal category is empty and randomized.
 - Final result must look like the same photo with only the selected beauty changes applied.
 `.trim();
 
@@ -586,17 +586,26 @@ ${img}
 `.trim();
 }
 
-function formatBridalAccessories(accessories?: string[]) {
-  if (!Array.isArray(accessories) || accessories.length === 0) {
-    return "Not selected";
+function formatBridalSelections(selections?: string[] | string) {
+  const values = Array.isArray(selections)
+    ? selections
+    : typeof selections === "string"
+    ? [selections]
+    : [];
+  const cleanValues = values
+    .map((value) => String(value).trim())
+    .filter((value) => value.length > 0);
+
+  if (cleanValues.length === 0) {
+    return "Random / not selected";
   }
 
-  return accessories.join(", ");
+  return cleanValues.join(", ");
 }
 
 function buildBridalPrompt(img: string, bridal: BridalOptions = {}) {
   return `
-Create ONE single ultra-high-resolution image arranged in a 3x2 grid (6 variations).
+Create ONE single ultra-high-resolution image arranged in a 3x3 grid (9 variations).
 
 Each grid cell must show THE SAME WOMAN from the reference image.
 Her identity must NEVER change.
@@ -608,7 +617,7 @@ ABSOLUTE RULES:
 - No AI face enhancement.
 - No different person.
 - Ultra-realistic photography only.
-- Clear numbering 1–6 on each variation.
+- Clear numbering 1-9 on each variation.
 
 ${SOURCE_PRESERVATION_RULES}
 
@@ -616,46 +625,44 @@ STYLE THEME:
 Luxury bridal beauty guided by the selected bridal options below.
 
 SELECTED BRIDAL OPTIONS:
-- Style / Origin: ${bridal.styleOrigin ?? "Not selected"}
-- Dress color: ${bridal.dressColor ?? "Not selected"}
-- Accessories: ${formatBridalAccessories(bridal.accessories)}
-- Hair: ${bridal.hair ?? "Not selected"}
-- Makeup: ${bridal.makeup ?? "Not selected"}
-- Dress shape: ${bridal.dressShape ?? "Not selected"}
-- Mood: ${bridal.mood ?? "Not selected"}
+- Style / Origin: ${formatBridalSelections(bridal.styleOrigin)}
+- Dress color: ${formatBridalSelections(bridal.dressColor)}
+- Accessories: ${formatBridalSelections(bridal.accessories)}
+- Hair: ${formatBridalSelections(bridal.hair)}
+- Makeup: ${formatBridalSelections(bridal.makeup)}
+- Dress shape: ${formatBridalSelections(bridal.dressShape)}
+- Mood: ${formatBridalSelections(bridal.mood)}
 
 SELECTION RULES:
-- Apply every selected bridal option clearly and consistently across all 6 variations.
-- Selected options override the generic variation list below.
-- If a category is not selected, choose a tasteful luxury bridal default that fits the selected origin and mood.
-- Do not add unselected accessory types unless they are extremely subtle and necessary for realism.
+- Generate exactly 9 unique bridal variations in the 3x3 grid.
+- Treat every selected value as an active request, not as a label only.
+- Spread multiple selected values across the 9 variations as evenly as possible.
+- If multiple origins are selected, some variations must visibly follow each selected origin. For example, if Indian style and Middle Eastern style are selected, include both styles across the 9 cells.
+- Apply the same distribution logic to dress color, accessories, hair, makeup, dress shape, and mood.
+- Each selected value in every category must appear in at least one grid cell when possible.
+- Repeat selected values as needed to fill all 9 cells.
+- If a category has 0 selected values, randomize that category with tasteful luxury bridal choices.
+- If Hair has 0 selected values, use varied random bridal hairstyles across the 9 cells.
+- Do not add unselected accessory types unless the Accessories category has 0 selected values.
 - If dress color or dress shape is selected, transform only the visible outfit area needed for that exact bridal dress request while preserving body shape, pose, crop, and identity.
-- If hair is selected, every variation must follow that hair direction, with only small accessory or finish differences.
+- If dress color or dress shape has 0 selected values, use tasteful random bridal dress colors and shapes across the 9 cells.
 
-Each variation may show subtle differences within the selected direction:
-
-1) Royal low bun with gold accessories and veil  
-2) Soft glamorous waves with Arabic bridal crown  
-3) High elegant bun with traditional hair jewelry  
-4) Half-up romantic curls with pearl ornaments  
-5) Voluminous curls with crystal tiara  
-6) Classic Arabic bridal updo with luxury pins  
+GRID VARIATION PLAN:
+- Make all 9 cells different but compatible with the selected categories.
+- Do not make all 9 cells the same origin, same dress, same hair, same makeup, or same mood when multiple values are selected.
+- If a category is random, vary that category naturally across cells.
 
 MAKEUP STYLE:
-- Professional Middle Eastern bridal makeup
-- Defined smoky eyes
-- Long dramatic lashes
-- Perfectly blended contour
-- Highlighted cheekbones
-- Elegant nude or deep rose lips
-- Matte luxury finish
+- Follow the selected makeup choices when provided.
+- If Makeup has 0 selected values, vary between natural bridal, soft glam, full glam, smokey bridal, Arabian glam, and dewy glow as suitable.
+- Keep makeup professionally blended and bridal appropriate.
 - No plastic skin
 
 JEWELRY & DETAILS:
 - Use the selected accessories exactly where possible.
 - Keep jewelry and accessories premium, realistic, and proportional.
-- Do not add a veil unless Veil is selected.
-- Do not add a nose ring unless Nose ring is selected.
+- Do not add a veil unless Veil is selected or Accessories has 0 selected values.
+- Do not add a nose ring unless Nose ring is selected or Accessories has 0 selected values.
 
 LIGHTING:
 - Keep the exact original lighting direction, shadows, exposure, and color temperature from the source image.
@@ -666,11 +673,11 @@ BACKGROUND:
 - NEVER change, replace, blur, stylize, or remove the background.
 
 FINAL OUTPUT:
-- Must look like a premium Arabic bridal portfolio
+- Must look like a premium bridal portfolio
 - High-end wedding magazine quality
 - Ultra-realistic DSLR photography
 - No CGI, no illustration, no painting
-- If background, camera angle, pose, lighting, identity, or unselected features change, regenerate. Clothing may change only to satisfy selected bridal dress options.
+- If background, camera angle, pose, lighting, identity, or unselected features change, regenerate. Clothing may change only to satisfy selected bridal dress options or randomized bridal dress categories when no dress option is selected.
 
 Reference image:
 ${img}
