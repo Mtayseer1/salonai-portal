@@ -516,5 +516,31 @@ export const arabicTranslations: Record<string, string> = {
   'Payout records': 'سجلات الدفعات',
   'Partner accounts': 'حسابات الشركاء',
   'Payouts': 'الدفعات',
+  'Visa and card payments are disabled. Pay by CliQ, cash, or representative collection.':
+    'تم إيقاف الدفع بالفيزا والبطاقات. ادفع عبر CliQ أو نقداً أو عند زيارة مندوبنا.',
+  'Pay this package manually by CliQ, cash, or representative collection.':
+    'يتم دفع هذه الباقة يدوياً عبر CliQ أو نقداً أو من خلال مندوبنا.',
+  'Send Screenshot on WhatsApp': 'إرسال صورة التحويل عبر واتساب',
+  'Manual payment only': 'الدفع يدوي فقط',
+  'Visa and card payments are disabled': 'تم إيقاف الدفع بالفيزا والبطاقات',
+  'Choose a package, transfer the exact amount, then send the transfer screenshot on WhatsApp with your username. You can also pay cash when our representative visits your salon.':
+    'اختر الباقة، وحوّل المبلغ الصحيح، ثم أرسل صورة التحويل عبر واتساب مع اسم المستخدم. يمكنك أيضاً الدفع نقداً عند زيارة مندوبنا للصالون.',
+  'CliQ transfer': 'تحويل CliQ',
+  'Transfer the exact package amount to the CliQ alias below.':
+    'حوّل قيمة الباقة بالضبط إلى اسم CliQ المستعار أدناه.',
+  'Screenshot confirmation': 'تأكيد بصورة التحويل',
+  'Take a screenshot of the transfer and send it on WhatsApp with your username.':
+    'خذ لقطة شاشة للتحويل وأرسلها عبر واتساب مع اسم المستخدم.',
+  'Cash or representative visit': 'الدفع نقداً أو زيارة مندوب',
+  'Call or message us to arrange cash payment or a representative visit to your salon.':
+    'اتصل بنا أو راسلنا لترتيب الدفع النقدي أو زيارة مندوبنا إلى صالونك.',
+  'CliQ Alias': 'اسم CliQ المستعار',
+  'Username to include': 'اسم المستخدم المطلوب إرساله',
+  'Your salon username': 'اسم مستخدم الصالون',
+  'WhatsApp and call numbers': 'أرقام واتساب والاتصال',
+  'Send the transfer screenshot on WhatsApp or call any number below.':
+    'أرسل صورة التحويل عبر واتساب أو اتصل بأي رقم أدناه.',
+  'WhatsApp': 'واتساب',
+  'Call': 'اتصال',
   'Name': 'الاسم',
 }
