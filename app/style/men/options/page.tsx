@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
 import { Alert, Button, Card } from '@/app/components/ui'
 import { useStyleSession } from '@/components/style-session'
 
@@ -87,11 +88,13 @@ export default function MenOptionsPage() {
         <div className="grid gap-4 sm:grid-cols-2">
           <ModeCard
             title="Smart Style"
+            icon={<SmartIcon />}
             active={session.mode === 'smart'}
             onClick={selectSmart}
           />
           <ModeCard
             title="Catalog Style"
+            icon={<CatalogIcon />}
             active={session.mode === 'catalog'}
             onClick={selectCatalog}
           />
@@ -147,10 +150,12 @@ export default function MenOptionsPage() {
 
 function ModeCard({
   title,
+  icon,
   active,
   onClick,
 }: {
   title: string
+  icon: ReactNode
   active: boolean
   onClick: () => void
 }) {
@@ -164,8 +169,50 @@ function ModeCard({
           : 'border-white/10 bg-white/[0.04] hover:bg-white/[0.08]'
       }`}
     >
-      <span className="text-xl font-semibold text-white">{title}</span>
+      <span className="grid h-16 w-16 place-items-center rounded-3xl bg-white text-zinc-950">
+        {icon}
+      </span>
+      <span className="mt-3 text-xl font-semibold text-white">{title}</span>
     </button>
+  )
+}
+
+function SmartIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className="h-9 w-9"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+    >
+      <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z" />
+      <path d="M5 17l.9 2.1L8 20l-2.1.9L5 23l-.9-2.1L2 20l2.1-.9L5 17Z" />
+      <path d="M19 2l.7 1.6L21 4l-1.3.4L19 6l-.7-1.6L17 4l1.3-.4L19 2Z" />
+    </svg>
+  )
+}
+
+function CatalogIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className="h-9 w-9"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+    >
+      <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5v-16Z" />
+      <path d="M8 7h8" />
+      <path d="M8 11h8" />
+      <path d="M8 15h5" />
+    </svg>
   )
 }
 
