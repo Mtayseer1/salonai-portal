@@ -41,13 +41,19 @@ export default function StyleInfoPage() {
   }, [handlingFreshSession, router, session])
 
   const continueToPhoto = () => {
+    const nextGender = session.gender
+
     setCustomerInfo({
       customerName: name.trim() || undefined,
       customerPhone: phone.trim() || undefined,
     })
     setMode(null)
 
-    router.push('/style/photo?flow=start')
+    router.push(
+      nextGender === 'men' || nextGender === 'women'
+        ? `/style/photo?flow=start&gender=${nextGender}`
+        : '/style/photo?flow=start',
+    )
   }
 
   const goBack = () => {

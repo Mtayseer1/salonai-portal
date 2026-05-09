@@ -46,13 +46,14 @@ function getStyleFlowBackRoute(
 
   if (pathname === '/style/photo') {
     const photoFlow = getPhotoFlow()
+    const photoGender = getPhotoGender() || session.gender
 
     if (photoFlow === 'start') {
       return '/style/info'
     }
 
     if (photoFlow === 'mode' || !session.imageFile) {
-      return getStyleOptionsRoute(session.gender)
+      return getStyleOptionsRoute(photoGender)
     }
 
     return getModeReviewRoute(session.gender, session.mode)
@@ -102,6 +103,16 @@ function getPhotoFlow() {
   }
 
   return new URLSearchParams(window.location.search).get('flow')
+}
+
+function getPhotoGender() {
+  if (typeof window === 'undefined') {
+    return null
+  }
+
+  const gender = new URLSearchParams(window.location.search).get('gender')
+
+  return gender === 'men' || gender === 'women' ? gender : null
 }
 
 function getStyleOptionsRoute(gender: ReturnType<typeof useStyleSession>['gender']) {
