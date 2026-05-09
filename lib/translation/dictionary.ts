@@ -548,5 +548,44 @@ export const arabicTranslations: Record<string, string> = {
   'Gallery / Studio': 'المعرض / الاستوديو',
   'Choose an existing photo from the gallery or studio files.':
     'اختر صورة موجودة من المعرض أو ملفات الاستوديو.',
+  'Create Accounts': 'إنشاء حسابات',
+  'Create Account': 'إنشاء حساب',
+  'Manage Customers': 'إدارة العملاء',
+  'Create accounts, manage customers, and control credits.':
+    'أنشئ الحسابات وأدر العملاء وتحكم بالأرصدة.',
+  'Active Customers': 'العملاء النشطون',
+  'Active admin accounts': 'حسابات المديرين النشطة',
+  'Admin operations': 'عمليات الإدارة',
+  'Create admin, partner, and customer accounts, then manage customer credits from one place.':
+    'أنشئ حسابات المديرين والشركاء والعملاء، ثم أدر أرصدة العملاء من مكان واحد.',
+  'Create admins, partners, and customer salon accounts.':
+    'أنشئ حسابات المديرين والشركاء وصالونات العملاء.',
+  'customer': 'عميل',
+  'partner': 'شريك',
+  'admin': 'مدير',
+  'Full name': 'الاسم الكامل',
+  'account@salon.com': 'account@salon.com',
+  'No partner': 'بدون شريك',
+  'Creating...': 'جارٍ الإنشاء...',
+  'Account created successfully.': 'تم إنشاء الحساب بنجاح.',
+  'Search salon customers and add credits manually.':
+    'ابحث عن عملاء الصالونات وأضف الأرصدة يدوياً.',
+  'Current search results': 'نتائج البحث الحالية',
+  'Search by salon, barber, email, or phone.':
+    'ابحث باسم الصالون أو الحلاق أو البريد الإلكتروني أو الهاتف.',
+  'Search customers': 'البحث عن العملاء',
+  'No customers found.': 'لم يتم العثور على عملاء.',
+  'Try another search or create a customer account.':
+    'جرّب بحثاً آخر أو أنشئ حساب عميل.',
+  'No barber name': 'لا يوجد اسم حلاق',
+  'No email': 'لا يوجد بريد إلكتروني',
+  'No phone': 'لا يوجد هاتف',
+  'No country': 'لا توجد دولة',
+  'Available': 'المتاح',
+  'Credits to add': 'الأرصدة المراد إضافتها',
+  'Adding...': 'جارٍ الإضافة...',
+  'Add Credits': 'إضافة أرصدة',
+  'Credits added successfully.': 'تمت إضافة الأرصدة بنجاح.',
+  'Enter a positive credit amount.': 'أدخل عدد أرصدة موجباً.',
   'Name': 'الاسم',
 }

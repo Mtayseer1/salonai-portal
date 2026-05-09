@@ -7,6 +7,16 @@ import { Alert, Brand, Button, Field, LoadingScreen, inputClass } from './compon
 import { supabase } from '../src/lib/supabase'
 
 async function getDashboardPath(userId: string) {
+  const { data: admin } = await supabase
+    .from('admins')
+    .select('id,is_active')
+    .eq('id', userId)
+    .maybeSingle()
+
+  if (admin?.is_active !== false && admin?.id) {
+    return '/admin'
+  }
+
   const { data: partner } = await supabase
     .from('partners')
     .select('id')
@@ -17,7 +27,17 @@ async function getDashboardPath(userId: string) {
     return '/partner'
   }
 
-  return '/dashboard'
+  const { data: barber } = await supabase
+    .from('barbers')
+    .select('id')
+    .eq('id', userId)
+    .maybeSingle()
+
+  if (barber) {
+    return '/dashboard'
+  }
+
+  return '/admin'
 }
 
 export default function Home() {

@@ -36,6 +36,8 @@ export const partnerNav: NavItem[] = [
 
 export const adminNav: NavItem[] = [
   { href: '/admin', label: 'Dashboard', icon: 'A' },
+  { href: '/admin/create', label: 'Create Accounts', icon: '+' },
+  { href: '/admin/customers', label: 'Customers', icon: 'C' },
 ]
 
 export const pageMotion = {
