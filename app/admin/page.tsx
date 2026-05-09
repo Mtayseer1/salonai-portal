@@ -87,7 +87,7 @@ export default function AdminPage() {
                 Create admin, partner, and customer accounts, then manage customer credits from one place.
               </p>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-3">
               <Button type="button" onClick={() => router.push('/admin/create')}>
                 Create Account
               </Button>
@@ -97,6 +97,13 @@ export default function AdminPage() {
                 onClick={() => router.push('/admin/customers')}
               >
                 Manage Customers
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => router.push('/admin/partners')}
+              >
+                Partner Payments
               </Button>
             </div>
           </div>

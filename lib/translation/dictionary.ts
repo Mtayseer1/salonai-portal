@@ -605,6 +605,34 @@ export const arabicTranslations: Record<string, string> = {
   'No commissions yet.': 'لا توجد عمولات حتى الآن.',
   'Partner commission records will appear here.': 'ستظهر سجلات عمولات الشريك هنا.',
   'Package Commission': 'عمولة الباقة',
+  'Partners': 'الشركاء',
+  'Partner Payments': 'دفعات الشركاء',
+  'Review unpaid commissions and record partner payouts.':
+    'راجع العمولات غير المدفوعة وسجل دفعات الشركاء.',
+  'With Due': 'لديهم مستحقات',
+  'Total Due': 'إجمالي المستحق',
+  'Unpaid overall commission': 'إجمالي العمولة غير المدفوعة',
+  'Partner list': 'قائمة الشركاء',
+  'Search partners, check unpaid commission, and record payout when paid.':
+    'ابحث عن الشركاء، تحقق من العمولة غير المدفوعة، وسجل الدفعة عند الدفع.',
+  'Search partners': 'البحث عن الشركاء',
+  'No partners found.': 'لم يتم العثور على شركاء.',
+  'Try another search or create a partner account.':
+    'جرّب بحثاً آخر أو أنشئ حساب شريك.',
+  'Last paid': 'آخر دفعة',
+  'Due': 'المستحق',
+  'Paid': 'المدفوع',
+  'Never': 'لم يتم الدفع',
+  'unpaid commission records': 'سجلات عمولة غير مدفوعة',
+  'Recording...': 'جارٍ التسجيل...',
+  'Mark Paid': 'تسجيل الدفع',
+  'No unpaid commission found for this partner.':
+    'لا توجد عمولة غير مدفوعة لهذا الشريك.',
+  'Commission Due': 'العمولة المستحقة',
+  'Unpaid overall commissions': 'إجمالي العمولات غير المدفوعة',
+  'Track partner payouts recorded by admin.':
+    'تتبع دفعات الشريك المسجلة من الإدارة.',
+  'commission records paid': 'سجلات عمولة مدفوعة',
   'Enter a positive credit amount.': 'أدخل عدد أرصدة موجباً.',
   'Name': 'الاسم',
 }

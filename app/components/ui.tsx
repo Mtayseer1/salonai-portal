@@ -31,13 +31,14 @@ export const partnerNav: NavItem[] = [
   { href: '/partner', label: 'Overview', icon: 'O' },
   { href: '/partner/add-customer', label: 'Add Customer', icon: '+' },
   { href: '/partner/customers', label: 'Customers', icon: 'U' },
-  { href: '/partner/payments', label: 'Commissions', icon: '$' },
+  { href: '/partner/payments', label: 'Payments', icon: '$' },
 ]
 
 export const adminNav: NavItem[] = [
   { href: '/admin', label: 'Dashboard', icon: 'A' },
   { href: '/admin/create', label: 'Create Accounts', icon: '+' },
   { href: '/admin/customers', label: 'Customers', icon: 'C' },
+  { href: '/admin/partners', label: 'Partners', icon: 'P' },
 ]
 
 export const pageMotion = {

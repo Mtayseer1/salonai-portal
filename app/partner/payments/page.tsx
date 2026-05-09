@@ -7,13 +7,11 @@ import { supabase } from '../../../src/lib/supabase'
 
 type Payment = {
   id: string
-  commission_amount: number
-  package_name?: string
-  credits?: number
-  status?: string
+  amount: number
+  commission_count?: number
   notes: string
   created_at: string
-  paid_at?: string
+  paid_at: string
 }
 
 export default function PaymentsPage() {
@@ -35,10 +33,10 @@ export default function PaymentsPage() {
       const partnerId = session.user.id
 
       const { data } = await supabase
-        .from('partner_commissions')
+        .from('partner_payouts')
         .select('*')
         .eq('partner_id', partnerId)
-        .order('created_at', { ascending: false })
+        .order('paid_at', { ascending: false })
 
       setPayments(data || [])
       setLoading(false)
@@ -51,37 +49,34 @@ export default function PaymentsPage() {
     return <LoadingScreen />
   }
 
-  const totalAssigned = payments.reduce(
-    (sum, payment) => sum + Number(payment.commission_amount || 0),
+  const totalPaid = payments.reduce(
+    (sum, payment) => sum + Number(payment.amount || 0),
     0,
   )
-  const pendingAmount = payments
-    .filter((payment) => payment.status !== 'paid')
-    .reduce((sum, payment) => sum + Number(payment.commission_amount || 0), 0)
 
   return (
     <AppShell
-      title="Commissions"
-      subtitle="Track package commissions assigned from customer credits."
+      title="Payment History"
+      subtitle="Track partner payouts recorded by admin."
       role="Partner"
       navItems={partnerNav}
       userLabel="Partner account"
     >
       <div className="space-y-6">
         <div className="grid gap-4 sm:grid-cols-2">
-          <StatCard label="Total Assigned" value={`${totalAssigned.toFixed(2)} JD`} detail="All package commissions" />
-          <StatCard label="Pending" value={`${pendingAmount.toFixed(2)} JD`} detail="Awaiting payout" />
+          <StatCard label="Total Paid" value={`${totalPaid.toFixed(2)} JD`} detail="All recorded payouts" />
+          <StatCard label="Payments" value={payments.length} detail="Payout records" />
         </div>
 
         <Card className="p-0">
           <div className="border-b border-white/10 p-5">
-            <h2 className="text-xl font-semibold text-white">Commission ledger</h2>
-            <p className="mt-1 text-sm text-zinc-500">Most recent commissions appear first.</p>
+            <h2 className="text-xl font-semibold text-white">Payouts</h2>
+            <p className="mt-1 text-sm text-zinc-500">Most recent payments appear first.</p>
           </div>
 
           {payments.length === 0 ? (
             <div className="p-5">
-              <EmptyState title="No commissions yet." description="Partner commission records will appear here." />
+              <EmptyState title="No payments yet." description="Partner payout records will appear here." />
             </div>
           ) : (
             <div className="divide-y divide-white/10">
@@ -92,18 +87,18 @@ export default function PaymentsPage() {
                 >
                   <div>
                     <p className="text-sm text-zinc-500">
-                      {new Date(payment.created_at).toLocaleDateString()}
+                      {new Date(payment.paid_at).toLocaleDateString()}
                     </p>
                     <p className="mt-1 font-semibold text-white">
-                      {payment.package_name || 'Package Commission'}
+                      {payment.notes || 'Partner Payment'}
                     </p>
                     <p className="mt-1 text-xs text-zinc-500">
-                      {payment.credits || 0} credits - {payment.status || 'pending'}
+                      {payment.commission_count || 0} commission records paid
                     </p>
                   </div>
 
                   <div className="text-2xl font-semibold text-fuchsia-100">
-                    {Number(payment.commission_amount || 0).toFixed(2)} JD
+                    {Number(payment.amount || 0).toFixed(2)} JD
                   </div>
                 </div>
               ))}

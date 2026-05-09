@@ -9,7 +9,7 @@ export default function PartnerPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [totalCustomers, setTotalCustomers] = useState(0)
-  const [monthCommission, setMonthCommission] = useState(0)
+  const [commissionDue, setCommissionDue] = useState(0)
 
   useEffect(() => {
     const checkAccess = async () => {
@@ -40,20 +40,18 @@ export default function PartnerPage() {
         .select('*', { count: 'exact', head: true })
         .eq('partner_id', userId)
 
-      const monthStart = new Date()
-      monthStart.setDate(1)
-      monthStart.setHours(0, 0, 0, 0)
-
       const { data: commissions } = await supabase
         .from('partner_commissions')
-        .select('commission_amount')
+        .select('commission_amount,status')
         .eq('partner_id', userId)
-        .gte('created_at', monthStart.toISOString())
 
       setTotalCustomers(count || 0)
-      setMonthCommission(
+      setCommissionDue(
         (commissions || []).reduce(
-          (sum, commission) => sum + Number(commission.commission_amount || 0),
+          (sum, commission) =>
+            commission.status === 'paid'
+              ? sum
+              : sum + Number(commission.commission_amount || 0),
           0,
         ),
       )
@@ -79,9 +77,9 @@ export default function PartnerPage() {
         <div className="grid gap-4 md:grid-cols-3">
           <StatCard label="Total Customers" value={totalCustomers} detail="Linked salon accounts" />
           <StatCard
-            label="This Month Commission"
-            value={`${monthCommission.toFixed(2)} JD`}
-            detail="Assigned package commissions"
+            label="Commission Due"
+            value={`${commissionDue.toFixed(2)} JD`}
+            detail="Unpaid overall commissions"
           />
           <StatCard label="Conversion Status" value="Active" tone="success" detail="Portal is ready" />
         </div>
@@ -100,7 +98,7 @@ export default function PartnerPage() {
                 View Customers
               </Button>
               <Button variant="secondary" onClick={() => router.push('/partner/payments')}>
-                Commissions
+                Payment History
               </Button>
             </div>
           </div>
