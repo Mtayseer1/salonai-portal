@@ -1,7 +1,4 @@
-import {
-  removeUploadedStyleImage,
-  uploadStyleImageForGeneration,
-} from './style-session-upload'
+import { uploadStyleImageForGeneration } from './style-session-upload'
 import { supabase } from '@/src/lib/supabase'
 import { getSelectedLipPrompt } from './lips-catalog'
 import {
@@ -55,65 +52,64 @@ export async function generateStyleFromSession(
 
   validateGenerationSession(session)
 
-  const uploadedImage = await uploadStyleImageForGeneration(
-    session.imageFile,
-    session.customerPhone,
-  )
+  const imageInput =
+    session.gender === 'women'
+      ? await createInlineImageInput(session.imageFile)
+      : {
+          imageUrl: (
+            await uploadStyleImageForGeneration(
+              session.imageFile,
+              session.customerPhone,
+            )
+          ).signedUrl,
+        }
 
-  try {
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser()
-    const {
-      data: { session: authSession },
-      error: sessionError,
-    } = await supabase.auth.getSession()
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser()
+  const {
+    data: { session: authSession },
+    error: sessionError,
+  } = await supabase.auth.getSession()
 
-    if (userError || !user || sessionError || !authSession?.access_token) {
-      throw new Error(
-        [
-          'Sign in before generating.',
-          '',
-          'Client auth debug:',
-          stringifyDebug({
-            hasUser: Boolean(user),
-            userId: user?.id,
-            userError: userError?.message,
-            hasSession: Boolean(authSession),
-            sessionError: sessionError?.message,
-            hasAccessToken: Boolean(authSession?.access_token),
-          }),
-        ].join('\n'),
-      )
-    }
-
-    const response = await fetch('/api/generate', {
-      method: 'POST',
-      cache: 'no-store',
-      headers: {
-        Authorization: `Bearer ${authSession.access_token}`,
-        'X-Supabase-Access-Token': authSession.access_token,
-        'X-Salon-User-Id': user.id,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(createGenerationRequest(session, uploadedImage.signedUrl)),
-    })
-
-    const result = await parseGenerationResponse(response)
-
-    if (!response.ok) {
-      throw new Error(formatGenerationError(response.status, result))
-    }
-
-    return result
-  } finally {
-    if (session.gender === 'women') {
-      await removeUploadedStyleImage(uploadedImage.path).catch(() => {
-        // Women source uploads are temporary generation inputs.
-      })
-    }
+  if (userError || !user || sessionError || !authSession?.access_token) {
+    throw new Error(
+      [
+        'Sign in before generating.',
+        '',
+        'Client auth debug:',
+        stringifyDebug({
+          hasUser: Boolean(user),
+          userId: user?.id,
+          userError: userError?.message,
+          hasSession: Boolean(authSession),
+          sessionError: sessionError?.message,
+          hasAccessToken: Boolean(authSession?.access_token),
+        }),
+      ].join('\n'),
+    )
   }
+
+  const response = await fetch('/api/generate', {
+    method: 'POST',
+    cache: 'no-store',
+    headers: {
+      Authorization: `Bearer ${authSession.access_token}`,
+      'X-Supabase-Access-Token': authSession.access_token,
+      'X-Salon-User-Id': user.id,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(createGenerationRequest(session, imageInput)),
+  })
+
+  const result = await parseGenerationResponse(response)
+
+  if (!response.ok) {
+    throw new Error(formatGenerationError(response.status, result))
+  }
+
+  return result
 }
 
 async function parseGenerationResponse(response: Response) {
@@ -221,8 +217,21 @@ function validateGenerationSession(session: StyleFlowSessionState) {
   }
 }
 
-function createGenerationRequest(session: StyleFlowSessionState, imageUrl: string) {
+type GenerationImageInput = {
+  imageUrl?: string
+  imageBase64?: string
+  imageMimeType?: string
+}
+
+function createGenerationRequest(
+  session: StyleFlowSessionState,
+  imageInput: GenerationImageInput,
+) {
   if (session.gender === 'men') {
+    if (!imageInput.imageUrl) {
+      throw new Error('Could not prepare image URL for generation.')
+    }
+
     const hairOption =
       session.mode === 'catalog'
         ? findMenHairOption(session.hairCategory, session.hairStyle)
@@ -236,7 +245,7 @@ function createGenerationRequest(session: StyleFlowSessionState, imageUrl: strin
       gender: 'men',
       mode: session.mode,
       generationProvider: 'gemini',
-      imageUrl,
+      imageUrl: imageInput.imageUrl,
       hairLength: session.hairLength,
       beardLength: session.beardLength,
       hairStyle: session.hairStyle,
@@ -296,7 +305,8 @@ function createGenerationRequest(session: StyleFlowSessionState, imageUrl: strin
   return {
     gender: 'women',
     mode: session.mode,
-    imageUrl,
+    imageBase64: imageInput.imageBase64,
+    imageMimeType: imageInput.imageMimeType,
     hairLength: session.hairLength,
     makeup: session.makeup,
     dye: session.dye,
@@ -332,6 +342,37 @@ function createGenerationRequest(session: StyleFlowSessionState, imageUrl: strin
     customerName: session.customerName,
     customerPhone: session.customerPhone,
   }
+}
+
+async function createInlineImageInput(imageFile: File): Promise<GenerationImageInput> {
+  const dataUrl = await readFileAsDataUrl(imageFile)
+  const match = dataUrl.match(/^data:([^;]+);base64,(.+)$/)
+
+  if (!match?.[2]) {
+    throw new Error('Could not prepare image data for generation.')
+  }
+
+  return {
+    imageBase64: match[2],
+    imageMimeType: match[1] || imageFile.type || 'image/jpeg',
+  }
+}
+
+function readFileAsDataUrl(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader()
+
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        resolve(reader.result)
+        return
+      }
+
+      reject(new Error('Could not read image file.'))
+    }
+    reader.onerror = () => reject(reader.error || new Error('Could not read image file.'))
+    reader.readAsDataURL(file)
+  })
 }
 
 function formatPromptOption(option?: { name: string; description?: string }) {

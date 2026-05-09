@@ -8,6 +8,8 @@ type GenerateRequestBody = {
   mode?: string
   generationProvider?: 'gemini' | 'openai'
   imageUrl?: string
+  imageBase64?: string
+  imageMimeType?: string
   hairLength?: string
   beardLength?: string
   hairStyle?: string
@@ -181,12 +183,13 @@ export async function POST(request: Request) {
       )
     }
 
-    if (!body.imageUrl) {
+    if (!hasGenerationImage(body)) {
       return noStoreJson(
         {
-          error: 'Missing source image URL.',
+          error: 'Missing source image.',
           debug: createDebug(requestId, 'validation', {
             hasImageUrl: Boolean(body.imageUrl),
+            hasImageBase64: Boolean(body.imageBase64),
           }),
         },
         { status: 400 },
@@ -457,6 +460,14 @@ function getRequestOrigin(request: Request) {
   return new URL(request.url).origin.replace(/\/+$/, '')
 }
 
+function hasGenerationImage(body: GenerateRequestBody) {
+  if (body.gender === 'women') {
+    return Boolean(body.imageBase64 || body.imageUrl)
+  }
+
+  return Boolean(body.imageUrl)
+}
+
 function toAbsolutePublicAssetUrl(path: string | undefined, origin: string) {
   if (!path) {
     return undefined
@@ -606,6 +617,8 @@ function createGenerationPayload(
   if (body.mode === 'bridal') {
     return withLogContext({
       src_file_url: body.imageUrl,
+      src_file_base64: body.imageBase64,
+      src_file_mime_type: body.imageMimeType,
       gender: 'female',
       mode: 'bridal',
       bridalStyleOrigin: body.bridalStyleOrigin,
@@ -615,6 +628,8 @@ function createGenerationPayload(
   if (body.mode === 'smart') {
     return withLogContext({
       src_file_url: body.imageUrl,
+      src_file_base64: body.imageBase64,
+      src_file_mime_type: body.imageMimeType,
       gender: 'female',
       mode: 'smart',
       hairLength: body.hairLength,
@@ -625,6 +640,8 @@ function createGenerationPayload(
 
   return withLogContext({
     src_file_url: body.imageUrl,
+    src_file_base64: body.imageBase64,
+    src_file_mime_type: body.imageMimeType,
     gender: 'female',
     mode: 'catalog',
     haircutId: body.haircutId,

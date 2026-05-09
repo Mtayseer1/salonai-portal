@@ -165,8 +165,30 @@ function compactLines(lines: string[]) {
   return lines.filter((line) => line.trim().length > 0).join("\n");
 }
 
+function parseInlineImageData(value?: string | null, mimeType?: string | null) {
+  const text = String(value ?? "").trim();
+  const dataUrlMatch = text.match(/^data:([^;]+);base64,(.+)$/);
+
+  if (dataUrlMatch) {
+    return {
+      imageBase64: dataUrlMatch[2],
+      mimeType: dataUrlMatch[1] || mimeType || "image/jpeg",
+    };
+  }
+
+  return {
+    imageBase64: text,
+    mimeType: mimeType || "image/jpeg",
+  };
+}
+
 function createSelectedOptions(body: Record<string, unknown>) {
-  const excluded = new Set(["src_file_url", "log_context"]);
+  const excluded = new Set([
+    "src_file_url",
+    "src_file_base64",
+    "src_file_mime_type",
+    "log_context",
+  ]);
 
   return Object.fromEntries(
     Object.entries(body).filter(
@@ -680,12 +702,16 @@ ${img}
    GEMINI CLIENT
 ============================================================ */
 
-async function callGemini(prompt: string, imageBase64: string) {
+async function callGemini(
+  prompt: string,
+  imageBase64: string,
+  imageMimeType = "image/jpeg",
+) {
   const parts: any[] = [
     { text: prompt },
     {
       inlineData: {
-        mimeType: "image/jpeg",
+        mimeType: imageMimeType,
         data: imageBase64,
       },
     },
@@ -744,6 +770,8 @@ Deno.serve(async (req) => {
 
     const {
       src_file_url,
+      src_file_base64,
+      src_file_mime_type,
       mode,
       hairLength,
       makeup,
@@ -783,10 +811,10 @@ Deno.serve(async (req) => {
       log_context,
     } = body;
 
-    if (!src_file_url) {
+    if (!src_file_url && !src_file_base64) {
       return json(400, {
         ok: false,
-        error: "Missing src_file_url",
+        error: "Missing source image",
       });
     }
 
@@ -798,10 +826,17 @@ Deno.serve(async (req) => {
         : "smart";
 
     /* ===============================
-       Fetch image
+       Prepare image
     =============================== */
 
-    const imageBase64 = await fetchImageBase64(src_file_url);
+    const inlineImage = src_file_base64
+      ? parseInlineImageData(src_file_base64, src_file_mime_type)
+      : {
+          imageBase64: await fetchImageBase64(src_file_url),
+          mimeType: "image/jpeg",
+        };
+    const sourceReference =
+      src_file_url || "Inline uploaded customer image supplied with this request.";
 
     /* ===============================
        Build prompt
@@ -809,12 +844,12 @@ Deno.serve(async (req) => {
 
     const prompt =
       finalMode === "bridal"
-        ? buildBridalPrompt(src_file_url, {
+        ? buildBridalPrompt(sourceReference, {
             styleOrigin: bridalStyleOrigin,
           })
         : finalMode === "catalog"
         ? buildCatalogPrompt(
-            src_file_url,
+            sourceReference,
             haircut,
             haircutId,
             hairStyle,
@@ -852,7 +887,7 @@ Deno.serve(async (req) => {
               extensions,
             },
           )
-        : buildSmartPrompt(src_file_url, hairLength, makeup, dye);
+        : buildSmartPrompt(sourceReference, hairLength, makeup, dye);
 
     /* ===============================
        Call Gemini
@@ -878,7 +913,11 @@ Deno.serve(async (req) => {
     let result;
 
     try {
-      result = await callGemini(prompt, imageBase64);
+      result = await callGemini(
+        prompt,
+        inlineImage.imageBase64,
+        inlineImage.mimeType,
+      );
       await updateGeminiCallLog(logId, {
         status: "success",
         generated_image_mime_type: result.mimeType,
