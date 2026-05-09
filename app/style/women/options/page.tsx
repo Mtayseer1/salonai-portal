@@ -25,7 +25,7 @@ export default function WomenOptionsPage() {
   const selectCatalog = () => {
     session.setGender('women')
     session.setMode('catalog')
-    router.push(session.imageFile ? '/style/women/catalog/style' : '/style/photo')
+    router.push(session.imageFile ? '/style/women/catalog/review' : '/style/photo')
   }
 
   const selectBridal = () => {
