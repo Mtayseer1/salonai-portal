@@ -26,7 +26,7 @@ export default function StylePhotoPage() {
       return
     }
 
-    if (isStartPhotoFlow()) {
+    if (getPhotoFlow() === 'start') {
       if (gender === 'men') {
         router.push('/style/men/options')
         return
@@ -67,8 +67,15 @@ export default function StylePhotoPage() {
   }
 
   const goBack = () => {
-    if (isStartPhotoFlow()) {
+    const photoFlow = getPhotoFlow()
+
+    if (photoFlow === 'start') {
       router.push('/style/info')
+      return
+    }
+
+    if (photoFlow === 'mode') {
+      router.push(gender === 'men' ? '/style/men/options' : '/style/women/options')
       return
     }
 
@@ -177,12 +184,12 @@ export default function StylePhotoPage() {
   )
 }
 
-function isStartPhotoFlow() {
+function getPhotoFlow() {
   if (typeof window === 'undefined') {
-    return false
+    return null
   }
 
-  return new URLSearchParams(window.location.search).get('flow') === 'start'
+  return new URLSearchParams(window.location.search).get('flow')
 }
 
 function PhotoSourceButton({

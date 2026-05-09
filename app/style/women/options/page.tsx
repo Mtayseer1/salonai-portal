@@ -19,19 +19,23 @@ export default function WomenOptionsPage() {
     session.setGender('women')
     session.setMode('smart')
     session.setWomenOptions({ hairLength: session.hairLength || 'Random' })
-    router.push(session.imageFile ? '/style/loading' : '/style/photo')
+    router.push(session.imageFile ? '/style/loading' : '/style/photo?flow=mode')
   }
 
   const selectCatalog = () => {
     session.setGender('women')
     session.setMode('catalog')
-    router.push(session.imageFile ? '/style/women/catalog/review' : '/style/photo')
+    router.push(
+      session.imageFile ? '/style/women/catalog/review' : '/style/photo?flow=mode',
+    )
   }
 
   const selectBridal = () => {
     session.setGender('women')
     session.setMode('bridal')
-    router.push(session.imageFile ? '/style/women/bridal/review' : '/style/photo')
+    router.push(
+      session.imageFile ? '/style/women/bridal/review' : '/style/photo?flow=mode',
+    )
   }
 
   return (

@@ -41,7 +41,7 @@ export default function MenOptionsPage() {
     session.setMode('smart')
 
     if (!session.imageFile && !session.imagePreviewUrl) {
-      router.push('/style/photo')
+      router.push('/style/photo?flow=mode')
     }
   }
 
@@ -52,7 +52,7 @@ export default function MenOptionsPage() {
     router.push(
       session.imageFile || session.imagePreviewUrl
         ? '/style/men/catalog/review'
-        : '/style/photo',
+        : '/style/photo?flow=mode',
     )
   }
 

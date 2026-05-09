@@ -19,6 +19,7 @@ type AppShellProps = {
   role: 'Salon' | 'Partner' | 'Admin'
   navItems: NavItem[]
   userLabel?: string
+  onBack?: () => void
 }
 
 export const salonNav: NavItem[] = [
@@ -54,6 +55,7 @@ export function AppShell({
   role,
   navItems,
   userLabel = 'Account',
+  onBack,
 }: AppShellProps) {
   void role
   void navItems
@@ -62,14 +64,14 @@ export function AppShell({
   const pathname = usePathname()
   const router = useRouter()
   const showBack = pathname !== '/dashboard'
-  const goBack = () => {
+  const goBack = onBack ?? (() => {
     if (pathname === '/style/result') {
       router.push('/dashboard')
       return
     }
 
     router.back()
-  }
+  })
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(192,132,252,0.16),transparent_34%),linear-gradient(135deg,#07070a_0%,#101014_48%,#07070a_100%)] text-white">
