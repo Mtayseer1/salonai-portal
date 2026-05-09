@@ -116,10 +116,6 @@ type CatalogBeautyOptions = {
 
 type BridalOptions = {
   styleOrigin?: string[];
-  accessories?: string[];
-  hair?: string[];
-  makeup?: string[];
-  mood?: string[];
 };
 
 type GeminiLogContext = {
@@ -584,7 +580,7 @@ ${img}
 `.trim();
 }
 
-function formatBridalSelections(selections?: string[] | string) {
+function formatBridalStyle(selections?: string[] | string) {
   const values = Array.isArray(selections)
     ? selections
     : typeof selections === "string"
@@ -594,16 +590,18 @@ function formatBridalSelections(selections?: string[] | string) {
     .map((value) => String(value).trim())
     .filter((value) => value.length > 0);
 
-  if (cleanValues.length === 0) {
-    return "Random / not selected";
-  }
-
-  return cleanValues.join(", ");
+  return cleanValues[0] || "Middle Eastern style";
 }
 
 function buildBridalPrompt(img: string, bridal: BridalOptions = {}) {
+  const bridalStyle = formatBridalStyle(bridal.styleOrigin);
+  const bridalTheme =
+    normalizeKey(bridalStyle) === "middleeasternstyle"
+      ? "Middle Eastern / Arabic"
+      : bridalStyle.replace(/\s*style$/i, "");
+
   return `
-Create ONE single ultra-high-resolution image arranged in a 3x3 grid (9 variations).
+Create ONE single ultra-high-resolution image arranged in a 3x2 grid (6 variations).
 
 Each grid cell must show THE SAME WOMAN from the reference image.
 Her identity must NEVER change.
@@ -615,52 +613,48 @@ ABSOLUTE RULES:
 - No AI face enhancement.
 - No different person.
 - Ultra-realistic photography only.
-- Clear numbering 1-9 on each variation.
+- Clear numbering 1-6 on each variation.
 
 ${SOURCE_PRESERVATION_RULES}
 
 STYLE THEME:
-Luxury bridal beauty guided by the selected bridal options below.
+Heavy ${bridalTheme} bridal makeup and bridal hairstyle only.
+Use this as the only selected bridal style/origin: ${bridalStyle}.
 
-SELECTED BRIDAL OPTIONS:
-- Style / Origin: ${formatBridalSelections(bridal.styleOrigin)}
-- Accessories: ${formatBridalSelections(bridal.accessories)}
-- Hair: ${formatBridalSelections(bridal.hair)}
-- Makeup: ${formatBridalSelections(bridal.makeup)}
-- Mood: ${formatBridalSelections(bridal.mood)}
+Each variation must show a different heavy bridal makeup and hairstyle direction influenced by ${bridalTheme} bridal beauty:
 
-SELECTION RULES:
-- Generate exactly 9 unique bridal variations in the 3x3 grid.
-- Treat every selected value as an active request, not as a label only.
-- Spread multiple selected values across the 9 variations as evenly as possible.
-- If multiple origins are selected, some variations must visibly follow each selected origin. For example, if Indian style and Middle Eastern style are selected, include both styles across the 9 cells.
-- Apply the same distribution logic to accessories, hair, makeup, and mood.
-- Each selected value in every category must appear in at least one grid cell when possible.
-- Repeat selected values as needed to fill all 9 cells.
-- If a category has 0 selected values, randomize that category with tasteful luxury bridal choices.
-- If Hair has 0 selected values, use varied random bridal hairstyles across the 9 cells.
-- Do not add unselected accessory types unless the Accessories category has 0 selected values.
-- Never change the dress, outfit, neckline, shoulder area, body, or clothing color.
+1) Royal low bun with heavy sculpted bridal makeup
+2) Soft glamorous waves with dramatic bridal eye makeup
+3) High elegant bun with bold bridal contour and highlighted cheeks
+4) Half-up romantic curls with intense bridal lashes and defined eyes
+5) Voluminous curls with full glam bridal makeup
+6) Classic ${bridalTheme} bridal updo with polished heavy bridal makeup
 
-GRID VARIATION PLAN:
-- Make all 9 cells different but compatible with the selected categories.
-- Do not make all 9 cells the same origin, same hair, same makeup, or same mood when multiple values are selected.
-- If a category is random, vary that category naturally across cells.
-- Keep the visual attention on the face, hairline, brows, eyes, lips, cheeks, skin texture, and accessories around the head and neck.
+STYLE RULES:
+- Generate exactly 6 unique bridal variations in the 3x2 grid.
+- Only change hairstyle and makeup.
+- Keep every hairstyle and makeup variation faithful to the selected ${bridalTheme} bridal style.
+- Do not mix in unselected bridal origins or unrelated cultural styling.
+- Keep the visual attention on the hairline, hairstyle shape, brows, eyes, lashes, lips, cheeks, contour, highlight, and skin texture.
 - Do not restyle the visible outfit to create bridal dress variations.
+- Do not add jewelry, earrings, necklaces, nose rings, hair ornaments, crowns, tiaras, veils, headpieces, flowers, pins, accessories, props, or decorative objects.
 
 MAKEUP STYLE:
-- Follow the selected makeup choices when provided.
-- If Makeup has 0 selected values, vary between natural bridal, soft glam, full glam, smokey bridal, Arabian glam, and dewy glow as suitable.
-- Keep makeup professionally blended and bridal appropriate.
+- Heavy professional ${bridalTheme} bridal makeup
+- Deep defined smoky eyes or culturally appropriate dramatic eye makeup
+- Strong eyeliner with long dramatic lashes
+- Full coverage bridal base while preserving real skin texture
+- Perfectly blended contour and bronzer
+- Highlighted cheekbones
+- Bold bridal lips suitable for the selected ${bridalTheme} style
+- Matte luxury finish
 - No plastic skin
 
-JEWELRY & DETAILS:
-- Use the selected accessories exactly where possible.
-- Keep jewelry and accessories premium, realistic, proportional, and face-focused.
-- Do not add a veil unless Veil is selected or Accessories has 0 selected values.
-- Do not add a nose ring unless Nose ring is selected or Accessories has 0 selected values.
-- Do not add or change the dress, sleeves, bodice, or garment shape.
+HAIR & MAKEUP ONLY:
+- Add no jewelry or accessories of any kind.
+- Add no bridal dress, outfit change, veil, crown, tiara, headpiece, hair jewelry, flowers, or pins.
+- Do not change the customer's clothing or outfit into a bridal dress.
+- Preserve any existing jewelry or accessories already visible in the source image, but do not add new ones.
 
 LIGHTING:
 - Keep the exact original lighting direction, shadows, exposure, and color temperature from the source image.
@@ -671,11 +665,11 @@ BACKGROUND:
 - NEVER change, replace, blur, stylize, or remove the background.
 
 FINAL OUTPUT:
-- Must look like a premium bridal portfolio
+- Must look like a premium ${bridalTheme} bridal portfolio
 - High-end wedding magazine quality
 - Ultra-realistic DSLR photography
 - No CGI, no illustration, no painting
-- If background, camera angle, pose, lighting, identity, clothing, body, or unselected features change, regenerate.
+- If clothing, background, camera angle, pose, lighting, or unselected features change, regenerate.
 
 Reference image:
 ${img}
@@ -786,10 +780,6 @@ Deno.serve(async (req) => {
       mascara,
       extensions,
       bridalStyleOrigin,
-      bridalAccessories,
-      bridalHair,
-      bridalMakeup,
-      bridalMood,
       log_context,
     } = body;
 
@@ -821,10 +811,6 @@ Deno.serve(async (req) => {
       finalMode === "bridal"
         ? buildBridalPrompt(src_file_url, {
             styleOrigin: bridalStyleOrigin,
-            accessories: bridalAccessories,
-            hair: bridalHair,
-            makeup: bridalMakeup,
-            mood: bridalMood,
           })
         : finalMode === "catalog"
         ? buildCatalogPrompt(

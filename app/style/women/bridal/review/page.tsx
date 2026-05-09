@@ -15,73 +15,16 @@ const styleOriginOptions = [
   'Moroccan style',
 ]
 
-const accessoryOptions = [
-  'Veil',
-  'Tiara',
-  'Earrings',
-  'Necklace',
-  'Head jewelry',
-  'Hair accessories',
-  'Nose ring',
-]
-
-const hairOptions = [
-  'Low bun',
-  'Updo bun',
-  'Hollywood waves',
-  'Soft curls',
-  'Braided style',
-  'Covered hair',
-  'Dupatta over head',
-]
-
-const makeupOptions = [
-  'Natural bridal',
-  'Soft glam',
-  'Full glam',
-  'Smokey bridal',
-  'Arabian glam',
-  'Dewy glow',
-]
-
-const moodOptions = [
-  'Elegant',
-  'Luxury',
-  'Romantic',
-  'Royal',
-  'Traditional',
-  'Modern',
-]
-
-type BridalSelectionKey =
-  | 'bridalStyleOrigin'
-  | 'bridalAccessories'
-  | 'bridalHair'
-  | 'bridalMakeup'
-  | 'bridalMood'
-
 export default function WomenBridalReviewPage() {
   const router = useRouter()
   const session = useStyleSession()
   const [message, setMessage] = useState('')
 
-  const selectedStyleOrigins = toSelectionArray(session.bridalStyleOrigin)
-  const selectedAccessories = toSelectionArray(session.bridalAccessories)
-  const selectedHair = toSelectionArray(session.bridalHair)
-  const selectedMakeup = toSelectionArray(session.bridalMakeup)
-  const selectedMoods = toSelectionArray(session.bridalMood)
+  const selectedStyleOrigin = toSelectedStyleOrigin(session.bridalStyleOrigin)
 
-  const toggleSelection = (
-    key: BridalSelectionKey,
-    selectedValues: string[],
-    value: string,
-  ) => {
+  const selectStyleOrigin = (value: string) => {
     setMessage('')
-    const nextValues = selectedValues.includes(value)
-      ? selectedValues.filter((item) => item !== value)
-      : [...selectedValues, value]
-
-    session.setWomenOptions({ [key]: nextValues })
+    session.setWomenOptions({ bridalStyleOrigin: [value] })
   }
 
   const generateBridalStyle = () => {
@@ -90,6 +33,11 @@ export default function WomenBridalReviewPage() {
 
     if (!session.imageFile) {
       setMessage('Upload the client image before generating.')
+      return
+    }
+
+    if (!selectedStyleOrigin) {
+      setMessage('Choose a bridal style before generating.')
       return
     }
 
@@ -141,45 +89,11 @@ export default function WomenBridalReviewPage() {
 
       {message && <Alert>{message}</Alert>}
 
-      <MultiOptionGroup
+      <OptionGroup
         title="Style / Origin"
         options={styleOriginOptions}
-        selected={selectedStyleOrigins}
-        onToggle={(value) =>
-          toggleSelection('bridalStyleOrigin', selectedStyleOrigins, value)
-        }
-      />
-
-      <MultiOptionGroup
-        title="Accessories"
-        options={accessoryOptions}
-        selected={selectedAccessories}
-        onToggle={(value) =>
-          toggleSelection('bridalAccessories', selectedAccessories, value)
-        }
-      />
-
-      <MultiOptionGroup
-        title="Hair"
-        options={hairOptions}
-        selected={selectedHair}
-        onToggle={(value) => toggleSelection('bridalHair', selectedHair, value)}
-      />
-
-      <MultiOptionGroup
-        title="Makeup"
-        options={makeupOptions}
-        selected={selectedMakeup}
-        onToggle={(value) =>
-          toggleSelection('bridalMakeup', selectedMakeup, value)
-        }
-      />
-
-      <MultiOptionGroup
-        title="Mood"
-        options={moodOptions}
-        selected={selectedMoods}
-        onToggle={(value) => toggleSelection('bridalMood', selectedMoods, value)}
+        selected={selectedStyleOrigin}
+        onSelect={selectStyleOrigin}
       />
 
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-white/10 bg-[#08080b]/95 px-4 py-4 backdrop-blur-xl">
@@ -205,16 +119,16 @@ export default function WomenBridalReviewPage() {
   )
 }
 
-function MultiOptionGroup({
+function OptionGroup({
   title,
   options,
   selected,
-  onToggle,
+  onSelect,
 }: {
   title: string
   options: string[]
-  selected: string[]
-  onToggle: (value: string) => void
+  selected?: string
+  onSelect: (value: string) => void
 }) {
   return (
     <Card className="p-4">
@@ -224,8 +138,8 @@ function MultiOptionGroup({
           <OptionButton
             key={option}
             label={option}
-            active={selected.includes(option)}
-            onClick={() => onToggle(option)}
+            active={selected === option}
+            onClick={() => onSelect(option)}
           />
         ))}
       </div>
@@ -233,12 +147,12 @@ function MultiOptionGroup({
   )
 }
 
-function toSelectionArray(value?: string | string[]) {
+function toSelectedStyleOrigin(value?: string | string[]) {
   if (Array.isArray(value)) {
-    return value
+    return value[0]
   }
 
-  return value ? [value] : []
+  return value
 }
 
 function OptionButton({

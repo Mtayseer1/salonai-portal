@@ -97,10 +97,6 @@ export type StyleFlowSessionState = {
   mascara?: string
   extensions?: boolean
   bridalStyleOrigin?: string[]
-  bridalAccessories?: string[]
-  bridalHair?: string[]
-  bridalMakeup?: string[]
-  bridalMood?: string[]
   customerName?: string
   customerPhone?: string
 }
@@ -150,10 +146,6 @@ export type WomenStyleSessionOptions = Partial<
     | 'mascara'
     | 'extensions'
     | 'bridalStyleOrigin'
-    | 'bridalAccessories'
-    | 'bridalHair'
-    | 'bridalMakeup'
-    | 'bridalMood'
   >
 >
 

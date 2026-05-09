@@ -45,10 +45,6 @@ type GenerateRequestBody = {
   mascara?: string
   extensions?: boolean
   bridalStyleOrigin?: string[]
-  bridalAccessories?: string[]
-  bridalHair?: string[]
-  bridalMakeup?: string[]
-  bridalMood?: string[]
   customerName?: string
   customerPhone?: string
 }
@@ -613,10 +609,6 @@ function createGenerationPayload(
       gender: 'female',
       mode: 'bridal',
       bridalStyleOrigin: body.bridalStyleOrigin,
-      bridalAccessories: body.bridalAccessories,
-      bridalHair: body.bridalHair,
-      bridalMakeup: body.bridalMakeup,
-      bridalMood: body.bridalMood,
     })
   }
 
