@@ -2,15 +2,17 @@
 
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Alert, Button, Card } from '@/app/components/ui'
 import { useStyleSession } from '@/components/style-session'
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 
 export default function StylePhotoPage() {
   const router = useRouter()
   const { gender, mode, imageFile, imagePreviewUrl, setImage } = useStyleSession()
   const [message, setMessage] = useState('')
+  const cameraInputRef = useRef<HTMLInputElement>(null)
+  const galleryInputRef = useRef<HTMLInputElement>(null)
 
   const selectImage = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] ?? null
@@ -25,7 +27,7 @@ export default function StylePhotoPage() {
     }
 
     if (gender === 'men') {
-      router.push(mode === 'smart' ? '/style/men/options' : '/style/men/catalog/review')
+      router.push(mode === 'catalog' ? '/style/men/catalog/review' : '/style/men/options')
       return
     }
 
@@ -52,6 +54,35 @@ export default function StylePhotoPage() {
     router.push('/style')
   }
 
+  const goBack = () => {
+    if (!mode) {
+      router.push('/style/info')
+      return
+    }
+
+    if (gender === 'men') {
+      router.push(mode === 'catalog' ? '/style/men/catalog/review' : '/style/men/options')
+      return
+    }
+
+    if (gender === 'women') {
+      if (mode === 'catalog') {
+        router.push('/style/women/catalog/review')
+        return
+      }
+
+      if (mode === 'bridal') {
+        router.push('/style/women/bridal/review')
+        return
+      }
+
+      router.push('/style/women/options')
+      return
+    }
+
+    router.push('/style/info')
+  }
+
   return (
     <Card className="max-w-3xl">
       <div className="space-y-6">
@@ -69,18 +100,36 @@ export default function StylePhotoPage() {
 
         {message && <Alert>{message}</Alert>}
 
-        <label className="block rounded-3xl border border-dashed border-white/15 bg-black/20 p-5 transition hover:bg-white/[0.04]">
-          <span className="block text-sm font-semibold text-white">Image upload</span>
-          <span className="mt-1 block text-sm text-zinc-500">
-            Choose a clear front-facing photo.
-          </span>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={selectImage}
-            className="mt-4 block w-full text-sm text-zinc-300 file:mr-4 file:rounded-2xl file:border-0 file:bg-white file:px-4 file:py-2 file:text-sm file:font-bold file:text-zinc-950"
+        <div className="grid gap-3 sm:grid-cols-2">
+          <PhotoSourceButton
+            title="Camera Capture"
+            description="Use the camera to capture a new client photo."
+            icon={<CameraIcon />}
+            onClick={() => cameraInputRef.current?.click()}
           />
-        </label>
+          <PhotoSourceButton
+            title="Gallery / Studio"
+            description="Choose an existing photo from the gallery or studio files."
+            icon={<GalleryIcon />}
+            onClick={() => galleryInputRef.current?.click()}
+          />
+        </div>
+
+        <input
+          ref={cameraInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          onChange={selectImage}
+          className="hidden"
+        />
+        <input
+          ref={galleryInputRef}
+          type="file"
+          accept="image/*"
+          onChange={selectImage}
+          className="hidden"
+        />
 
         {imagePreviewUrl && (
           <div className="relative h-[440px] overflow-hidden rounded-3xl border border-white/10 bg-black/30">
@@ -98,9 +147,7 @@ export default function StylePhotoPage() {
           <Button
             type="button"
             variant="secondary"
-            onClick={() =>
-              router.push(gender === 'women' ? '/style/women/options' : '/style/info')
-            }
+            onClick={goBack}
           >
             Back
           </Button>
@@ -110,5 +157,69 @@ export default function StylePhotoPage() {
         </div>
       </div>
     </Card>
+  )
+}
+
+function PhotoSourceButton({
+  title,
+  description,
+  icon,
+  onClick,
+}: {
+  title: string
+  description: string
+  icon: ReactNode
+  onClick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="grid min-h-40 place-items-center rounded-3xl border border-white/10 bg-black/20 p-5 text-center transition hover:border-fuchsia-200/30 hover:bg-white/[0.08]"
+    >
+      <span className="grid h-16 w-16 place-items-center rounded-3xl bg-white text-zinc-950">
+        {icon}
+      </span>
+      <span className="mt-3 text-lg font-semibold text-white">{title}</span>
+      <span className="mt-1 text-xs leading-5 text-zinc-500">{description}</span>
+    </button>
+  )
+}
+
+function CameraIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className="h-9 w-9"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+    >
+      <path d="M14.5 4l1.2 2H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4.3l1.2-2h5Z" />
+      <circle cx="12" cy="13" r="4" />
+    </svg>
+  )
+}
+
+function GalleryIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className="h-9 w-9"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+    >
+      <rect x="3" y="4" width="18" height="16" rx="2" />
+      <circle cx="8.5" cy="9" r="1.5" />
+      <path d="M21 15l-4.5-4.5L7 20" />
+      <path d="M14 20l-3.5-3.5" />
+    </svg>
   )
 }

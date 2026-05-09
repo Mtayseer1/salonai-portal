@@ -8,7 +8,7 @@ import { useStyleSession } from '@/components/style-session'
 export default function StyleInfoPage() {
   const router = useRouter()
   const session = useStyleSession()
-  const { customerName, customerPhone, gender, setCustomerInfo } = session
+  const { customerName, customerPhone, setCustomerInfo } = session
   const freshSessionHandledRef = useRef(false)
   const [handlingFreshSession, setHandlingFreshSession] = useState(() => {
     if (typeof window === 'undefined') {
@@ -46,16 +46,11 @@ export default function StyleInfoPage() {
       customerPhone: phone.trim() || undefined,
     })
 
-    if (gender === 'women') {
-      router.push('/style/women/options')
-      return
-    }
-
     router.push('/style/photo')
   }
 
   const goBack = () => {
-    router.push(gender === 'men' ? '/style/men/options' : '/dashboard')
+    router.push('/dashboard')
   }
 
   if (handlingFreshSession) {

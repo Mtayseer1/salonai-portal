@@ -542,5 +542,11 @@ export const arabicTranslations: Record<string, string> = {
     'أرسل صورة التحويل عبر واتساب أو اتصل بأي رقم أدناه.',
   'WhatsApp': 'واتساب',
   'Call': 'اتصال',
+  'Camera Capture': 'التقاط بالكاميرا',
+  'Use the camera to capture a new client photo.':
+    'استخدم الكاميرا لالتقاط صورة جديدة للعميل.',
+  'Gallery / Studio': 'المعرض / الاستوديو',
+  'Choose an existing photo from the gallery or studio files.':
+    'اختر صورة موجودة من المعرض أو ملفات الاستوديو.',
   'Name': 'الاسم',
 }

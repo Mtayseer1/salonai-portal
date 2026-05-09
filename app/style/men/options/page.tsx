@@ -39,14 +39,21 @@ export default function MenOptionsPage() {
     setMessage('')
     session.setGender('men')
     session.setMode('smart')
-    router.push('/style/info')
+
+    if (!session.imageFile && !session.imagePreviewUrl) {
+      router.push('/style/photo')
+    }
   }
 
   const selectCatalog = () => {
     setMessage('')
     session.setGender('men')
     session.setMode('catalog')
-    router.push('/style/info')
+    router.push(
+      session.imageFile || session.imagePreviewUrl
+        ? '/style/men/catalog/review'
+        : '/style/photo',
+    )
   }
 
   const generateSmartStyle = () => {

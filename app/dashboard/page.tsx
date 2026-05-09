@@ -44,11 +44,7 @@ export default function DashboardPage() {
   }, [router])
 
   const startStyle = (gender: StyleSessionGender) => {
-    router.push(
-      gender === 'men'
-        ? '/style/men/options?fresh=1'
-        : '/style/info?fresh=1&gender=women',
-    )
+    router.push(`/style/info?fresh=1&gender=${gender}`)
   }
 
   if (loading) {
