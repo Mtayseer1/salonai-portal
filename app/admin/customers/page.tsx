@@ -27,12 +27,23 @@ type Customer = {
   is_active?: boolean
 }
 
+type PackageItem = {
+  id: string
+  name: string
+  images_count: number
+  price_before_vat: number
+  vat_percent: number
+  is_active: boolean
+}
+
 export default function AdminCustomersPage() {
   const [loading, setLoading] = useState(true)
+  const [packagesLoading, setPackagesLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [customers, setCustomers] = useState<Customer[]>([])
+  const [packages, setPackages] = useState<PackageItem[]>([])
   const [message, setMessage] = useState('')
-  const [creditInputs, setCreditInputs] = useState<Record<string, string>>({})
+  const [packageSelections, setPackageSelections] = useState<Record<string, string>>({})
   const [savingId, setSavingId] = useState<string | null>(null)
 
   const loadCustomers = async (query = search) => {
@@ -56,6 +67,22 @@ export default function AdminCustomersPage() {
     }
   }
 
+  const loadPackages = async () => {
+    try {
+      const response = await fetch('/api/packages', { cache: 'no-store' })
+      const data = await response.json()
+      setPackages(Array.isArray(data) ? data : [])
+    } catch {
+      setPackages([])
+    } finally {
+      setPackagesLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadPackages()
+  }, [])
+
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
       loadCustomers(search)
@@ -72,10 +99,11 @@ export default function AdminCustomersPage() {
 
   const addCredits = async (customer: Customer) => {
     try {
-      const amount = Number(creditInputs[customer.id])
+      const packageId = packageSelections[customer.id]
+      const selectedPackage = packages.find((pkg) => pkg.id === packageId)
 
-      if (!Number.isInteger(amount) || amount <= 0) {
-        setMessage('Enter a positive credit amount.')
+      if (!packageId || !selectedPackage) {
+        setMessage('Choose an active package.')
         return
       }
 
@@ -84,12 +112,14 @@ export default function AdminCustomersPage() {
       const result = await adminFetch<{
         remainingCredits: number
         totalCredits: number
+        partnerId: string | null
+        commissionAmount: number
       }>('/api/admin/customers/credits', {
         method: 'POST',
         body: JSON.stringify({
           customerId: customer.id,
-          credits: amount,
-          notes: 'Admin manual credit top-up',
+          packageId,
+          notes: `Admin added ${selectedPackage.name} package`,
         }),
       })
 
@@ -104,8 +134,12 @@ export default function AdminCustomersPage() {
             : item,
         ),
       )
-      setCreditInputs((current) => ({ ...current, [customer.id]: '' }))
-      setMessage('Credits added successfully.')
+      setPackageSelections((current) => ({ ...current, [customer.id]: '' }))
+      setMessage(
+        result.partnerId
+          ? `Credits added successfully. Partner commission assigned: ${Number(result.commissionAmount || 0).toFixed(2)} JOD.`
+          : 'Credits added successfully. No partner is linked to this customer.',
+      )
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Could not add credits.')
     } finally {
@@ -113,14 +147,14 @@ export default function AdminCustomersPage() {
     }
   }
 
-  if (loading) {
+  if (loading || packagesLoading) {
     return <LoadingScreen />
   }
 
   return (
     <AppShell
       title="Customers"
-      subtitle="Search salon customers and add credits manually."
+      subtitle="Search salon customers and add credits by active package."
       role="Admin"
       navItems={adminNav}
       userLabel="Admin account"
@@ -148,7 +182,7 @@ export default function AdminCustomersPage() {
             <div>
               <h2 className="text-xl font-semibold text-white">Customer list</h2>
               <p className="mt-1 text-sm text-zinc-500">
-                Search by salon, barber, email, or phone.
+                Search by salon, barber, email, or phone. Credits can only be added through active packages.
               </p>
             </div>
             <Field label="Search customers">
@@ -198,24 +232,29 @@ export default function AdminCustomersPage() {
                   </div>
 
                   <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
-                    <input
+                    <select
                       className={inputClass}
-                      value={creditInputs[customer.id] || ''}
+                      value={packageSelections[customer.id] || ''}
                       onChange={(event) =>
-                        setCreditInputs((current) => ({
+                        setPackageSelections((current) => ({
                           ...current,
                           [customer.id]: event.target.value,
                         }))
                       }
-                      placeholder="Credits to add"
-                      inputMode="numeric"
-                    />
+                    >
+                      <option value="">Choose package</option>
+                      {packages.map((pkg) => (
+                        <option key={pkg.id} value={pkg.id}>
+                          {pkg.name} - {pkg.images_count} credits - {formatPackageTotal(pkg)} JOD
+                        </option>
+                      ))}
+                    </select>
                     <Button
                       type="button"
                       onClick={() => addCredits(customer)}
-                      disabled={savingId === customer.id}
+                      disabled={savingId === customer.id || packages.length === 0}
                     >
-                      {savingId === customer.id ? 'Adding...' : 'Add Credits'}
+                      {savingId === customer.id ? 'Adding...' : 'Add Package'}
                     </Button>
                   </div>
                 </div>
@@ -226,4 +265,11 @@ export default function AdminCustomersPage() {
       </div>
     </AppShell>
   )
+}
+
+function formatPackageTotal(pkg: PackageItem) {
+  return (
+    Number(pkg.price_before_vat || 0) +
+    (Number(pkg.price_before_vat || 0) * Number(pkg.vat_percent || 0)) / 100
+  ).toFixed(2)
 }

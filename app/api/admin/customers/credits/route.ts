@@ -1,7 +1,6 @@
 import {
   adminJson,
   optionalString,
-  parsePositiveInteger,
   requireAdmin,
   requiredString,
 } from '../../_lib'
@@ -16,52 +15,39 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     const customerId = requiredString(body.customerId)
-    const credits = parsePositiveInteger(body.credits)
+    const packageId = requiredString(body.packageId)
     const notes = optionalString(body.notes)
 
-    if (!customerId || !credits) {
+    if (!customerId || !packageId) {
       return adminJson(
-        { error: 'Customer and positive credit amount are required.' },
+        { error: 'Customer and active package are required.' },
         { status: 400 },
       )
     }
 
-    const { data: customer, error: customerError } = await admin.context.supabaseAdmin
-      .from('barbers')
-      .select('id,remaining_credits,total_credits')
-      .eq('id', customerId)
-      .maybeSingle()
-
-    if (customerError || !customer) {
-      return adminJson({ error: 'Customer not found.' }, { status: 404 })
-    }
-
-    const nextRemaining = Number(customer.remaining_credits || 0) + credits
-    const nextTotal = Number(customer.total_credits || 0) + credits
-
-    const { error: updateError } = await admin.context.supabaseAdmin
-      .from('barbers')
-      .update({
-        remaining_credits: nextRemaining,
-        total_credits: nextTotal,
+    const { data, error } = await admin.context.supabaseAdmin
+      .rpc('admin_add_package_credits', {
+        p_customer_id: customerId,
+        p_package_id: packageId,
+        p_admin_id: admin.context.user.id,
+        p_notes: notes,
       })
-      .eq('id', customerId)
 
-    if (updateError) {
-      return adminJson({ error: updateError.message }, { status: 400 })
+    if (error) {
+      return adminJson({ error: error.message }, { status: 400 })
     }
 
-    await admin.context.supabaseAdmin.from('credit_transactions').insert({
-      customer_id: customerId,
-      change_amount: credits,
-      transaction_type: 'admin_add',
-      notes: notes || `Admin added ${credits} credits`,
-    })
+    const result = Array.isArray(data) ? data[0] : data
 
     return adminJson({
       success: true,
-      remainingCredits: nextRemaining,
-      totalCredits: nextTotal,
+      remainingCredits: result?.remaining_credits ?? 0,
+      totalCredits: result?.total_credits ?? 0,
+      creditsAdded: result?.credits_added ?? 0,
+      packageName: result?.package_name ?? '',
+      packageTotalAmount: result?.package_total_amount ?? 0,
+      partnerId: result?.partner_id ?? null,
+      commissionAmount: result?.commission_amount ?? 0,
     })
   } catch {
     return adminJson({ error: 'Unexpected server error.' }, { status: 500 })

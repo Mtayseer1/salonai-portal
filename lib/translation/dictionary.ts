@@ -570,9 +570,13 @@ export const arabicTranslations: Record<string, string> = {
   'Account created successfully.': 'تم إنشاء الحساب بنجاح.',
   'Search salon customers and add credits manually.':
     'ابحث عن عملاء الصالونات وأضف الأرصدة يدوياً.',
+  'Search salon customers and add credits by active package.':
+    'ابحث عن عملاء الصالونات وأضف الأرصدة من خلال الباقات النشطة.',
   'Current search results': 'نتائج البحث الحالية',
   'Search by salon, barber, email, or phone.':
     'ابحث باسم الصالون أو الحلاق أو البريد الإلكتروني أو الهاتف.',
+  'Search by salon, barber, email, or phone. Credits can only be added through active packages.':
+    'ابحث باسم الصالون أو الحلاق أو البريد الإلكتروني أو الهاتف. يمكن إضافة الأرصدة من خلال الباقات النشطة فقط.',
   'Search customers': 'البحث عن العملاء',
   'No customers found.': 'لم يتم العثور على عملاء.',
   'Try another search or create a customer account.':
@@ -583,9 +587,24 @@ export const arabicTranslations: Record<string, string> = {
   'No country': 'لا توجد دولة',
   'Available': 'المتاح',
   'Credits to add': 'الأرصدة المراد إضافتها',
+  'Choose package': 'اختر الباقة',
+  'Choose an active package.': 'اختر باقة نشطة.',
   'Adding...': 'جارٍ الإضافة...',
   'Add Credits': 'إضافة أرصدة',
+  'Add Package': 'إضافة الباقة',
   'Credits added successfully.': 'تمت إضافة الأرصدة بنجاح.',
+  'No partner is linked to this customer.': 'لا يوجد شريك مرتبط بهذا العميل.',
+  'Commissions': 'العمولات',
+  'Assigned package commissions': 'عمولات الباقات المخصصة',
+  'Track package commissions assigned from customer credits.':
+    'تتبع عمولات الباقات المخصصة من أرصدة العملاء.',
+  'Total Assigned': 'إجمالي المخصص',
+  'All package commissions': 'جميع عمولات الباقات',
+  'Commission ledger': 'سجل العمولات',
+  'Most recent commissions appear first.': 'تظهر أحدث العمولات أولاً.',
+  'No commissions yet.': 'لا توجد عمولات حتى الآن.',
+  'Partner commission records will appear here.': 'ستظهر سجلات عمولات الشريك هنا.',
+  'Package Commission': 'عمولة الباقة',
   'Enter a positive credit amount.': 'أدخل عدد أرصدة موجباً.',
   'Name': 'الاسم',
 }

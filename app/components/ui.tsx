@@ -31,7 +31,7 @@ export const partnerNav: NavItem[] = [
   { href: '/partner', label: 'Overview', icon: 'O' },
   { href: '/partner/add-customer', label: 'Add Customer', icon: '+' },
   { href: '/partner/customers', label: 'Customers', icon: 'U' },
-  { href: '/partner/payments', label: 'Payments', icon: '$' },
+  { href: '/partner/payments', label: 'Commissions', icon: '$' },
 ]
 
 export const adminNav: NavItem[] = [
