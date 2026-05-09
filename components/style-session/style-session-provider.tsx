@@ -27,7 +27,7 @@ import type {
 
 type StyleSessionContextValue = StyleFlowSessionState & {
   setGender: (gender: StyleSessionGender) => void
-  setMode: (mode: StyleSessionMode) => void
+  setMode: (mode: StyleSessionMode | null) => void
   setImage: (imageFile: File | null) => void
   setMenOptions: (options: MenStyleSessionOptions) => void
   setWomenOptions: (options: WomenStyleSessionOptions) => void
@@ -73,7 +73,7 @@ export function StyleSessionProvider({ children }: { children: React.ReactNode }
     setState((current) => ({ ...current, gender }))
   }, [])
 
-  const setMode = useCallback((mode: StyleSessionMode) => {
+  const setMode = useCallback((mode: StyleSessionMode | null) => {
     setState((current) => ({ ...current, mode }))
   }, [])
 

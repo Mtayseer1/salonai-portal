@@ -19,6 +19,7 @@ export default function StyleResultPage() {
     session.generatedImageUrl,
     session.generatedImageBase64,
   )
+  const regenerateRoute = getRegenerateRoute(session.gender, session.mode)
 
   useEffect(() => {
     if (
@@ -188,15 +189,7 @@ export default function StyleResultPage() {
           type="button"
           variant="secondary"
           className="h-14 w-full text-base"
-          onClick={() =>
-            router.push(
-              session.gender === 'women'
-                ? '/style/women/catalog/review'
-                : session.mode === 'catalog'
-                  ? '/style/men/catalog/review'
-                  : '/style/men/options',
-            )
-          }
+          onClick={() => router.push(regenerateRoute)}
           disabled={!session.imageFile}
         >
           Regenerate
@@ -250,6 +243,29 @@ function getResultImageSrc(imageUrl?: string, imageBase64?: string) {
   }
 
   return null
+}
+
+function getRegenerateRoute(
+  gender: ReturnType<typeof useStyleSession>['gender'],
+  mode: ReturnType<typeof useStyleSession>['mode'],
+) {
+  if (gender === 'women') {
+    if (mode === 'bridal') {
+      return '/style/women/bridal/review'
+    }
+
+    if (mode === 'catalog') {
+      return '/style/women/catalog/review'
+    }
+
+    return '/style/women/options'
+  }
+
+  if (gender === 'men') {
+    return mode === 'catalog' ? '/style/men/catalog/review' : '/style/men/options'
+  }
+
+  return '/style'
 }
 
 async function imageSourceToBlob(src: string) {
