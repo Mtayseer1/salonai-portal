@@ -46,6 +46,10 @@ type GenerateRequestBody = {
   highlightFinish?: string
   mascara?: string
   extensions?: boolean
+  signatureLookId?: string
+  signatureLookName?: string
+  signatureLookPrompt?: string
+  signatureLookImagePath?: string
   bridalStyleOrigin?: string[]
   customerName?: string
   customerPhone?: string
@@ -172,11 +176,22 @@ export async function POST(request: Request) {
     if (
       body.mode !== 'smart' &&
       body.mode !== 'catalog' &&
-      body.mode !== 'bridal'
+      body.mode !== 'bridal' &&
+      body.mode !== 'signature'
     ) {
       return noStoreJson(
         {
           error: 'Invalid generation mode.',
+          debug: createDebug(requestId, 'validation', { mode: body.mode }),
+        },
+        { status: 400 },
+      )
+    }
+
+    if (body.gender === 'men' && body.mode === 'signature') {
+      return noStoreJson(
+        {
+          error: 'Invalid generation mode for men.',
           debug: createDebug(requestId, 'validation', { mode: body.mode }),
         },
         { status: 400 },
@@ -190,6 +205,23 @@ export async function POST(request: Request) {
           debug: createDebug(requestId, 'validation', {
             hasImageUrl: Boolean(body.imageUrl),
             hasImageBase64: Boolean(body.imageBase64),
+          }),
+        },
+        { status: 400 },
+      )
+    }
+
+    if (
+      body.gender === 'women' &&
+      body.mode === 'signature' &&
+      !body.signatureLookPrompt?.trim()
+    ) {
+      return noStoreJson(
+        {
+          error: 'Choose a signature look before generating.',
+          debug: createDebug(requestId, 'validation', {
+            mode: body.mode,
+            signatureLookId: body.signatureLookId,
           }),
         },
         { status: 400 },
@@ -622,6 +654,20 @@ function createGenerationPayload(
       gender: 'female',
       mode: 'bridal',
       bridalStyleOrigin: body.bridalStyleOrigin,
+    })
+  }
+
+  if (body.mode === 'signature') {
+    return withLogContext({
+      src_file_url: body.imageUrl,
+      src_file_base64: body.imageBase64,
+      src_file_mime_type: body.imageMimeType,
+      gender: 'female',
+      mode: 'signature',
+      signatureLookId: body.signatureLookId,
+      signatureLookName: body.signatureLookName,
+      signatureLookPrompt: body.signatureLookPrompt,
+      signatureLookImagePath: body.signatureLookImagePath,
     })
   }
 

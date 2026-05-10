@@ -215,6 +215,12 @@ function validateGenerationSession(session: StyleFlowSessionState) {
       throw new Error('Complete all catalog selections before generating.')
     }
   }
+
+  if (session.gender === 'women' && session.mode === 'signature') {
+    if (!session.signatureLookId || !session.signatureLookPrompt) {
+      throw new Error('Choose a signature look before generating.')
+    }
+  }
 }
 
 type GenerationImageInput = {
@@ -338,6 +344,10 @@ function createGenerationRequest(
     highlightFinish,
     mascara: eyeLashes || session.mascara,
     extensions: Boolean(session.extensions),
+    signatureLookId: session.signatureLookId,
+    signatureLookName: session.signatureLookName,
+    signatureLookPrompt: session.signatureLookPrompt,
+    signatureLookImagePath: session.signatureLookImagePath,
     bridalStyleOrigin: session.bridalStyleOrigin,
     customerName: session.customerName,
     customerPhone: session.customerPhone,

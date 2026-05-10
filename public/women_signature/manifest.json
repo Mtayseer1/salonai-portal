@@ -1,0 +1,187 @@
+{
+  "generatedAt": "2026-05-10T15:19:45.529Z",
+  "source": "Women_Makeup_Hair_Top30/MakeupElements.cs Top30Catalog",
+  "label": "Signature Looks",
+  "looks": [
+    {
+      "id": "01_Clean_Natural_Beauty",
+      "name": "Clean Natural Beauty",
+      "imagePath": "/women_signature/01_Clean_Natural_Beauty.png",
+      "prompt": "Skin base: Natural Skin Finish: Light natural base, visible pores.\nHair: Long soft natural layers with a clean middle part; natural espresso brown hair color with subtle healthy shine.\nEyes: Natural very light neutral shadow; Thin eyeliner; Natural lashes.\nBrows: Natural Brows: Soft natural eyebrows with minimal grooming.\nLips: Nude Beige: classic nude; Satin: soft shine; Natural: normal lips.\nCheeks and sculpting: Soft Pink blush color; Natural Cheek blush placement; Very Soft contour or bronzer intensity; Soft Glow highlight intensity.\nOverall finish: clean everyday salon beauty, fresh, realistic, not heavy."
+    },
+    {
+      "id": "02_Soft_Glam_Classic",
+      "name": "Soft Glam Classic",
+      "imagePath": "/women_signature/02_Soft_Glam_Classic.png",
+      "prompt": "Skin base: Soft Matte: Velvet soft matte.\nHair: Polished voluminous side-part blowout; rich chocolate brown hair color with soft caramel face-framing highlights.\nEyes: Soft Glam warm blended shadow; Classic Wing eyeliner; Volume lashes.\nBrows: Soft Glam Brows: Soft glam balance.\nLips: Nude Caramel: deep nude; Velvet Matte: soft matte; Sharp Defined: clean edges.\nCheeks and sculpting: Rose Pink blush; High Placement blush; Defined Contour intensity; Champagne Glow highlighter tone.\nOverall finish: polished soft glam with balanced definition, not theatrical."
+    },
+    {
+      "id": "03_Bridal_Rose_Glam",
+      "name": "Bridal Rose Glam",
+      "imagePath": "/women_signature/03_Bridal_Rose_Glam.png",
+      "prompt": "Skin base: Luminous Skin: Elegant glow.\nHair: Romantic loose waves with soft face-framing pieces; warm rose-brown brunette hair color.\nEyes: Soft Glam warm blended shadow; Kitten Eye eyeliner; Wispy lashes.\nBrows: Sculpted Brows: Polished salon look.\nLips: Rose Pink: elegant pink; Satin: soft shine; Soft Blurred: blur edges.\nCheeks and sculpting: Dusty Rose blush; Lifted Blush placement; Soft Sculpt contour; Pearl Glow highlighter tone.\nOverall finish: romantic bridal makeup, soft rose harmony, graceful and realistic."
+    },
+    {
+      "id": "04_Luxury_Bridal_Glow",
+      "name": "Luxury Bridal Glow",
+      "imagePath": "/women_signature/04_Luxury_Bridal_Glow.png",
+      "prompt": "Skin base: Korean Glass Skin: Ultra smooth luminous skin.\nHair: Elegant soft bridal updo with gentle volume at the crown and loose face-framing strands; glossy deep espresso brunette hair color.\nEyes: Gold shimmer shadow; Classic Wing eyeliner; Volume Plus Length lashes.\nBrows: Clean Sculpted Brows: Refined edges, clean structure.\nLips: Nude Ivory: light neutral nude; Gloss: reflective; Natural: normal lips.\nCheeks and sculpting: Soft Peach blush; Korean Soft Blush placement; Natural Contour; Rose Gold highlighter tone.\nOverall finish: luminous luxury bridal beauty with refined glow and soft warmth."
+    },
+    {
+      "id": "05_Arabic_Glam",
+      "name": "Arabic Glam",
+      "imagePath": "/women_signature/05_Arabic_Glam.png",
+      "prompt": "Skin base: Full Coverage: Polished even complexion.\nHair: Long center-part glam waves with polished volume; glossy blue-black hair color.\nEyes: Arabic Dramatic bold deep shadow; Sharp Wing eyeliner; Dramatic lashes.\nBrows: Sharp Defined Brows: Precise outline.\nLips: Burgundy: dark red; Matte: no shine; Sharp Defined: clean edges.\nCheeks and sculpting: Plum blush; Diagonal Blush placement; Full Glam Contour intensity; Golden Glow highlighter tone.\nOverall finish: bold Arabic glam, precise and dramatic while preserving realism."
+    },
+    {
+      "id": "06_Red_Carpet_Red_Lip",
+      "name": "Red Carpet Red Lip",
+      "imagePath": "/women_signature/06_Red_Carpet_Red_Lip.png",
+      "prompt": "Skin base: Velvet Matte: Luxury matte finish.\nHair: Classic old Hollywood side-part waves; deep neutral brunette hair color with a polished salon shine.\nEyes: Natural very light neutral shadow; Classic Wing eyeliner; Lengthening lashes.\nBrows: Defined Brows: Clean defined shape.\nLips: Classic Red: true red; Matte: no shine; Sharp Defined: clean edges.\nCheeks and sculpting: Rosy blush; Cheekbone Blush placement; Sculpted Contour; Champagne Glow highlighter tone.\nOverall finish: classic red carpet beauty, crisp red lip, elegant eyes."
+    },
+    {
+      "id": "07_Smokey_Evening",
+      "name": "Smokey Evening",
+      "imagePath": "/women_signature/07_Smokey_Evening.png",
+      "prompt": "Skin base: Photo Ready Skin: Camera-ready finish.\nHair: Sleek high ponytail with smooth roots and a polished finish; dark mocha brunette hair color.\nEyes: Smokey Dark shadow; Smokey Liner; Mega Volume lashes.\nBrows: Full Glam Brows: Bold glam brows.\nLips: Nude Mocha: brown nude; Satin: soft shine; Overlined: bigger outline.\nCheeks and sculpting: Bronze Rose blush; Draped Blush placement; Strong contour intensity; Bronze Glow highlighter tone.\nOverall finish: evening smokey glam with strong eyes and balanced nude lips."
+    },
+    {
+      "id": "08_Peachy_Day_Glam",
+      "name": "Peachy Day Glam",
+      "imagePath": "/women_signature/08_Peachy_Day_Glam.png",
+      "prompt": "Skin base: Fresh Hydrated Skin: Plump hydrated look.\nHair: Loose beach waves with airy movement; honey caramel brown hair color with sunlit warm highlights.\nEyes: Peach tones shadow; Thin eyeliner; Wispy lashes.\nBrows: Soft Feathered Brows: Subtle feathering.\nLips: Peach: soft peach; Lip Oil: wet look; Natural: normal lips.\nCheeks and sculpting: Warm Peach blush; Apple Cheek placement; Soft Warm Bronze tone; Peach Glow highlighter tone.\nOverall finish: fresh peach daytime glam, hydrated and soft."
+    },
+    {
+      "id": "09_Korean_Soft_Makeup",
+      "name": "Korean Soft Makeup",
+      "imagePath": "/women_signature/09_Korean_Soft_Makeup.png",
+      "prompt": "Skin base: Glass Skin: Smooth reflective Korean glow.\nHair: Silky straight Korean-style hair with a soft center part and light face framing; cool ash brown hair color.\nEyes: Pink tones shadow; Ultra Thin Precision eyeliner; Natural lashes.\nBrows: Straight Korean Brows: Soft straight Korean style.\nLips: Baby Pink: soft pastel pink; Tint: light stain; Gradient: center fade.\nCheeks and sculpting: Baby Pink blush; Under-Eye Blush placement; Barely There contour intensity; Pearl Glow highlighter tone.\nOverall finish: soft Korean-inspired makeup, delicate, youthful, diffused."
+    },
+    {
+      "id": "10_Editorial_Berry",
+      "name": "Editorial Berry",
+      "imagePath": "/women_signature/10_Editorial_Berry.png",
+      "prompt": "Skin base: Airbrushed Finish: Smooth polished skin.\nHair: Sharp sleek blunt bob ending around the jawline; black cherry hair color with a refined editorial shine.\nEyes: Halo Eye bright center shadow; Graphic eyeliner; Dramatic lashes.\nBrows: Bold Brows: Strong dark brows.\nLips: Berry: rich berry; Vinyl: glass shine; Sharp Defined: clean edges.\nCheeks and sculpting: Soft Berry blush; Editorial Blush placement; Editorial Sculpt contour; Opal Glow highlighter tone.\nOverall finish: fashion editorial berry look, artistic but still realistic."
+    },
+    {
+      "id": "11_Warm_Bronze_Glam",
+      "name": "Warm Bronze Glam",
+      "imagePath": "/women_signature/11_Warm_Bronze_Glam.png",
+      "prompt": "Skin base: Golden Glow Base: Golden highlight.\nHair: Long bronze balayage waves with smooth salon volume; warm golden brown hair color with bronze highlights.\nEyes: Bronze shimmer shadow; Extended Wing eyeliner; Cat Eye lashes.\nBrows: Warm Brown Brows: Warm tone.\nLips: Cocoa: mid brown; Gloss: reflective; Overlined: bigger outline.\nCheeks and sculpting: Terracotta blush; Temple Blush placement; Golden Bronze tone; Copper Glow highlighter tone.\nOverall finish: warm bronze glam with sunlit warmth and sculpted polish."
+    },
+    {
+      "id": "12_Nude_Sculpted_Glam",
+      "name": "Nude Sculpted Glam",
+      "imagePath": "/women_signature/12_Nude_Sculpted_Glam.png",
+      "prompt": "Skin base: HD Foundation: High-definition base.\nHair: Sleek long straight hair with a precise center part; cool dark brunette hair color.\nEyes: Cut Crease Soft shadow; Classic Wing eyeliner; Volume lashes.\nBrows: Medium Fill Brows: Balanced density and color.\nLips: Nude Mocha: brown nude; Velvet Matte: soft matte; Overlined: bigger outline.\nCheeks and sculpting: Nude Blush; Cheekbone Blush placement; Neutral Brown Contour tone; Nude Glow highlighter tone.\nOverall finish: sculpted nude glam, high-definition and salon polished."
+    },
+    {
+      "id": "13_Fresh_Pink_Salon_Look",
+      "name": "Fresh Pink Salon Look",
+      "imagePath": "/women_signature/13_Fresh_Pink_Salon_Look.png",
+      "prompt": "Skin base: Satin Skin: Between matte and dewy.\nHair: Shoulder-length soft curls with gentle face framing; warm medium brown hair color.\nEyes: Pink tones shadow; Kitten Eye eyeliner; Lengthening lashes.\nBrows: Clean Groomed Brows: Neatly groomed with slight cleaning.\nLips: Blush Pink: natural pink; Gloss: reflective; Soft Blurred: blur edges.\nCheeks and sculpting: Cool Pink blush; Soft Diffused blush placement; Very Soft contour intensity; Pink Pearl highlighter tone.\nOverall finish: fresh pink salon makeup, soft, polished, and bright."
+    },
+    {
+      "id": "14_Mocha_Soft_Glam",
+      "name": "Mocha Soft Glam",
+      "imagePath": "/women_signature/14_Mocha_Soft_Glam.png",
+      "prompt": "Skin base: Soft Blur: Soft texture smoothing.\nHair: Long mocha waves with a smooth side part; mocha brunette hair color with subtle beige-brown highlights.\nEyes: Bronze shimmer shadow; Smudged eyeliner; Wispy lashes.\nBrows: Ash Brown Brows: Cool tone.\nLips: Latte: light brown; Satin: soft shine; Natural: normal lips.\nCheeks and sculpting: Warm Brown blush; Lifted Blush placement; Mocha Bronze tone; Honey Glow highlighter tone.\nOverall finish: mocha-toned soft glam with smooth warmth and blended eyes."
+    },
+    {
+      "id": "15_High_Fashion_Matte",
+      "name": "High Fashion Matte",
+      "imagePath": "/women_signature/15_High_Fashion_Matte.png",
+      "prompt": "Skin base: Powder Matte: Powder-set matte.\nHair: Sleek geometric blunt bob with a sharp center part; glossy jet black hair color.\nEyes: Cut Crease Sharp shadow; Graphic Double Wing eyeliner; Dramatic lashes.\nBrows: Laminated Brows: Glossy lifted brows.\nLips: Black: black lips; Matte: no shine; Sharp Defined: clean edges.\nCheeks and sculpting: Mauve blush; Editorial Blush placement; Sharp Sculpt contour; Silver Glow highlighter tone.\nOverall finish: high-fashion matte editorial makeup, bold but clean and controlled."
+    },
+    {
+      "id": "16_Sun-Kissed_Summer",
+      "name": "Sun-Kissed Summer",
+      "imagePath": "/women_signature/16_Sun-Kissed_Summer.png",
+      "prompt": "Skin base: Sunlit Skin: Natural sunlight glow.\nHair: Tousled beach waves with natural texture; sun-kissed bronde hair color with golden blonde ribbons.\nEyes: Gold shimmer shadow; Half Liner eyeliner; Natural lashes.\nBrows: Fluffy Brows: Airy full brows.\nLips: Coral: coral tone; Gloss: reflective; Natural: normal lips.\nCheeks and sculpting: Golden Peach blush; Sun-Kissed blush placement; Beach Bronze tone; Soft Gold highlighter tone.\nOverall finish: fresh sun-kissed summer beauty with golden warmth."
+    },
+    {
+      "id": "17_Soft_Plum_Evening",
+      "name": "Soft Plum Evening",
+      "imagePath": "/women_signature/17_Soft_Plum_Evening.png",
+      "prompt": "Skin base: Semi Matte: Balanced shine control.\nHair: Side-swept soft waves with elegant volume; deep plum brunette hair color with subtle violet-brown reflection.\nEyes: Smokey Medium shadow; Soft Pencil Liner; Volume lashes.\nBrows: Soft Bold Brows: Bold but softened.\nLips: Plum: plum tone; Satin: soft shine; Sharp Defined: clean edges.\nCheeks and sculpting: Mauve blush; Draped Blush placement; Cool Taupe Contour tone; Lavender Glow highlighter tone.\nOverall finish: refined plum evening makeup, elegant, cool-toned, and softly dramatic."
+    },
+    {
+      "id": "18_Minimal_No-Makeup",
+      "name": "Minimal No-Makeup",
+      "imagePath": "/women_signature/18_Minimal_No-Makeup.png",
+      "prompt": "Skin base: Bare Skin: No visible foundation, natural texture.\nHair: Simple natural straight hair with a relaxed middle part; natural dark brown hair color.\nEyes: None: no eye shadow; None: no eyeliner; None: no false lashes.\nBrows: Natural Untouched Brows: Almost no makeup, natural unevenness.\nLips: Nude Porcelain: very light nude; Tint: light stain; Natural: normal lips.\nCheeks and sculpting: Nude Blush; Natural Cheek placement; Barely There contour intensity; Natural Skin Highlight finish.\nOverall finish: realistic no-makeup makeup, barely visible enhancement, natural skin preserved."
+    },
+    {
+      "id": "19_Full_Glam_Salon",
+      "name": "Full Glam Salon",
+      "imagePath": "/women_signature/19_Full_Glam_Salon.png",
+      "prompt": "Skin base: Full Coverage: Polished even complexion.\nHair: Long full glam Hollywood waves with high shine and volume; glossy dark brown hair color with soft burgundy undertone.\nEyes: Glitter sparkle shadow; Double Wing eyeliner; Mega Volume lashes.\nBrows: Pomade Brows: Bold structured fill.\nLips: Fuchsia: intense pink; High Shine: very glossy; Overlined: bigger outline.\nCheeks and sculpting: Watermelon blush; High Placement blush; Full Face Sculpt contour; Glass Glow highlight intensity.\nOverall finish: full glam salon look with bright lips, strong lashes, and polished sculpting."
+    },
+    {
+      "id": "20_Elegant_Mature_Glam",
+      "name": "Elegant Mature Glam",
+      "imagePath": "/women_signature/20_Elegant_Mature_Glam.png",
+      "prompt": "Skin base: Radiant Glow: Healthy luminous skin.\nHair: Elegant shoulder-length layered blowout with soft movement; warm chestnut brown hair color.\nEyes: Soft Glam warm blended shadow; Thin eyeliner; Lengthening lashes.\nBrows: Soft Arch Brows: Gentle curve.\nLips: Dusty Pink: muted pink; Satin: soft shine; Soft Blurred: blur edges.\nCheeks and sculpting: Rose Pink blush; Soft Glam Blush placement; Soft Sculpt contour; Very Soft Glow highlight intensity.\nOverall finish: elegant mature glam, refined, radiant, and flattering without heaviness."
+    },
+    {
+      "id": "21_Glossy_Espresso_Chic",
+      "name": "Glossy Espresso Chic",
+      "imagePath": "/women_signature/21_Glossy_Espresso_Chic.png",
+      "prompt": "Skin base: Dewy Skin: Hydrated glow.\nHair: Sleek long glossy layers with a clean center part; deep espresso black-brown hair color with mirrorlike salon shine.\nEyes: Natural very light neutral shadow; Tightline eyeliner; Lengthening lashes.\nBrows: Feathered Brows: Upward brushed hairs.\nLips: Chocolate: dark brown; Gloss: reflective; Natural: normal lips.\nCheeks and sculpting: Bronze Rose blush; Lifted Blush placement; Nude Bronze tone; Wet Look Glow highlight intensity.\nOverall finish: modern glossy chic beauty with expensive hair shine and clean makeup balance."
+    },
+    {
+      "id": "22_Champagne_Blonde_Glam",
+      "name": "Champagne Blonde Glam",
+      "imagePath": "/women_signature/22_Champagne_Blonde_Glam.png",
+      "prompt": "Skin base: Radiant Glow: Healthy luminous skin.\nHair: Voluminous layered blowout with soft face-framing movement; champagne blonde hair color with beige-gold dimension.\nEyes: Soft Glam warm blended shadow; Classic Wing eyeliner; Volume Plus Length lashes.\nBrows: Light Brown Brows: Light brown tone.\nLips: Nude Beige: classic nude; High Shine: very glossy; Overlined: bigger outline.\nCheeks and sculpting: Golden Peach blush; High Placement blush; Golden Bronze tone; Champagne Glow highlighter tone.\nOverall finish: glamorous blonde salon look, warm, polished, and camera-ready."
+    },
+    {
+      "id": "23_Copper_Peach_Glow",
+      "name": "Copper Peach Glow",
+      "imagePath": "/women_signature/23_Copper_Peach_Glow.png",
+      "prompt": "Skin base: Warm Radiant Base: Warm glow.\nHair: Soft loose curls with natural volume; luminous copper auburn hair color with warm golden reflection.\nEyes: Peach tones shadow; Gold shimmer accent; Kitten Eye eyeliner; Wispy lashes.\nBrows: Warm Brown Brows: Warm tone.\nLips: Apricot: warm peach; Lip Oil: wet look; Soft Blurred: blur edges.\nCheeks and sculpting: Coral blush; Soft Diffused placement; Honey Bronze tone; Peach Glow highlighter tone.\nOverall finish: warm copper and peach beauty, fresh, glowing, and cohesive."
+    },
+    {
+      "id": "24_Cool_Taupe_Smokey",
+      "name": "Cool Taupe Smokey",
+      "imagePath": "/women_signature/24_Cool_Taupe_Smokey.png",
+      "prompt": "Skin base: Soft Matte: Velvet soft matte.\nHair: Shoulder-length smooth lob with a subtle side part; cool mushroom brown hair color with ash-beige dimension.\nEyes: Smokey Medium shadow; Soft Pencil Liner; Wispy lashes.\nBrows: Ash Brown Brows: Cool tone.\nLips: Dusty Pink: muted pink; Velvet Matte: soft matte; Sharp Defined: clean edges.\nCheeks and sculpting: Mauve blush; Cheekbone Blush placement; Cool Taupe Contour tone; Pearl Glow highlighter tone.\nOverall finish: cool-toned soft smokey salon look, refined and understated."
+    },
+    {
+      "id": "25_Rosy_French_Bob",
+      "name": "Rosy French Bob",
+      "imagePath": "/women_signature/25_Rosy_French_Bob.png",
+      "prompt": "Skin base: Rosy Fresh Base: Soft pink tone.\nHair: Soft French bob ending near the chin with airy curved ends and light face framing; natural chestnut brown hair color.\nEyes: Pink tones shadow; Ultra Thin Precision eyeliner; Natural lashes.\nBrows: Soft Fill Brows: Light fill, soft edges.\nLips: Rose Pink: elegant pink; Satin: soft shine; Natural: normal lips.\nCheeks and sculpting: Rosy blush; Round Blush placement; Barely There contour intensity; Pink Pearl highlighter tone.\nOverall finish: romantic rosy bob look, fresh and softly feminine."
+    },
+    {
+      "id": "26_Caramel_Balayage_Nude",
+      "name": "Caramel Balayage Nude",
+      "imagePath": "/women_signature/26_Caramel_Balayage_Nude.png",
+      "prompt": "Skin base: Natural Matte: Soft oil control.\nHair: Long layered caramel balayage waves with soft salon volume; dark brunette root melting into caramel beige highlights.\nEyes: Bronze shimmer shadow; Thin eyeliner; Cat Eye lashes.\nBrows: Medium Brown Brows: Balanced brown.\nLips: Nude Sand: warm nude; Satin: soft shine; Overlined: bigger outline.\nCheeks and sculpting: Beige Blush; Diagonal Blush placement; Caramel Bronze tone; Soft Gold highlighter tone.\nOverall finish: wearable nude glam with dimensional caramel hair and warm sculpting."
+    },
+    {
+      "id": "27_Icy_Silver_Editorial",
+      "name": "Icy Silver Editorial",
+      "imagePath": "/women_signature/27_Icy_Silver_Editorial.png",
+      "prompt": "Skin base: Luxury Editorial Skin: High-end editorial finish.\nHair: Sleek long straight hair with a sharp center part; icy silver platinum hair color with cool metallic shine.\nEyes: Smokey Light shadow; White Liner accent; Dramatic lashes.\nBrows: Bleached Brows: Lightened brows.\nLips: Nude Porcelain: very light nude; Metallic: metal finish; Sharp Defined: clean edges.\nCheeks and sculpting: Cool Pink blush; Editorial Blush placement; Ash Brown Contour tone; Icy Glow highlighter tone.\nOverall finish: high-fashion icy editorial beauty, controlled, polished, and realistic."
+    },
+    {
+      "id": "28_Soft_Burgundy_Waves",
+      "name": "Soft Burgundy Waves",
+      "imagePath": "/women_signature/28_Soft_Burgundy_Waves.png",
+      "prompt": "Skin base: Satin Skin: Between matte and dewy.\nHair: Long soft waves with side-swept volume; deep burgundy wine hair color with subtle brunette depth.\nEyes: Smokey Medium shadow; Smudged eyeliner; Volume lashes.\nBrows: Dark Brown Brows: Dark tone.\nLips: Wine: dark wine; Satin: soft shine; Soft Blurred: blur edges.\nCheeks and sculpting: Berry blush; Draped Blush placement; Neutral Brown Contour tone; Rose Gold highlighter tone.\nOverall finish: romantic burgundy evening look, rich but blended and wearable."
+    },
+    {
+      "id": "29_Golden_Bridal_Updo",
+      "name": "Golden Bridal Updo",
+      "imagePath": "/women_signature/29_Golden_Bridal_Updo.png",
+      "prompt": "Skin base: Luminous Skin: Elegant glow.\nHair: Polished low bridal chignon with soft face-framing strands and gentle crown volume; golden brunette hair color with subtle honey highlights.\nEyes: Gold shimmer shadow; Kitten Eye eyeliner; Wispy lashes.\nBrows: Clean Groomed Brows: Neatly groomed with slight cleaning.\nLips: Nude Beige: classic nude; Gloss: reflective; Soft Blurred: blur edges.\nCheeks and sculpting: Rose Pink blush; Lifted Blush placement; Natural Contour; Champagne Glow highlighter tone.\nOverall finish: elegant golden bridal look with refined updo and soft luminous makeup."
+    },
+    {
+      "id": "30_Clean_Copper_Bob",
+      "name": "Clean Copper Bob",
+      "imagePath": "/women_signature/30_Clean_Copper_Bob.png",
+      "prompt": "Skin base: Soft Focus Skin: Light diffused texture.\nHair: Clean collarbone-length blunt lob with smooth tucked-under ends; soft copper brown hair color with natural warmth.\nEyes: Natural very light neutral shadow; Colored Liner Green; Lengthening lashes.\nBrows: Soft Arch Brows: Gentle curve.\nLips: Coral: coral tone; Satin: soft shine; Sharp Defined: clean edges.\nCheeks and sculpting: Soft Coral blush; Center Face Blush placement; Soft Beige Contour tone; Vanilla Glow highlighter tone.\nOverall finish: fresh copper bob beauty with clean skin, soft coral color, and a subtle modern eye accent."
+    }
+  ]
+}

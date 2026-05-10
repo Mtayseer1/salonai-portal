@@ -82,6 +82,10 @@ function getStyleFlowBackRoute(
     return '/style/women/options'
   }
 
+  if (pathname === '/style/women/signature') {
+    return '/style/women/options'
+  }
+
   if (pathname.startsWith('/style/women/catalog/')) {
     return '/style/women/catalog/review'
   }
@@ -140,6 +144,10 @@ function getModeReviewRoute(
       return '/style/women/catalog/review'
     }
 
+    if (mode === 'signature') {
+      return '/style/women/signature'
+    }
+
     return '/style/women/options'
   }
 
@@ -169,6 +177,7 @@ export const styleSessionRouteOrder: StyleSessionRoute[] = [
   '/style/women/catalog/contour',
   '/style/women/catalog/highlight',
   '/style/women/catalog/review',
+  '/style/women/signature',
   '/style/women/bridal/review',
   '/style/loading',
   '/style/result',

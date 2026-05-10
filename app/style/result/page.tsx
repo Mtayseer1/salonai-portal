@@ -258,6 +258,10 @@ function getRegenerateRoute(
       return '/style/women/catalog/review'
     }
 
+    if (mode === 'signature') {
+      return '/style/women/signature'
+    }
+
     return '/style/women/options'
   }
 

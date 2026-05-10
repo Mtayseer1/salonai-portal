@@ -38,14 +38,27 @@ export default function WomenOptionsPage() {
     )
   }
 
+  const selectSignature = () => {
+    session.setGender('women')
+    session.setMode('signature')
+    router.push(
+      session.imageFile ? '/style/women/signature' : '/style/photo?flow=mode',
+    )
+  }
+
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-semibold tracking-tight text-white">
         WOMEN STYLE
       </h1>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2">
         <ModeCard title="Smart Style" icon={<SmartIcon />} onClick={selectSmart} />
+        <ModeCard
+          title="Signature Looks"
+          icon={<SignatureIcon />}
+          onClick={selectSignature}
+        />
         <ModeCard
           title="Catalog Style"
           icon={<CatalogIcon />}
@@ -115,6 +128,27 @@ function CatalogIcon() {
       <path d="M8 7h8" />
       <path d="M8 11h8" />
       <path d="M8 15h5" />
+    </svg>
+  )
+}
+
+function SignatureIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className="h-9 w-9"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+    >
+      <rect x="4" y="3" width="16" height="18" rx="2" />
+      <path d="M8 8h8" />
+      <path d="M8 12h5" />
+      <path d="M8 16h4" />
+      <path d="M17 14l.6 1.4L19 16l-1.4.6L17 18l-.6-1.4L15 16l1.4-.6L17 14Z" />
     </svg>
   )
 }

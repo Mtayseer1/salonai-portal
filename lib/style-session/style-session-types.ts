@@ -1,6 +1,6 @@
 export type StyleSessionGender = 'men' | 'women'
 
-export type StyleSessionMode = 'smart' | 'catalog' | 'bridal'
+export type StyleSessionMode = 'smart' | 'catalog' | 'bridal' | 'signature'
 
 export type WomenCatalogCategory =
   | 'style'
@@ -37,6 +37,7 @@ export type StyleSessionRoute =
   | '/style/women/catalog/highlight'
   | '/style/women/catalog/lashes'
   | '/style/women/catalog/review'
+  | '/style/women/signature'
   | '/style/women/bridal/review'
   | '/style/loading'
   | '/style/result'
@@ -48,6 +49,7 @@ export type StyleSessionStep =
   | 'men-options'
   | 'women-options'
   | `women-catalog-${WomenCatalogCategory}`
+  | 'women-signature'
   | 'loading'
   | 'result'
 
@@ -96,6 +98,10 @@ export type StyleFlowSessionState = {
   highlightFinish?: string
   mascara?: string
   extensions?: boolean
+  signatureLookId?: string
+  signatureLookName?: string
+  signatureLookPrompt?: string
+  signatureLookImagePath?: string
   bridalStyleOrigin?: string[]
   customerName?: string
   customerPhone?: string
@@ -145,6 +151,10 @@ export type WomenStyleSessionOptions = Partial<
     | 'highlightFinish'
     | 'mascara'
     | 'extensions'
+    | 'signatureLookId'
+    | 'signatureLookName'
+    | 'signatureLookPrompt'
+    | 'signatureLookImagePath'
     | 'bridalStyleOrigin'
   >
 >

@@ -56,6 +56,11 @@ export default function StylePhotoPage() {
         return
       }
 
+      if (mode === 'signature') {
+        router.push('/style/women/signature')
+        return
+      }
+
       if (mode === 'smart' && imageFile) {
         router.push('/style/loading')
         return
@@ -100,6 +105,11 @@ export default function StylePhotoPage() {
 
       if (mode === 'bridal') {
         router.push('/style/women/bridal/review')
+        return
+      }
+
+      if (mode === 'signature') {
+        router.push('/style/women/signature')
         return
       }
 

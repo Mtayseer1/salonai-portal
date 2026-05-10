@@ -285,6 +285,19 @@ SOURCE PRESERVATION RULES (MANDATORY):
 - Final result must look like the same photo with only the selected beauty changes applied.
 `.trim();
 
+const BRIDAL_SOURCE_PRESERVATION_RULES = `
+SOURCE PRESERVATION RULES (MANDATORY):
+- Preserve the exact camera angle, crop, framing, head position, body pose, shoulders, and perspective from the uploaded image.
+- Preserve the exact background, room/location, objects, lighting direction, shadows, exposure, and color temperature from the uploaded image.
+- Preserve the woman's identity, expression, face shape, eye shape, nose, lip shape, jawline, body shape, age, and skin tone.
+- Keep the result looking like the same original photo in every grid cell.
+- Only change bridal hair, bridal makeup, subtle wedding accessories, and the visible clothing areas requested in this prompt.
+- Keep existing clothing shape, neckline position, shoulders, and body coverage. Where clothing is visible in the original crop, restyle only the visible upper clothing fabric into white bridal dress fabric such as white satin, silk, lace, or tulle.
+- Show only partial white dress details already within the original visible frame, such as a neckline, shoulder strap, sleeve edge, bodice edge, or lace trim.
+- Do not create a full dress, full body gown, new lower body, wider crop, new pose, new background, studio scene, bouquet, handheld prop, furniture, or wedding venue.
+- Do not over-smooth skin, retouch the face, enlarge lips, enlarge eyes, or change identity.
+`.trim();
+
 /* ============================================================
    FEMALE CATALOG PROMPT LIBRARY
 ============================================================ */
@@ -602,6 +615,52 @@ ${img}
 `.trim();
 }
 
+function buildSignaturePrompt(
+  img: string,
+  signatureLookName?: string,
+  signatureLookPrompt?: string,
+) {
+  const selectedLook = readable(signatureLookName) ?? "Selected signature look";
+  const lookPrompt = String(signatureLookPrompt ?? "").trim();
+
+  return `
+Create ONE ultra-realistic premium salon portrait of THE SAME WOMAN from the reference image.
+
+ABSOLUTE RULES:
+- Same face, same features, same age, same skin tone.
+- Do NOT change face shape, eyes, nose, lips, jawline, or expression.
+- No face reshaping.
+- Do NOT beautify, enhance, smooth, or filter the face beyond the selected salon styling.
+- Keep natural skin texture and realistic facial details.
+- No identity drift.
+- Ultra-realistic photography only.
+- No grid. Only one final portrait.
+- The customer identity comes ONLY from the uploaded customer image.
+
+${SOURCE_PRESERVATION_RULES}
+
+SIGNATURE LOOK:
+- Selected look: ${selectedLook}
+- Apply this complete curated hair and makeup style exactly:
+${lookPrompt || "- Apply the selected complete salon look."}
+
+SIGNATURE APPLICATION RULES:
+- Treat the selected look as one cohesive premium salon style.
+- Apply the hair styling and hair color described in the selected look.
+- Apply the skin base, eye makeup, brows, lashes, lips, blush, contour, bronzer, and highlight described in the selected look.
+- If a category says none, natural, clean, minimal, or barely visible, keep that category understated.
+- Keep makeup realistic, professionally blended, and suitable for salon preview.
+- Do not add unrequested bridal accessories, jewelry, outfit changes, props, studio scenery, or background changes.
+- Do not over-smooth skin, enlarge lips, enlarge eyes, or change identity.
+
+LIGHTING:
+- Keep the exact original lighting, shadows, exposure, background, crop, pose, and clothing from the source image.
+
+Reference image:
+${img}
+`.trim();
+}
+
 function formatBridalStyle(selections?: string[] | string) {
   const values = Array.isArray(selections)
     ? selections
@@ -637,7 +696,7 @@ ABSOLUTE RULES:
 - Ultra-realistic photography only.
 - Clear numbering 1-6 on each variation.
 
-${SOURCE_PRESERVATION_RULES}
+${BRIDAL_SOURCE_PRESERVATION_RULES}
 
 STYLE THEME:
 Heavy ${bridalTheme} bridal makeup and bridal hairstyle only.
@@ -645,21 +704,25 @@ Use this as the only selected bridal style/origin: ${bridalStyle}.
 
 Each variation must show a different heavy bridal makeup and hairstyle direction influenced by ${bridalTheme} bridal beauty:
 
-1) Royal low bun with heavy sculpted bridal makeup
-2) Soft glamorous waves with dramatic bridal eye makeup
-3) High elegant bun with bold bridal contour and highlighted cheeks
-4) Half-up romantic curls with intense bridal lashes and defined eyes
-5) Voluminous curls with full glam bridal makeup
-6) Classic ${bridalTheme} bridal updo with polished heavy bridal makeup
+1) Royal low bun with heavy sculpted bridal makeup and a delicate bridal tiara
+2) Soft glamorous waves with dramatic bridal eye makeup and visible white satin or lace neckline detail
+3) High elegant bun with bold bridal contour, highlighted cheeks, and a slim crystal tiara
+4) Half-up romantic curls with intense bridal lashes, defined eyes, and small pearl hair pins
+5) Voluminous curls with full glam bridal makeup and subtle white dress shoulder or bodice detail
+6) Classic ${bridalTheme} bridal updo with polished heavy bridal makeup and a tiny crystal hair comb or subtle veil edge
 
 STYLE RULES:
 - Generate exactly 6 unique bridal variations in the 3x2 grid.
-- Only change hairstyle and makeup.
+- Only change hairstyle, makeup, subtle wedding accessories, and visible upper clothing fabric requested for the bridal preview.
 - Keep every hairstyle and makeup variation faithful to the selected ${bridalTheme} bridal style.
 - Do not mix in unselected bridal origins or unrelated cultural styling.
 - Keep the visual attention on the hairline, hairstyle shape, brows, eyes, lashes, lips, cheeks, contour, highlight, and skin texture.
-- Do not restyle the visible outfit to create bridal dress variations.
-- Do not add jewelry, earrings, necklaces, nose rings, hair ornaments, crowns, tiaras, veils, headpieces, flowers, pins, accessories, props, or decorative objects.
+- Add partial white bridal dress cues only where clothing is already visible in the original crop.
+- The visible outfit should read as a white bridal dress only in the visible upper areas, such as neckline, shoulders, sleeves, upper bodice edge, satin fabric, lace trim, or tulle detail.
+- Do not generate a full wedding dress, full gown, lower body, train, wide dress silhouette, or new body pose.
+- Add subtle wedding accessories only in some variations, not all variations.
+- Allowed new accessories: delicate tiara, slim crystal tiara, tiny crystal hair comb, small pearl hair pins, or a faint veil edge near the hairstyle.
+- Do not add earrings, necklaces, nose rings, large crowns, large headpieces, flowers, bouquets, handheld props, or decorative objects.
 
 MAKEUP STYLE:
 - Heavy professional ${bridalTheme} bridal makeup
@@ -672,11 +735,12 @@ MAKEUP STYLE:
 - Matte luxury finish
 - No plastic skin
 
-HAIR & MAKEUP ONLY:
-- Add no jewelry or accessories of any kind.
-- Add no bridal dress, outfit change, veil, crown, tiara, headpiece, hair jewelry, flowers, or pins.
-- Do not change the customer's clothing or outfit into a bridal dress.
-- Preserve any existing jewelry or accessories already visible in the source image, but do not add new ones.
+BRIDAL ACCESSORIES AND DRESS:
+- Add only a little wedding accessory styling, and only in the variations that request it.
+- Keep accessories small, elegant, realistic, and physically attached to the hairstyle.
+- Add partial white bridal dress fabric only to visible clothing areas already inside the source frame.
+- Keep the dress partial and cropped by the original photo. Never invent the full dress.
+- Preserve any existing jewelry or accessories already visible in the source image unless they conflict with the selected bridal look.
 
 LIGHTING:
 - Keep the exact original lighting direction, shadows, exposure, and color temperature from the source image.
@@ -807,6 +871,8 @@ Deno.serve(async (req) => {
       highlightFinish,
       mascara,
       extensions,
+      signatureLookName,
+      signatureLookPrompt,
       bridalStyleOrigin,
       log_context,
     } = body;
@@ -821,6 +887,8 @@ Deno.serve(async (req) => {
     const finalMode =
       String(mode).toLowerCase() === "bridal"
         ? "bridal"
+        : String(mode).toLowerCase() === "signature"
+        ? "signature"
         : String(mode).toLowerCase() === "catalog"
         ? "catalog"
         : "smart";
@@ -847,6 +915,12 @@ Deno.serve(async (req) => {
         ? buildBridalPrompt(sourceReference, {
             styleOrigin: bridalStyleOrigin,
           })
+        : finalMode === "signature"
+        ? buildSignaturePrompt(
+            sourceReference,
+            signatureLookName,
+            signatureLookPrompt,
+          )
         : finalMode === "catalog"
         ? buildCatalogPrompt(
             sourceReference,
