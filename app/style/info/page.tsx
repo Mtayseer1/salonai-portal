@@ -36,12 +36,16 @@ export default function StyleInfoPage() {
       session.setGender(genderParam)
     }
 
-    router.replace('/style/info')
+    router.replace(
+      genderParam === 'men' || genderParam === 'women'
+        ? `/style/info?gender=${genderParam}`
+        : '/style/info',
+    )
     setHandlingFreshSession(false)
   }, [handlingFreshSession, router, session])
 
   const continueToPhoto = () => {
-    const nextGender = session.gender
+    const nextGender = getInfoGender() || session.gender
 
     setCustomerInfo({
       customerName: name.trim() || undefined,
@@ -109,4 +113,14 @@ export default function StyleInfoPage() {
       </div>
     </Card>
   )
+}
+
+function getInfoGender() {
+  if (typeof window === 'undefined') {
+    return null
+  }
+
+  const gender = new URLSearchParams(window.location.search).get('gender')
+
+  return gender === 'men' || gender === 'women' ? gender : null
 }
