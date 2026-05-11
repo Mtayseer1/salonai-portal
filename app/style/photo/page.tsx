@@ -30,26 +30,22 @@ export default function StylePhotoPage() {
       return
     }
 
+    // Resolve gender from URL param first (most reliable on fresh load),
+    // then fall back to session context. Using flowGender consistently
+    // prevents a race where the session context hasn't hydrated yet.
     const flowGender = getPhotoGender() || gender
 
-    if (getPhotoFlow() === 'start') {
-      if (flowGender === 'men') {
-        router.push('/style/men/options')
-        return
-      }
-
-      if (flowGender === 'women') {
-        router.push('/style/women/options')
-        return
-      }
+    if (!flowGender) {
+      router.push('/style/info')
+      return
     }
 
-    if (gender === 'men') {
+    if (flowGender === 'men') {
       router.push(mode === 'catalog' ? '/style/men/catalog/review' : '/style/men/options')
       return
     }
 
-    if (gender === 'women') {
+    if (flowGender === 'women') {
       if (mode === 'catalog') {
         router.push('/style/women/catalog/review')
         return
@@ -77,8 +73,6 @@ export default function StylePhotoPage() {
       router.push('/style/women/options')
       return
     }
-
-    router.push('/style')
   }
 
   const goBack = () => {
@@ -100,12 +94,12 @@ export default function StylePhotoPage() {
       return
     }
 
-    if (gender === 'men') {
+    if (flowGender === 'men') {
       router.push(mode === 'catalog' ? '/style/men/catalog/review' : '/style/men/options')
       return
     }
 
-    if (gender === 'women') {
+    if (flowGender === 'women') {
       if (mode === 'catalog') {
         router.push('/style/women/catalog/review')
         return
