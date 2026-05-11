@@ -56,9 +56,21 @@ export function StyleSessionProvider({ children }: { children: React.ReactNode }
     }
   })
   const previewUrlRef = useRef<string | null>(state.imagePreviewUrl)
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
-    saveStyleFlowSessionState(state)
+    if (saveTimeoutRef.current !== null) {
+      clearTimeout(saveTimeoutRef.current)
+    }
+    saveTimeoutRef.current = setTimeout(() => {
+      saveStyleFlowSessionState(state)
+    }, 300)
+
+    return () => {
+      if (saveTimeoutRef.current !== null) {
+        clearTimeout(saveTimeoutRef.current)
+      }
+    }
   }, [state])
 
   useEffect(() => {

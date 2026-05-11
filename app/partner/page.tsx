@@ -35,15 +35,16 @@ export default function PartnerPage() {
         return
       }
 
-      const { count } = await supabase
-        .from('partner_customers')
-        .select('*', { count: 'exact', head: true })
-        .eq('partner_id', userId)
-
-      const { data: commissions } = await supabase
-        .from('partner_commissions')
-        .select('commission_amount,status')
-        .eq('partner_id', userId)
+      const [{ count }, { data: commissions }] = await Promise.all([
+        supabase
+          .from('partner_customers')
+          .select('*', { count: 'exact', head: true })
+          .eq('partner_id', userId),
+        supabase
+          .from('partner_commissions')
+          .select('commission_amount,status')
+          .eq('partner_id', userId),
+      ])
 
       setTotalCustomers(count || 0)
       setCommissionDue(

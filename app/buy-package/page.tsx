@@ -57,11 +57,14 @@ export default function BuyPackagePage() {
           return
         }
 
-        const { data: barber } = await supabase
-          .from('barbers')
-          .select('id,country,barber_name,shop_name')
-          .eq('id', session.user.id)
-          .single<BarberProfile>()
+        const [{ data: barber }, packagesRes] = await Promise.all([
+          supabase
+            .from('barbers')
+            .select('id,country,barber_name,shop_name')
+            .eq('id', session.user.id)
+            .single<BarberProfile>(),
+          fetch('/api/packages'),
+        ])
 
         if (!barber) {
           router.replace('/dashboard')
@@ -76,8 +79,7 @@ export default function BuyPackagePage() {
             session.user.id,
         )
 
-        const res = await fetch('/api/packages')
-        const data = await res.json()
+        const data = await packagesRes.json()
 
         if (Array.isArray(data)) {
           setPackages(data)

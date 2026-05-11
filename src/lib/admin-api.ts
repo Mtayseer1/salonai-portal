@@ -28,5 +28,9 @@ export async function adminFetch<T>(path: string, init: RequestInit = {}) {
     throw new Error(result?.error || 'Admin request failed.')
   }
 
+  if (result === null) {
+    throw new Error('Invalid response from server.')
+  }
+
   return result as T
 }

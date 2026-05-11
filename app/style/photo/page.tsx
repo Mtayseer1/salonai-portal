@@ -61,7 +61,11 @@ export default function StylePhotoPage() {
         return
       }
 
-      if (mode === 'smart' && imageFile) {
+      if (mode === 'smart') {
+        if (!imageFile) {
+          setMessage('Please re-upload the photo to continue.')
+          return
+        }
         router.push('/style/loading')
         return
       }

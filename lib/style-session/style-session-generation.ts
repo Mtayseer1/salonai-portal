@@ -35,43 +35,19 @@ import type {
   StyleSessionGenerationResult,
 } from './style-session-types'
 
-export async function generateStyleFromSession(
-  session: StyleFlowSessionState,
-): Promise<StyleSessionGenerationResult> {
-  if (!session.gender) {
-    throw new Error('Choose a client path before generating.')
+async function resolveAuthSession() {
+  let { data: { session: authSession }, error: sessionError } =
+    await supabase.auth.getSession()
+
+  // Retry once — Supabase may not have restored the session from storage yet
+  // on the first render after navigation.
+  if (!authSession?.access_token && !sessionError) {
+    await new Promise<void>((r) => setTimeout(r, 800))
+    ;({ data: { session: authSession }, error: sessionError } =
+      await supabase.auth.getSession())
   }
 
-  if (!session.mode) {
-    throw new Error('Choose a style mode before generating.')
-  }
-
-  if (!session.imageFile) {
-    throw new Error('Upload the client image again before generating.')
-  }
-
-  validateGenerationSession(session)
-
-  const imageInput =
-    session.gender === 'women'
-      ? await createInlineImageInput(session.imageFile)
-      : {
-          imageUrl: (
-            await uploadStyleImageForGeneration(
-              session.imageFile,
-              session.customerPhone,
-            )
-          ).signedUrl,
-        }
-
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser()
-  const {
-    data: { session: authSession },
-    error: sessionError,
-  } = await supabase.auth.getSession()
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
 
   if (userError || !user || sessionError || !authSession?.access_token) {
     throw new Error(
@@ -90,6 +66,43 @@ export async function generateStyleFromSession(
       ].join('\n'),
     )
   }
+
+  return { authSession, user }
+}
+
+export async function generateStyleFromSession(
+  session: StyleFlowSessionState,
+): Promise<StyleSessionGenerationResult> {
+  if (!session.gender) {
+    throw new Error('Choose a client path before generating.')
+  }
+
+  if (!session.mode) {
+    throw new Error('Choose a style mode before generating.')
+  }
+
+  if (!session.imageFile) {
+    throw new Error('Upload the client image again before generating.')
+  }
+
+  validateGenerationSession(session)
+
+  // Resolve auth before image processing so we fail fast without doing expensive work.
+  // One retry handles the race where Supabase hasn't finished restoring the session
+  // from localStorage by the time the loading page mounts.
+  const { authSession, user } = await resolveAuthSession()
+
+  const imageInput =
+    session.gender === 'women'
+      ? await createInlineImageInput(session.imageFile)
+      : {
+          imageUrl: (
+            await uploadStyleImageForGeneration(
+              session.imageFile,
+              session.customerPhone,
+            )
+          ).signedUrl,
+        }
 
   const response = await fetch('/api/generate', {
     method: 'POST',
