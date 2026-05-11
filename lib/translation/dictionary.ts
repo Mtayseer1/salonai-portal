@@ -43,6 +43,7 @@ export const arabicTranslations: Record<string, string> = {
   'Bold': 'جريء',
   'Bold Brows': 'حواجب جريئة',
   'Braided style': 'تسريحة ضفائر',
+  'Bridal Style': 'إطلالة العرائس',
   'Bronze': 'برونزي',
   'Bronze Glow': 'لمعة برونزية',
   'Bronze Rose': 'وردي برونزي',
@@ -355,6 +356,7 @@ export const arabicTranslations: Record<string, string> = {
   'Random': 'عشوائي',
   'Radiant Glow': 'إشراقة مضيئة',
   'Reading photo': 'قراءة الصورة',
+  'Rendering': 'معالجة الصورة',
   'Red Flush': 'احمرار طبيعي',
   'Regenerate': 'إعادة التوليد',
   'Result': 'النتيجة',
@@ -385,6 +387,7 @@ export const arabicTranslations: Record<string, string> = {
   'Selected client preview': 'معاينة صورة العميل',
   'Set initial password': 'ضع كلمة مرور أولية',
   'Share': 'مشاركة',
+  'Signature Looks': 'الإطلالات المميزة',
   'Sharp Defined': 'تحديد حاد',
   'Sharp Defined Brows': 'حواجب محددة بحدة',
   'Sharp Sculpt': 'نحت حاد',
@@ -400,6 +403,7 @@ export const arabicTranslations: Record<string, string> = {
   'Silver Glow': 'لمعة فضية',
   'Skin Base': 'أساس البشرة',
   'Smart Style': 'النمط الذكي',
+  'Styling': 'التصفيف',
   'Smokey Dark': 'سموكي داكن',
   'Smokey Light': 'سموكي خفيف',
   'Smokey Medium': 'سموكي متوسط',
@@ -481,6 +485,10 @@ export const arabicTranslations: Record<string, string> = {
   'Upload the client image': 'ارفع صورة العميل',
   'Upload the client image again before generating.':
     'ارفع صورة العميل مرة أخرى قبل التوليد.',
+  'Image is too large (max 20 MB). Please choose a smaller photo.':
+    'الصورة كبيرة جداً (الحد الأقصى 20 ميغابايت). اختر صورة أصغر.',
+  'Please re-upload the photo to continue.':
+    'يرجى إعادة رفع الصورة للمتابعة.',
   'Updo bun': 'كعكة مرفوعة',
   'Veil': 'طرحة',
   'Velvet Matte': 'مخملي مطفي',

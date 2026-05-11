@@ -44,7 +44,10 @@ export function TranslationProvider({ children }: { children: React.ReactNode })
     setLanguage(language === 'ar' ? 'en' : 'ar')
   }, [language, setLanguage])
 
-  const translate = useCallback((text: string) => translateValue(text), [])
+  const translate = useCallback(
+    (text: string) => (language === 'ar' ? translateValue(text) : text),
+    [language],
+  )
 
   useEffect(() => {
     document.documentElement.lang = language
