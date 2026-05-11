@@ -17,6 +17,10 @@ export default function StylePhotoPage() {
   const selectImage = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] ?? null
     setMessage('')
+    if (file && file.size > 20 * 1024 * 1024) {
+      setMessage('Image is too large (max 20 MB). Please choose a smaller photo.')
+      return
+    }
     setImage(file)
   }
 

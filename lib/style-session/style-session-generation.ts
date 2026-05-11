@@ -368,7 +368,10 @@ function createGenerationRequest(
 }
 
 async function createInlineImageInput(imageFile: File): Promise<GenerationImageInput> {
-  const dataUrl = await readFileAsDataUrl(imageFile)
+  // Compress before base64 encoding — Vercel rejects payloads >4.5MB and
+  // a typical phone photo at 3–8MB would exceed this once base64-encoded.
+  const compressed = await compressImageForGeneration(imageFile)
+  const dataUrl = await readFileAsDataUrl(compressed)
   const match = dataUrl.match(/^data:([^;]+);base64,(.+)$/)
 
   if (!match?.[2]) {
@@ -377,11 +380,51 @@ async function createInlineImageInput(imageFile: File): Promise<GenerationImageI
 
   return {
     imageBase64: match[2],
-    imageMimeType: match[1] || imageFile.type || 'image/jpeg',
+    imageMimeType: 'image/jpeg',
   }
 }
 
-function readFileAsDataUrl(file: File) {
+function compressImageForGeneration(file: File): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    const objectUrl = URL.createObjectURL(file)
+
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl)
+
+      const MAX_WIDTH = 1536
+      const scale = Math.min(1, MAX_WIDTH / img.width)
+      const canvas = document.createElement('canvas')
+      canvas.width = Math.round(img.width * scale)
+      canvas.height = Math.round(img.height * scale)
+
+      const ctx = canvas.getContext('2d')
+      if (!ctx) {
+        reject(new Error('Could not compress image — canvas unavailable.'))
+        return
+      }
+
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+      canvas.toBlob(
+        (blob) => {
+          if (blob) resolve(blob)
+          else reject(new Error('Could not compress image.'))
+        },
+        'image/jpeg',
+        0.82,
+      )
+    }
+
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl)
+      reject(new Error('Could not load image for compression.'))
+    }
+
+    img.src = objectUrl
+  })
+}
+
+function readFileAsDataUrl(file: File | Blob) {
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader()
 
