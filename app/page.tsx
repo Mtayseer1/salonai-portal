@@ -357,8 +357,8 @@ export default function LandingPage() {
               SalonAI generates photorealistic AI previews of hairstyles and makeup for your clients — in seconds, before they commit.
             </motion.p>
             <motion.div {...mount(0.3)} className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
-              <Link href="/login" className="rounded-2xl bg-gradient-to-r from-fuchsia-200 via-white to-sky-100 px-8 py-3.5 text-sm font-bold text-zinc-950 shadow-xl shadow-fuchsia-950/30 transition hover:brightness-110">
-                Get Started →
+              <Link href="/contact" className="rounded-2xl bg-gradient-to-r from-fuchsia-200 via-white to-sky-100 px-8 py-3.5 text-sm font-bold text-zinc-950 shadow-xl shadow-fuchsia-950/30 transition hover:brightness-110">
+                Start Free Trial →
               </Link>
               <a href="#reel" className="rounded-2xl border border-white/10 bg-white/[0.06] px-8 py-3.5 text-sm font-semibold text-white transition hover:bg-white/[0.1]">
                 See the Reel ↓
@@ -423,8 +423,8 @@ export default function LandingPage() {
             From natural beauty to high-fashion editorial — our AI catalog covers every style, every occasion, every client.
           </motion.p>
           <motion.div {...reveal(0.3)} className="mt-9">
-            <Link href="/login" className="rounded-2xl bg-gradient-to-r from-fuchsia-200 via-white to-sky-100 px-10 py-4 text-sm font-bold text-zinc-950 shadow-2xl shadow-fuchsia-950/50 transition hover:brightness-110">
-              Try It Now →
+            <Link href="/contact" className="rounded-2xl bg-gradient-to-r from-fuchsia-200 via-white to-sky-100 px-10 py-4 text-sm font-bold text-zinc-950 shadow-2xl shadow-fuchsia-950/50 transition hover:brightness-110">
+              Try It Free →
             </Link>
           </motion.div>
         </div>
@@ -461,8 +461,8 @@ export default function LandingPage() {
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
             <motion.div {...reveal(0)} className="relative z-10 rounded-3xl border border-white/10 bg-black/60 px-10 py-8 text-center backdrop-blur-xl">
               <p className="text-xs font-semibold uppercase tracking-[0.28em] text-fuchsia-300">AI Transformation</p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">Two clients.<br/>Infinite possibilities.</h2>
-              <p className="mt-3 text-sm text-zinc-400">Every look, generated in real time.</p>
+              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">One photo.<br/>Any look imaginable.</h2>
+              <p className="mt-3 text-sm text-zinc-400">Every style, generated in real time.</p>
             </motion.div>
           </div>
         </div>
