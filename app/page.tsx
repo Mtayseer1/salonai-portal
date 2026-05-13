@@ -187,6 +187,312 @@ function ReelFrame({
   )
 }
 
+// ─── Style Demo (animated product walkthrough) ────────────────────────────────
+
+type DemoPhase = 'hair' | 'color' | 'makeup' | 'merge' | 'result'
+
+const DEMO_HAIR   = ['Natural Waves', 'Sleek Bob', 'Soft Curls', 'French Braid']
+const DEMO_COLORS = [
+  { hex: '#2C1810', name: 'Dark Brown' },
+  { hex: '#C9993F', name: 'Blonde'     },
+  { hex: '#111111', name: 'Black'      },
+  { hex: '#B87878', name: 'Auburn'     },
+  { hex: '#7B5230', name: 'Caramel'   },
+]
+const DEMO_MAKEUP = ['Soft Glam', 'Smokey Eye', 'Arabic Glam', 'Korean Glow']
+const DEMO_SEQ: { phase: DemoPhase; ms: number }[] = [
+  { phase: 'hair',   ms: 3000 },
+  { phase: 'color',  ms: 2600 },
+  { phase: 'makeup', ms: 2800 },
+  { phase: 'merge',  ms: 2700 },
+  { phase: 'result', ms: 3800 },
+]
+
+function HairPhase() {
+  const [selected, setSelected] = useState<string | null>(null)
+  useEffect(() => {
+    const t = setTimeout(() => setSelected('Soft Curls'), 1800)
+    return () => clearTimeout(t)
+  }, [])
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }}
+      transition={{ duration: 0.4, ease: 'easeOut' as const }}
+      className="w-full"
+    >
+      <p className="mb-1 text-center text-[10px] font-semibold uppercase tracking-[0.24em] text-zinc-600">Step 1 of 3</p>
+      <h3 className="mb-5 text-center text-sm font-semibold text-white">Choose hairstyle</h3>
+      <div className="grid grid-cols-2 gap-2.5">
+        {DEMO_HAIR.map((opt, i) => {
+          const active = selected === opt
+          return (
+            <motion.div key={opt}
+              initial={{ opacity: 0, scale: 0.88 }} animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.13, duration: 0.35, ease: 'easeOut' as const }}
+              className={`relative overflow-hidden rounded-xl border px-3 py-2.5 text-xs font-medium transition-all duration-500 ${
+                active
+                  ? 'border-fuchsia-300/60 bg-fuchsia-300/15 text-fuchsia-100 shadow-lg shadow-fuchsia-950/40'
+                  : 'border-white/10 bg-white/[0.05] text-zinc-400'
+              }`}
+            >
+              {active && (
+                <motion.span initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} className="mr-1 text-fuchsia-300">✓</motion.span>
+              )}
+              {opt}
+              {active && (
+                <motion.div initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.4 }}
+                  className="absolute inset-x-0 bottom-0 h-0.5 origin-left bg-fuchsia-400/60" />
+              )}
+            </motion.div>
+          )
+        })}
+      </div>
+    </motion.div>
+  )
+}
+
+function ColorPhase() {
+  const [selected, setSelected] = useState<string | null>(null)
+  useEffect(() => {
+    const t = setTimeout(() => setSelected('Blonde'), 1600)
+    return () => clearTimeout(t)
+  }, [])
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }}
+      transition={{ duration: 0.4, ease: 'easeOut' as const }}
+      className="w-full"
+    >
+      <p className="mb-1 text-center text-[10px] font-semibold uppercase tracking-[0.24em] text-zinc-600">Step 2 of 3</p>
+      <h3 className="mb-5 text-center text-sm font-semibold text-white">Pick hair color</h3>
+      <div className="flex justify-center gap-3">
+        {DEMO_COLORS.map((c, i) => {
+          const active = selected === c.name
+          return (
+            <motion.div key={c.name}
+              initial={{ opacity: 0, y: 12, scale: 0.8 }} animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ delay: i * 0.1, duration: 0.35, ease: 'easeOut' as const }}
+              className="flex flex-col items-center gap-1.5"
+            >
+              <div
+                className={`relative h-10 w-10 rounded-full transition-all duration-500 ${
+                  active ? 'ring-2 ring-fuchsia-300 ring-offset-2 ring-offset-zinc-950' : 'ring-1 ring-white/10'
+                }`}
+                style={{ background: c.hex }}
+              >
+                {active && (
+                  <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }}
+                    className="absolute inset-0 flex items-center justify-center text-xs text-white drop-shadow">✓</motion.span>
+                )}
+              </div>
+              <span className={`text-[9px] font-medium transition-colors ${active ? 'text-fuchsia-200' : 'text-zinc-600'}`}>{c.name}</span>
+            </motion.div>
+          )
+        })}
+      </div>
+      {selected && (
+        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
+          className="mt-4 text-center text-[11px] text-zinc-500">
+          Selected: <span className="font-semibold text-fuchsia-200">{selected}</span>
+        </motion.p>
+      )}
+    </motion.div>
+  )
+}
+
+function MakeupPhase() {
+  const [selected, setSelected] = useState<string | null>(null)
+  useEffect(() => {
+    const t = setTimeout(() => setSelected('Arabic Glam'), 1900)
+    return () => clearTimeout(t)
+  }, [])
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }}
+      transition={{ duration: 0.4, ease: 'easeOut' as const }}
+      className="w-full"
+    >
+      <p className="mb-1 text-center text-[10px] font-semibold uppercase tracking-[0.24em] text-zinc-600">Step 3 of 3</p>
+      <h3 className="mb-5 text-center text-sm font-semibold text-white">Select makeup style</h3>
+      <div className="grid grid-cols-2 gap-2.5">
+        {DEMO_MAKEUP.map((opt, i) => {
+          const active = selected === opt
+          return (
+            <motion.div key={opt}
+              initial={{ opacity: 0, scale: 0.88 }} animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.13, duration: 0.35, ease: 'easeOut' as const }}
+              className={`relative overflow-hidden rounded-xl border px-3 py-2.5 text-xs font-medium transition-all duration-500 ${
+                active
+                  ? 'border-fuchsia-300/60 bg-fuchsia-300/15 text-fuchsia-100 shadow-lg shadow-fuchsia-950/40'
+                  : 'border-white/10 bg-white/[0.05] text-zinc-400'
+              }`}
+            >
+              {active && (
+                <motion.span initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} className="mr-1 text-fuchsia-300">✓</motion.span>
+              )}
+              {opt}
+              {active && (
+                <motion.div initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.4 }}
+                  className="absolute inset-x-0 bottom-0 h-0.5 origin-left bg-fuchsia-400/60" />
+              )}
+            </motion.div>
+          )
+        })}
+      </div>
+    </motion.div>
+  )
+}
+
+function MergePhase() {
+  const [converging, setConverging] = useState(false)
+  useEffect(() => {
+    const t = setTimeout(() => setConverging(true), 900)
+    return () => clearTimeout(t)
+  }, [])
+
+  const TAGS = [
+    { label: 'Soft Curls',  x: -90, y: -55 },
+    { label: '⬤ Blonde',    x: 90,  y: -55 },
+    { label: 'Arabic Glam', x: 0,   y: 75  },
+  ]
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      transition={{ duration: 0.4 }}
+      className="relative flex w-full flex-col items-center justify-center"
+      style={{ minHeight: 240 }}
+    >
+      {/* Central orb */}
+      <motion.div
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: converging ? 1 : 0.4, opacity: converging ? 1 : 0.3 }}
+        transition={{ duration: 0.7, type: 'spring', bounce: 0.3 }}
+        className="absolute h-20 w-20 rounded-full"
+        style={{ background: 'radial-gradient(circle, rgba(240,171,252,0.9) 0%, rgba(192,132,252,0.4) 50%, transparent 70%)' }}
+      />
+      {/* Spinning ring */}
+      <AnimatePresence>
+        {converging && (
+          <motion.div key="ring"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1, rotate: 360 }}
+            exit={{ scale: 0, opacity: 0 }}
+            transition={{
+              scale:   { duration: 0.3 },
+              opacity: { duration: 0.3 },
+              rotate:  { duration: 1.6, repeat: Infinity, ease: 'linear' },
+            }}
+            className="absolute h-28 w-28 rounded-full border-2 border-fuchsia-400/20 border-t-fuchsia-300/80"
+          />
+        )}
+      </AnimatePresence>
+      {/* Tags flying to center */}
+      {TAGS.map((tag, i) => (
+        <motion.div key={tag.label}
+          initial={{ x: tag.x, y: tag.y, opacity: 1, scale: 1 }}
+          animate={converging
+            ? { x: 0, y: 0, opacity: 0, scale: 0.2 }
+            : { x: tag.x, y: tag.y, opacity: 1, scale: 1 }
+          }
+          transition={{ duration: 0.55, delay: i * 0.07, ease: 'easeIn' as const }}
+          className="absolute rounded-full border border-fuchsia-300/40 bg-fuchsia-300/15 px-3 py-1.5 text-[11px] font-semibold text-fuchsia-200 backdrop-blur-sm"
+        >
+          {tag.label}
+        </motion.div>
+      ))}
+      {/* Generating label */}
+      <AnimatePresence>
+        {converging && (
+          <motion.p key="gen"
+            initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+            transition={{ delay: 0.5, duration: 0.4 }}
+            className="absolute bottom-0 text-center text-xs font-medium text-fuchsia-200"
+          >
+            Generating AI preview...
+          </motion.p>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  )
+}
+
+function ResultPhase() {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="relative flex flex-col items-center"
+    >
+      <motion.div
+        initial={{ scale: 0.3, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 18 }}
+        className="relative"
+      >
+        <div className="absolute -inset-3 rounded-[1.8rem] opacity-60"
+          style={{ background: 'radial-gradient(circle, rgba(240,171,252,0.5) 0%, transparent 70%)' }} />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/women_signature/05_Arabic_Glam.png" alt="Arabic Glam AI result"
+          className="relative h-[240px] w-[160px] rounded-[1.4rem] object-cover shadow-2xl shadow-fuchsia-950/50" />
+        <div className="absolute inset-x-0 bottom-0 rounded-b-[1.4rem] bg-gradient-to-t from-black/95 to-transparent px-3 pb-3 pt-8">
+          <p className="text-[9px] font-semibold uppercase tracking-[0.22em] text-fuchsia-300">AI Generated</p>
+          <p className="mt-0.5 text-xs font-semibold text-white">Arabic Glam</p>
+        </div>
+      </motion.div>
+      {/* Sparkles */}
+      {[{ x: -16, y: -14, d: 0.15 }, { x: 14, y: -18, d: 0.3 }, { x: 20, y: 18, d: 0.45 }].map((sp, i) => (
+        <motion.span key={i}
+          initial={{ opacity: 0, scale: 0 }} animate={{ opacity: [0, 1, 0], scale: [0, 1.4, 0] }}
+          transition={{ delay: sp.d, duration: 0.7 }}
+          className="absolute text-fuchsia-300" style={{ left: `calc(50% + ${sp.x}px)`, top: sp.y, fontSize: 12 }}>
+          ✦
+        </motion.span>
+      ))}
+      <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.4 }}
+        className="mt-3 text-[11px] font-semibold text-emerald-400">
+        ✓ Preview ready in 24 seconds
+      </motion.p>
+    </motion.div>
+  )
+}
+
+function StyleDemo() {
+  const [idx, setIdx] = useState(0)
+  useEffect(() => {
+    const t = setTimeout(() => setIdx(i => (i + 1) % DEMO_SEQ.length), DEMO_SEQ[idx].ms)
+    return () => clearTimeout(t)
+  }, [idx])
+
+  const phase = DEMO_SEQ[idx].phase
+
+  return (
+    <div className="mx-auto w-full max-w-sm overflow-hidden rounded-3xl border border-white/10 bg-zinc-950/80 shadow-2xl shadow-black/50 backdrop-blur-xl">
+      {/* Fake window chrome */}
+      <div className="flex items-center gap-1.5 border-b border-white/10 px-4 py-3">
+        <div className="h-2 w-2 rounded-full bg-red-400/60" />
+        <div className="h-2 w-2 rounded-full bg-yellow-400/60" />
+        <div className="h-2 w-2 rounded-full bg-green-400/60" />
+        <span className="ml-2 text-[10px] text-zinc-600">SalonAI — Style Preview</span>
+        <div className="ml-auto flex gap-1">
+          {DEMO_SEQ.map((_, i) => (
+            <div key={i} className={`h-1 rounded-full transition-all duration-500 ${i === idx ? 'w-4 bg-fuchsia-400' : 'w-1 bg-white/20'}`} />
+          ))}
+        </div>
+      </div>
+      {/* Phase content */}
+      <div className="flex min-h-[280px] items-center justify-center p-6">
+        <AnimatePresence mode="wait">
+          {phase === 'hair'   && <HairPhase   key="hair" />}
+          {phase === 'color'  && <ColorPhase  key="color" />}
+          {phase === 'makeup' && <MakeupPhase key="makeup" />}
+          {phase === 'merge'  && <MergePhase  key="merge" />}
+          {phase === 'result' && <ResultPhase key="result" />}
+        </AnimatePresence>
+      </div>
+    </div>
+  )
+}
+
 // ─── Navbar ────────────────────────────────────────────────────────────────────
 
 function LandingNav() {
@@ -427,6 +733,41 @@ export default function LandingPage() {
               Try It Free →
             </Link>
           </motion.div>
+        </div>
+      </section>
+
+      {/* ── Style Demo ── */}
+      <section id="demo" className="px-4 py-24">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid items-center gap-12 lg:grid-cols-2">
+            {/* Copy */}
+            <div>
+              <motion.p {...reveal(0)} className="text-xs font-semibold uppercase tracking-[0.24em] text-zinc-500">How It Works</motion.p>
+              <motion.h2 {...reveal(0.1)} className="mt-4 text-4xl font-semibold tracking-tight text-white">
+                Pick a style.<br/>See it on your client.
+              </motion.h2>
+              <motion.p {...reveal(0.2)} className="mt-5 max-w-sm text-base leading-7 text-zinc-400">
+                Choose hairstyle, hair color, and makeup in seconds. Our AI merges all your selections into a photorealistic preview — before anyone sits in the chair.
+              </motion.p>
+              <motion.ul {...reveal(0.25)} className="mt-6 space-y-3 text-sm text-zinc-400">
+                {['Select hairstyle from 100+ catalog options', 'Choose hair color from a full swatch palette', 'Layer on any makeup look — glam, natural, or editorial', 'AI merges everything into one photorealistic result'].map((step, i) => (
+                  <li key={i} className="flex items-start gap-2.5">
+                    <span className="mt-0.5 text-fuchsia-300">✦</span>
+                    {step}
+                  </li>
+                ))}
+              </motion.ul>
+              <motion.div {...reveal(0.35)} className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Link href="/contact" className="rounded-2xl bg-gradient-to-r from-fuchsia-200 via-white to-sky-100 px-7 py-3.5 text-center text-sm font-bold text-zinc-950 shadow-xl shadow-fuchsia-950/30 transition hover:brightness-110">
+                  Try It Free →
+                </Link>
+              </motion.div>
+            </div>
+            {/* Demo animation */}
+            <motion.div {...reveal(0.1)}>
+              <StyleDemo />
+            </motion.div>
+          </div>
         </div>
       </section>
 
