@@ -519,118 +519,7 @@ function StyleDemo() {
   )
 }
 
-// ─── Salon CTA Reveal ─────────────────────────────────────────────────────────
 
-function SalonCTAReveal() {
-  const { lang } = useContext(LangCtx)
-  const [visible, setVisible] = useState(false)
-  const ref = useRef<HTMLElement>(null)
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const obs = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect() } },
-      { threshold: 0.15 }
-    )
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [])
-
-  const CARDS = [
-    { src: '/women_signature/03_Bridal_Rose_Glam.png',  label: 'Bridal Glam', from: { x: -280, rotate: -18 }, to: { x: 0, rotate: -9 },  size: 'h-[190px] w-[120px]', border: 'border-white/10' },
-    { src: '/women_signature/05_Arabic_Glam.png',        label: 'Arabic Glam', from: { y:  140, scale: 0.6  }, to: { y: 0,  scale: 1   },  size: 'h-[230px] w-[150px]', border: 'border-amber-300/30', featured: true },
-    { src: '/women_signature/09_Korean_Soft_Makeup.png', label: 'Korean Glow', from: { x:  280, rotate:  18 }, to: { x: 0, rotate:  9 },  size: 'h-[190px] w-[120px]', border: 'border-white/10' },
-  ]
-
-  return (
-    <section ref={ref} className="relative px-4 py-28">
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[700px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full"
-        style={{ background: 'radial-gradient(circle, rgba(201,153,63,0.09) 0%, transparent 68%)' }} />
-
-      <div className="relative mx-auto max-w-3xl text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={visible ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-          className="mb-8 flex justify-center"
-        >
-          <div className="relative">
-            <div className="absolute inset-0 rounded-full" style={{ boxShadow: '0 0 55px 16px rgba(201,153,63,0.38)' }} />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/icon.png" alt="SalonAI" className="relative h-20 w-20 rounded-full object-cover ring-2 ring-amber-300/40" />
-          </div>
-        </motion.div>
-
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={visible ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5, delay: 0.1, ease: 'easeOut' }}
-          className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-300"
-        >
-          {lang === 'en' ? 'Try It Free' : 'جرّبيه مجاناً'}
-        </motion.p>
-        <motion.h2
-          initial={{ opacity: 0, y: 24 }}
-          animate={visible ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.55, delay: 0.15, ease: 'easeOut' }}
-          className="mt-4 text-4xl font-semibold tracking-tight text-white sm:text-5xl"
-        >
-          {lang === 'en' ? 'Your salon. Elevated.' : 'صالونك. بمستوى آخر.'}
-        </motion.h2>
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={visible ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
-          className="mx-auto mt-5 max-w-md text-base leading-7 text-zinc-400"
-        >
-          {lang === 'en'
-            ? 'AI previews that clients love and salons trust. Start your free trial — no credit card needed.'
-            : 'معاينات ذكاء اصطناعي يعشقها العملاء وتثق بها الصالونات. ابدأ تجربتك المجانية بدون بطاقة ائتمان.'}
-        </motion.p>
-
-        {/* Cards fly in from both sides */}
-        <div className="mt-12 flex items-end justify-center gap-3 overflow-hidden rounded-3xl pb-2">
-          {CARDS.map((card, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, ...card.from }}
-              animate={visible ? { opacity: 1, ...card.to } : {}}
-              transition={{ delay: 0.1 + i * 0.1, duration: 0.7, type: 'spring', damping: 18, stiffness: 120 }}
-              className={`relative overflow-hidden rounded-2xl border shadow-2xl ${card.size} ${card.border} ${card.featured ? 'shadow-amber-950/50' : 'shadow-black/50'}`}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={card.src} alt={card.label} className="h-full w-full object-cover" loading="lazy" />
-              {card.featured && (
-                <>
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent px-3 pb-3 pt-10">
-                    <p className="text-[8px] font-semibold uppercase tracking-widest text-amber-300">AI Preview</p>
-                    <p className="mt-0.5 text-xs font-semibold text-white">{card.label}</p>
-                  </div>
-                  <div className="absolute right-2 top-2 rounded-full bg-amber-300/20 px-2 py-0.5 text-[8px] font-bold tracking-widest text-amber-200 backdrop-blur-sm">✦ AI</div>
-                </>
-              )}
-            </motion.div>
-          ))}
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={visible ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5, delay: 0.45, ease: 'easeOut' }}
-          className="mt-10"
-        >
-          <Link
-            href="/contact"
-            className="inline-block rounded-2xl bg-gradient-to-r from-amber-200 via-white to-amber-100 px-10 py-4 text-sm font-bold text-zinc-950 shadow-2xl shadow-amber-950/50 transition hover:brightness-110"
-          >
-            {lang === 'en' ? 'Start Free Trial →' : '← ابدأ التجربة المجانية'}
-          </Link>
-        </motion.div>
-      </div>
-    </section>
-  )
-}
 
 // ─── Scissors Divider ─────────────────────────────────────────────────────────
 
@@ -938,9 +827,6 @@ export default function LandingPage() {
             </motion.div>
           </div>
         </section>
-
-        {/* ── Salon CTA Reveal ── */}
-        <SalonCTAReveal />
 
         {/* ── Style Demo ── */}
         <section id="demo" className="px-4 py-24">
