@@ -539,7 +539,7 @@ function LandingNav() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
         <Brand />
         <nav className="hidden items-center gap-8 md:flex">
-          {[['#reel', c.reel], ['#compare', c.compare], ['#features', c.features], ['#pricing', c.pricing]].map(([href, label]) => (
+          {[['#reel', c.reel], ['#compare', c.compare], ['#features', c.features]].map(([href, label]) => (
             <a key={href} href={href} className="text-sm text-zinc-400 transition hover:text-white">{label}</a>
           ))}
         </nav>
@@ -562,7 +562,7 @@ function LandingNav() {
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden border-t border-white/10 bg-black/70 backdrop-blur-xl md:hidden">
             <div className="flex flex-col gap-1 px-4 py-4">
-              {[['#reel', c.reel], ['#compare', c.compare], ['#features', c.features], ['#pricing', c.pricing]].map(([href, label]) => (
+              {[['#reel', c.reel], ['#compare', c.compare], ['#features', c.features]].map(([href, label]) => (
                 <a key={href} href={href} onClick={close} className="rounded-xl px-4 py-3 text-sm text-zinc-400 transition hover:bg-white/[0.06] hover:text-white">{label}</a>
               ))}
               <Link href="/login" onClick={close} className="mt-2 rounded-xl px-4 py-3 text-sm font-bold text-amber-200 transition hover:bg-white/[0.06]">{c.signIn} →</Link>
@@ -859,68 +859,6 @@ export default function LandingPage() {
                 </motion.div>
               ))}
             </div>
-          </div>
-        </section>
-
-        {/* ── Testimonials ── */}
-        <section className="px-4 py-20">
-          <div className="mx-auto max-w-6xl">
-            <div className="grid gap-5 md:grid-cols-3">
-              {c.testimonials.map((t, i) => (
-                <motion.div key={i} {...reveal(i * 0.1)}>
-                  <div className="h-full rounded-3xl border border-amber-300/20 bg-amber-300/10 p-6">
-                    <p className="text-sm leading-6 text-zinc-300">"{t.quote}"</p>
-                    <div className="mt-5">
-                      <p className="text-sm font-semibold text-white">{t.author}</p>
-                      <p className="mt-1 text-xs text-zinc-500">{t.role}</p>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── Pricing ── */}
-        <section id="pricing" className="px-4 py-24">
-          <div className="mx-auto max-w-6xl">
-            <div className="mb-14 text-center">
-              <motion.p {...reveal(0)} className="text-xs font-semibold uppercase tracking-[0.28em] text-zinc-500">{c.pricing.label}</motion.p>
-              <motion.h2 {...reveal(0.1)} className="mt-3 text-3xl font-semibold tracking-tight text-white">{c.pricing.h2}</motion.h2>
-              <motion.p {...reveal(0.2)} className="mx-auto mt-4 max-w-md text-sm leading-6 text-zinc-400">{c.pricing.sub}</motion.p>
-            </div>
-            <div className="grid gap-5 md:grid-cols-3">
-              {c.pricing.tiers.map((tier, i) => (
-                <motion.div key={i} {...reveal(i * 0.1)}>
-                  <div className={`relative flex h-full flex-col rounded-3xl border p-6 ${tier.featured ? 'border-amber-300/40 bg-white/[0.08]' : 'border-white/10 bg-white/[0.055]'}`}>
-                    {tier.featured && (
-                      <div className="absolute -top-3 start-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-fuchsia-200/30 bg-fuchsia-300 px-3 py-1 text-xs font-bold text-zinc-950">{tier.tag}</div>
-                    )}
-                    {!tier.featured && <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">{tier.tag}</p>}
-                    <h3 className="mt-3 text-2xl font-semibold text-white">{tier.name}</h3>
-                    <p className="mt-4 flex-1 text-sm leading-6 text-zinc-400">{tier.desc}</p>
-                    <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer"
-                      className="mt-6 block w-full rounded-2xl border border-emerald-300/20 bg-emerald-400/10 py-3 text-center text-sm font-bold text-emerald-100 transition hover:bg-emerald-400/20">
-                      {c.pricing.cta}
-                    </a>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-            <motion.p {...reveal(0.3)} className="mt-8 text-center text-xs text-zinc-500">{c.pricing.note}</motion.p>
-          </div>
-        </section>
-
-        {/* ── FAQ ── */}
-        <section id="faq" className="px-4 py-24">
-          <div className="mx-auto max-w-2xl">
-            <div className="mb-12 text-center">
-              <motion.p {...reveal(0)} className="text-xs font-semibold uppercase tracking-[0.28em] text-zinc-500">{c.faq.label}</motion.p>
-              <motion.h2 {...reveal(0.1)} className="mt-3 text-3xl font-semibold tracking-tight text-white">{c.faq.h2}</motion.h2>
-            </div>
-            <motion.div {...reveal(0.2)} className="rounded-3xl border border-white/10 bg-white/[0.04] px-6">
-              {c.faq.items.map(item => <FaqItem key={item.q} q={item.q} a={item.a} />)}
-            </motion.div>
           </div>
         </section>
 
