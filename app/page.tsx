@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, useScroll, useTransform } from 'framer-motion'
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { Brand } from './components/ui'
 
@@ -308,7 +308,7 @@ function ReelFrame({ images, intervalMs = 3000, className = '' }: { images: { sr
           </div>
           <div className="ms-auto flex gap-1.5">
             {images.map((_, i) => (
-              <div key={i} className={`rounded-full transition-all duration-500 ${i === curr ? 'w-4 h-1.5 bg-fuchsia-300' : 'w-1.5 h-1.5 bg-white/30'}`} />
+              <div key={i} className={`rounded-full transition-all duration-500 ${i === curr ? 'w-4 h-1.5 bg-amber-300' : 'w-1.5 h-1.5 bg-white/30'}`} />
             ))}
           </div>
         </motion.div>
@@ -340,7 +340,7 @@ function HairPhase() {
               className={`relative overflow-hidden rounded-xl border px-3 py-2.5 text-xs font-medium transition-all duration-500 ${active ? 'border-amber-300/60 bg-amber-300/15 text-amber-100 shadow-lg shadow-amber-950/40' : 'border-white/10 bg-white/[0.05] text-zinc-400'}`}>
               {active && <motion.span initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} className="me-1 text-amber-300">✓</motion.span>}
               {opt}
-              {active && <motion.div initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.4 }} className="absolute inset-x-0 bottom-0 h-0.5 origin-start bg-fuchsia-400/60" />}
+              {active && <motion.div initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.4 }} className="absolute inset-x-0 bottom-0 h-0.5 origin-start bg-amber-400/60" />}
             </motion.div>
           )
         })}
@@ -405,7 +405,7 @@ function MakeupPhase() {
               className={`relative overflow-hidden rounded-xl border px-3 py-2.5 text-xs font-medium transition-all duration-500 ${active ? 'border-amber-300/60 bg-amber-300/15 text-amber-100 shadow-lg shadow-amber-950/40' : 'border-white/10 bg-white/[0.05] text-zinc-400'}`}>
               {active && <motion.span initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} className="me-1 text-amber-300">✓</motion.span>}
               {opt}
-              {active && <motion.div initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.4 }} className="absolute inset-x-0 bottom-0 h-0.5 origin-start bg-fuchsia-400/60" />}
+              {active && <motion.div initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.4 }} className="absolute inset-x-0 bottom-0 h-0.5 origin-start bg-amber-400/60" />}
             </motion.div>
           )
         })}
@@ -502,7 +502,7 @@ function StyleDemo() {
         <span className="ms-2 text-[10px] text-zinc-600">{d.windowTitle}</span>
         <div className="ms-auto flex gap-1">
           {DEMO_SEQ.map((_, i) => (
-            <div key={i} className={`h-1 rounded-full transition-all duration-500 ${i === idx ? 'w-4 bg-fuchsia-400' : 'w-1 bg-white/20'}`} />
+            <div key={i} className={`h-1 rounded-full transition-all duration-500 ${i === idx ? 'w-4 bg-amber-400' : 'w-1 bg-white/20'}`} />
           ))}
         </div>
       </div>
@@ -514,6 +514,114 @@ function StyleDemo() {
           {phase === 'merge'  && <MergePhase  key="merge" />}
           {phase === 'result' && <ResultPhase key="result" />}
         </AnimatePresence>
+      </div>
+    </div>
+  )
+}
+
+// ─── Salon Door Reveal (scroll-linked) ───────────────────────────────────────
+
+function SalonDoorReveal() {
+  const { lang } = useContext(LangCtx)
+  const ref = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] })
+
+  const leftRotate     = useTransform(scrollYProgress, [0, 0.55], [0, -95])
+  const rightRotate    = useTransform(scrollYProgress, [0, 0.55], [0, 95])
+  const contentOpacity = useTransform(scrollYProgress, [0.3, 0.62], [0, 1])
+  const contentScale   = useTransform(scrollYProgress, [0.3, 0.62], [0.88, 1])
+
+  return (
+    <div ref={ref} style={{ height: '200vh' }} className="relative">
+      <div className="sticky top-0 h-screen overflow-hidden" style={{ perspective: '1400px' }}>
+        {/* Content revealed behind doors */}
+        <motion.div
+          style={{ opacity: contentOpacity, scale: contentScale }}
+          className="absolute inset-0 flex items-center justify-center px-4"
+        >
+          <div className="text-center">
+            <div className="relative mx-auto mb-8 h-24 w-24">
+              <div className="absolute inset-0 rounded-full"
+                style={{ boxShadow: '0 0 60px 18px rgba(201,153,63,0.38)' }} />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/icon.png" alt="SalonAI" className="relative h-24 w-24 rounded-full object-cover ring-2 ring-amber-300/40" />
+            </div>
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-300">
+              {lang === 'en' ? 'Try It Free' : 'جرّبيه مجاناً'}
+            </p>
+            <h2 className="mt-4 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+              {lang === 'en' ? 'Your salon. Elevated.' : 'صالونك. بمستوى آخر.'}
+            </h2>
+            <p className="mx-auto mt-4 max-w-md text-base leading-7 text-zinc-400">
+              {lang === 'en'
+                ? 'AI previews that clients love and salons trust. Start your free trial — no credit card needed.'
+                : 'معاينات ذكاء اصطناعي يعشقها العملاء وتثق بها الصالونات. ابدأ تجربتك المجانية بدون بطاقة ائتمان.'}
+            </p>
+            <Link
+              href="/contact"
+              className="mt-8 inline-block rounded-2xl bg-gradient-to-r from-amber-200 via-white to-amber-100 px-10 py-4 text-sm font-bold text-zinc-950 shadow-2xl shadow-amber-950/50 transition hover:brightness-110"
+            >
+              {lang === 'en' ? 'Start Free Trial →' : '← ابدأ التجربة المجانية'}
+            </Link>
+          </div>
+        </motion.div>
+
+        {/* Left door */}
+        <motion.div
+          style={{ rotateY: leftRotate, transformOrigin: 'right center' }}
+          className="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-br from-zinc-950 via-[#0c0b09] to-zinc-950"
+        >
+          <div className="absolute inset-6 rounded-2xl border border-white/[0.05]" />
+          <div className="absolute inset-0 flex items-center justify-end pe-10 opacity-[0.035]">
+            <p className="text-right text-[72px] font-black leading-none tracking-tighter text-white">
+              SALON<br />AI
+            </p>
+          </div>
+          {/* Gold seam */}
+          <div className="absolute inset-y-0 right-0 w-px bg-gradient-to-b from-transparent via-amber-300/50 to-transparent" />
+          {/* Handle */}
+          <div className="absolute top-1/2 right-0 h-14 w-[14px] -translate-y-1/2 translate-x-1/2 rounded-full border border-amber-300/30 bg-gradient-to-b from-amber-200/20 to-amber-400/20 shadow-lg shadow-amber-950/40" />
+        </motion.div>
+
+        {/* Right door */}
+        <motion.div
+          style={{ rotateY: rightRotate, transformOrigin: 'left center' }}
+          className="absolute inset-y-0 right-0 w-1/2 bg-gradient-to-bl from-zinc-950 via-[#0c0b09] to-zinc-950"
+        >
+          <div className="absolute inset-6 rounded-2xl border border-white/[0.05]" />
+          <div className="absolute inset-0 flex items-center justify-start ps-10 opacity-[0.035]">
+            <p className="text-left text-[72px] font-black leading-none tracking-tighter text-white">
+              STYLE<br />IT
+            </p>
+          </div>
+          {/* Gold seam */}
+          <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-amber-300/50 to-transparent" />
+          {/* Handle */}
+          <div className="absolute top-1/2 left-0 h-14 w-[14px] -translate-y-1/2 -translate-x-1/2 rounded-full border border-amber-300/30 bg-gradient-to-b from-amber-200/20 to-amber-400/20 shadow-lg shadow-amber-950/40" />
+        </motion.div>
+      </div>
+    </div>
+  )
+}
+
+// ─── Scissors Divider ─────────────────────────────────────────────────────────
+
+function ScissorsDivider() {
+  return (
+    <div className="overflow-hidden px-4 py-6">
+      <div className="mx-auto flex max-w-6xl items-center">
+        <div className="h-px flex-1 border-t border-dashed border-white/15" />
+        <motion.span
+          initial={{ x: '-70vw' }}
+          whileInView={{ x: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.75, ease: [0.25, 0.46, 0.45, 0.94] }}
+          className="mx-4 shrink-0 text-xl text-amber-300"
+          style={{ filter: 'drop-shadow(0 0 8px rgba(201,153,63,0.55))' }}
+        >
+          ✂
+        </motion.span>
+        <div className="h-px flex-1 border-t border-dashed border-white/15" />
       </div>
     </div>
   )
@@ -613,7 +721,7 @@ function BeforeAfterSlider({ left, right, leftLabel, rightLabel }: { left: strin
           onMouseDown={() => { dragging.current = true }} onTouchStart={() => { dragging.current = true }}>↔</button>
       </div>
       <span className="pointer-events-none absolute bottom-3 left-3 z-30 rounded-full bg-black/70 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm">{leftLabel}</span>
-      <span className="pointer-events-none absolute bottom-3 right-3 z-30 rounded-full bg-fuchsia-300 px-3 py-1.5 text-xs font-bold text-zinc-950">{rightLabel}</span>
+      <span className="pointer-events-none absolute bottom-3 right-3 z-30 rounded-full bg-amber-300 px-3 py-1.5 text-xs font-bold text-zinc-950">{rightLabel}</span>
     </div>
   )
 }
@@ -759,6 +867,9 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* ── Salon Door Reveal ── */}
+        <SalonDoorReveal />
+
         {/* ── Style Demo ── */}
         <section id="demo" className="px-4 py-24">
           <div className="mx-auto max-w-6xl">
@@ -861,6 +972,9 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
+        {/* ── Scissors Divider ── */}
+        <ScissorsDivider />
 
         {/* ── Footer ── */}
         <footer className="border-t border-white/10 px-4 py-10">
