@@ -676,18 +676,26 @@ export default function LandingPage() {
         <section className="relative px-4 py-16 lg:py-24">
           <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2">
             <div className="text-center lg:text-start">
-              <motion.p {...mount(0)} className="text-xs font-semibold uppercase tracking-[0.28em] text-zinc-500">
+              {/* Logo icon with glow */}
+              <motion.div {...mount(0)} className="mb-6 flex justify-center lg:justify-start">
+                <div className="relative">
+                  <div className="absolute inset-0 rounded-full opacity-60" style={{ boxShadow: '0 0 48px 12px rgba(240,171,252,0.35)' }} />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/icon.png" alt="SalonAI" className="relative h-20 w-20 rounded-full object-cover ring-2 ring-fuchsia-300/30" />
+                </div>
+              </motion.div>
+              <motion.p {...mount(0.05)} className="text-xs font-semibold uppercase tracking-[0.28em] text-zinc-500">
                 {c.hero.label}
               </motion.p>
-              <motion.h1 {...mount(0.1)} className="mt-5 text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
+              <motion.h1 {...mount(0.15)} className="mt-5 text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
                 {c.hero.h1a}{' '}
                 <span className="bg-gradient-to-r from-fuchsia-200 via-white to-sky-200 bg-clip-text text-transparent">{c.hero.h1b}</span>
                 <br />{c.hero.h1c}
               </motion.h1>
-              <motion.p {...mount(0.2)} className="mx-auto mt-5 max-w-md text-base leading-7 text-zinc-400 lg:mx-0">
+              <motion.p {...mount(0.25)} className="mx-auto mt-5 max-w-md text-base leading-7 text-zinc-400 lg:mx-0">
                 {c.hero.sub}
               </motion.p>
-              <motion.div {...mount(0.3)} className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
+              <motion.div {...mount(0.35)} className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
                 <Link href="/contact" className="rounded-2xl bg-gradient-to-r from-fuchsia-200 via-white to-sky-100 px-8 py-3.5 text-sm font-bold text-zinc-950 shadow-xl shadow-fuchsia-950/30 transition hover:brightness-110">
                   {c.hero.cta1}
                 </Link>

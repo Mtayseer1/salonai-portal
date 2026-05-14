@@ -167,8 +167,9 @@ export function AppBar({
 export function Brand({ compact = false }: { compact?: boolean }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="grid h-11 w-11 place-items-center rounded-2xl border border-white/10 bg-white/[0.07] text-sm font-black text-fuchsia-100 shadow-2xl shadow-fuchsia-950/30">
-        SA
+      <div className="grid h-11 w-11 place-items-center overflow-hidden rounded-2xl border border-white/10 bg-zinc-900 shadow-2xl shadow-fuchsia-950/30">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/icon.png" alt="SalonAI" className="h-full w-full object-cover" />
       </div>
       {!compact && (
         <div>
