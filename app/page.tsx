@@ -102,7 +102,7 @@ const COPY = {
         { q: 'Does it work for both genders?',   a: 'Yes. Full catalogs for men and women including signature looks, bridal styles, catalog cuts, and smart AI mode.' },
       ],
     },
-    footer: { copyright: '© 2025 SalonAI. All rights reserved.', whatsapp: 'WhatsApp', signIn: 'Sign In' },
+    footer: { copyright: '© 2025 SalonAI. All rights reserved.', powered: 'A product of Future Lights Technologies', whatsapp: 'WhatsApp', signIn: 'Sign In' },
   },
 
   ar: {
@@ -192,7 +192,7 @@ const COPY = {
         { q: 'هل يعمل للرجال والنساء؟',              a: 'نعم. كتالوج كامل للرجال والنساء يشمل الإطلالات المميزة وتسريحات العرائس وقصات الكتالوج ووضع الذكاء الاصطناعي الذكي.' },
       ],
     },
-    footer: { copyright: '© ٢٠٢٥ SalonAI. جميع الحقوق محفوظة.', whatsapp: 'واتساب', signIn: 'تسجيل الدخول' },
+    footer: { copyright: '© ٢٠٢٥ SalonAI. جميع الحقوق محفوظة.', powered: 'منتج Future Lights Technologies', whatsapp: 'واتساب', signIn: 'تسجيل الدخول' },
   },
 } as const
 
@@ -1052,7 +1052,10 @@ export default function LandingPage() {
         <footer className="border-t border-white/10 px-4 py-10">
           <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 sm:flex-row sm:justify-between">
             <Brand />
-            <p className="text-xs text-zinc-500">{c.footer.copyright}</p>
+            <div className="text-center">
+              <p className="text-xs text-zinc-500">{c.footer.copyright}</p>
+              <p className="mt-1 text-xs text-zinc-600">{c.footer.powered}</p>
+            </div>
             <div className="flex items-center gap-6">
               <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="text-xs text-zinc-500 transition hover:text-white">{c.footer.whatsapp}</a>
               <Link href="/login" className="text-xs text-zinc-500 transition hover:text-white">{c.footer.signIn}</Link>
