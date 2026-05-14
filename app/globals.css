@@ -2,11 +2,16 @@
 
 /* ---------- Base ---------- */
 
+html {
+  scroll-behavior: smooth;
+}
+
 html,
 body {
-  background: #07070a;
+  background: #080602;
   color: white;
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 html[dir="rtl"] body {
@@ -24,7 +29,7 @@ html[dir="rtl"] select {
 }
 
 ::selection {
-  background: rgba(216, 180, 254, 0.35);
+  background: rgba(201, 153, 63, 0.35);
   color: white;
 }
 
@@ -42,7 +47,7 @@ html[dir="rtl"] select {
 /* ---------- Layout ---------- */
 
 .page-bg {
-  @apply min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(192,132,252,0.15),transparent_34%),linear-gradient(135deg,#07070a_0%,#101014_48%,#07070a_100%)] text-white;
+  @apply min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(201,153,63,0.14),transparent_34%),linear-gradient(135deg,#080602_0%,#0e0c07_48%,#080602_100%)] text-white;
 }
 
 .page-wrap {
@@ -70,21 +75,21 @@ html[dir="rtl"] select {
 /* ---------- Inputs ---------- */
 
 .input-main {
-  @apply w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-white outline-none transition placeholder:text-zinc-600 focus:border-fuchsia-300/60 focus:bg-white/[0.06];
+  @apply w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-white outline-none transition placeholder:text-zinc-600 focus:border-amber-300/60 focus:bg-white/[0.06];
 }
 
 .select-main {
-  @apply w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-white outline-none transition focus:border-fuchsia-300/60 focus:bg-white/[0.06];
+  @apply w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-white outline-none transition focus:border-amber-300/60 focus:bg-white/[0.06];
 }
 
 .textarea-main {
-  @apply w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-white outline-none transition placeholder:text-zinc-600 focus:border-fuchsia-300/60 focus:bg-white/[0.06];
+  @apply w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-white outline-none transition placeholder:text-zinc-600 focus:border-amber-300/60 focus:bg-white/[0.06];
 }
 
 /* ---------- Buttons ---------- */
 
 .btn-primary {
-  @apply w-full rounded-2xl bg-gradient-to-r from-fuchsia-200 via-white to-sky-100 py-3 font-bold text-zinc-950 shadow-lg shadow-fuchsia-950/30 transition hover:brightness-110;
+  @apply w-full rounded-2xl bg-gradient-to-r from-amber-200 via-white to-amber-100 py-3 font-bold text-zinc-950 shadow-lg shadow-amber-950/30 transition hover:brightness-110;
 }
 
 .btn-dark {

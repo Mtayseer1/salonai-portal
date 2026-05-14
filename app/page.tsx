@@ -289,13 +289,13 @@ function ReelFrame({ images, intervalMs = 3000, className = '' }: { images: { sr
   return (
     <div className={`relative overflow-hidden ${className}`}>
       {prev >= 0 && (
-        <motion.div key={`prev-${prev}`} className="absolute inset-0" initial={{ opacity: 1 }} animate={{ opacity: 0 }} transition={{ duration: 1.2, ease: 'easeInOut' }}>
+        <motion.div key={`prev-${prev}`} className="absolute inset-0" initial={{ opacity: 1 }} animate={{ opacity: 0 }} transition={{ duration: 2.0, ease: 'easeInOut' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={images[prev].src} alt={images[prev].label} className="h-full w-full object-cover" loading="lazy" />
         </motion.div>
       )}
-      <motion.div key={`curr-${curr}`} className="absolute inset-0" initial={{ opacity: 0, scale: 1.0 }} animate={{ opacity: 1, scale: 1.07 }}
-        transition={{ opacity: { duration: 1.2, ease: 'easeInOut' }, scale: { duration: intervalMs / 1000 + 0.5, ease: 'linear' } }}>
+      <motion.div key={`curr-${curr}`} className="absolute inset-0" initial={{ opacity: 0, scale: 1.0 }} animate={{ opacity: 1, scale: 1.04 }}
+        transition={{ opacity: { duration: 2.0, ease: 'easeInOut' }, scale: { duration: intervalMs / 1000 + 0.5, ease: 'linear' } }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={images[curr].src} alt={images[curr].label} className="h-full w-full object-cover" loading="lazy" />
       </motion.div>
@@ -303,7 +303,7 @@ function ReelFrame({ images, intervalMs = 3000, className = '' }: { images: { sr
         <motion.div key={`label-${curr}`} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.4 }}
           className="absolute bottom-0 inset-x-0 flex items-end bg-gradient-to-t from-black/90 via-black/30 to-transparent p-6 pt-20">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-fuchsia-300">AI Preview</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-amber-300">AI Preview</p>
             <p className="mt-1 text-lg font-semibold text-white">{images[curr].label}</p>
           </div>
           <div className="ms-auto flex gap-1.5">
@@ -337,8 +337,8 @@ function HairPhase() {
           return (
             <motion.div key={i} initial={{ opacity: 0, scale: 0.88 }} animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: i * 0.13, duration: 0.35, ease: 'easeOut' as const }}
-              className={`relative overflow-hidden rounded-xl border px-3 py-2.5 text-xs font-medium transition-all duration-500 ${active ? 'border-fuchsia-300/60 bg-fuchsia-300/15 text-fuchsia-100 shadow-lg shadow-fuchsia-950/40' : 'border-white/10 bg-white/[0.05] text-zinc-400'}`}>
-              {active && <motion.span initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} className="me-1 text-fuchsia-300">✓</motion.span>}
+              className={`relative overflow-hidden rounded-xl border px-3 py-2.5 text-xs font-medium transition-all duration-500 ${active ? 'border-amber-300/60 bg-amber-300/15 text-amber-100 shadow-lg shadow-amber-950/40' : 'border-white/10 bg-white/[0.05] text-zinc-400'}`}>
+              {active && <motion.span initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} className="me-1 text-amber-300">✓</motion.span>}
               {opt}
               {active && <motion.div initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.4 }} className="absolute inset-x-0 bottom-0 h-0.5 origin-start bg-fuchsia-400/60" />}
             </motion.div>
@@ -367,17 +367,17 @@ function ColorPhase() {
           return (
             <motion.div key={i} initial={{ opacity: 0, y: 12, scale: 0.8 }} animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ delay: i * 0.1, duration: 0.35, ease: 'easeOut' as const }} className="flex flex-col items-center gap-1.5">
-              <div className={`relative h-10 w-10 rounded-full transition-all duration-500 ${active ? 'ring-2 ring-fuchsia-300 ring-offset-2 ring-offset-zinc-950' : 'ring-1 ring-white/10'}`} style={{ background: c.hex }}>
+              <div className={`relative h-10 w-10 rounded-full transition-all duration-500 ${active ? 'ring-2 ring-amber-300 ring-offset-2 ring-offset-zinc-950' : 'ring-1 ring-white/10'}`} style={{ background: c.hex }}>
                 {active && <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute inset-0 flex items-center justify-center text-xs text-white drop-shadow">✓</motion.span>}
               </div>
-              <span className={`text-[9px] font-medium transition-colors ${active ? 'text-fuchsia-200' : 'text-zinc-600'}`}>{d.colorNames[i]}</span>
+              <span className={`text-[9px] font-medium transition-colors ${active ? 'text-amber-200' : 'text-zinc-600'}`}>{d.colorNames[i]}</span>
             </motion.div>
           )
         })}
       </div>
       {selIdx !== null && (
         <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="mt-4 text-center text-[11px] text-zinc-500">
-          {d.selectedLabel} <span className="font-semibold text-fuchsia-200">{d.colorNames[selIdx]}</span>
+          {d.selectedLabel} <span className="font-semibold text-amber-200">{d.colorNames[selIdx]}</span>
         </motion.p>
       )}
     </motion.div>
@@ -402,8 +402,8 @@ function MakeupPhase() {
           return (
             <motion.div key={i} initial={{ opacity: 0, scale: 0.88 }} animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: i * 0.13, duration: 0.35, ease: 'easeOut' as const }}
-              className={`relative overflow-hidden rounded-xl border px-3 py-2.5 text-xs font-medium transition-all duration-500 ${active ? 'border-fuchsia-300/60 bg-fuchsia-300/15 text-fuchsia-100 shadow-lg shadow-fuchsia-950/40' : 'border-white/10 bg-white/[0.05] text-zinc-400'}`}>
-              {active && <motion.span initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} className="me-1 text-fuchsia-300">✓</motion.span>}
+              className={`relative overflow-hidden rounded-xl border px-3 py-2.5 text-xs font-medium transition-all duration-500 ${active ? 'border-amber-300/60 bg-amber-300/15 text-amber-100 shadow-lg shadow-amber-950/40' : 'border-white/10 bg-white/[0.05] text-zinc-400'}`}>
+              {active && <motion.span initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} className="me-1 text-amber-300">✓</motion.span>}
               {opt}
               {active && <motion.div initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.4 }} className="absolute inset-x-0 bottom-0 h-0.5 origin-start bg-fuchsia-400/60" />}
             </motion.div>
@@ -433,26 +433,26 @@ function MergePhase() {
       <motion.div initial={{ scale: 0, opacity: 0 }} animate={{ scale: converging ? 1 : 0.4, opacity: converging ? 1 : 0.3 }}
         transition={{ duration: 0.7, type: 'spring', bounce: 0.3 }}
         className="absolute h-20 w-20 rounded-full"
-        style={{ background: 'radial-gradient(circle, rgba(240,171,252,0.9) 0%, rgba(192,132,252,0.4) 50%, transparent 70%)' }} />
+        style={{ background: 'radial-gradient(circle, rgba(201,153,63,0.9) 0%, rgba(201,153,63,0.4) 50%, transparent 70%)' }} />
       <AnimatePresence>
         {converging && (
           <motion.div key="ring" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1, rotate: 360 }} exit={{ scale: 0, opacity: 0 }}
             transition={{ scale: { duration: 0.3 }, opacity: { duration: 0.3 }, rotate: { duration: 1.6, repeat: Infinity, ease: 'linear' } }}
-            className="absolute h-28 w-28 rounded-full border-2 border-fuchsia-400/20 border-t-fuchsia-300/80" />
+            className="absolute h-28 w-28 rounded-full border-2 border-amber-400/20 border-t-amber-300/80" />
         )}
       </AnimatePresence>
       {TAGS.map((tag, i) => (
         <motion.div key={i} initial={{ x: tag.x, y: tag.y, opacity: 1, scale: 1 }}
           animate={converging ? { x: 0, y: 0, opacity: 0, scale: 0.2 } : { x: tag.x, y: tag.y, opacity: 1, scale: 1 }}
           transition={{ duration: 0.55, delay: i * 0.07, ease: 'easeIn' as const }}
-          className="absolute rounded-full border border-fuchsia-300/40 bg-fuchsia-300/15 px-3 py-1.5 text-[11px] font-semibold text-fuchsia-200 backdrop-blur-sm">
+          className="absolute rounded-full border border-amber-400/40 bg-amber-400/15 px-3 py-1.5 text-[11px] font-semibold text-amber-200 backdrop-blur-sm">
           {d.mergeTags[tag.idx]}
         </motion.div>
       ))}
       <AnimatePresence>
         {converging && (
           <motion.p key="gen" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ delay: 0.5, duration: 0.4 }}
-            className="absolute bottom-0 text-center text-xs font-medium text-fuchsia-200">{d.generating}</motion.p>
+            className="absolute bottom-0 text-center text-xs font-medium text-amber-200">{d.generating}</motion.p>
         )}
       </AnimatePresence>
     </motion.div>
@@ -465,17 +465,17 @@ function ResultPhase() {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="relative flex flex-col items-center">
       <motion.div initial={{ scale: 0.3, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 18 }} className="relative">
-        <div className="absolute -inset-3 rounded-[1.8rem] opacity-60" style={{ background: 'radial-gradient(circle, rgba(240,171,252,0.5) 0%, transparent 70%)' }} />
+        <div className="absolute -inset-3 rounded-[1.8rem] opacity-60" style={{ background: 'radial-gradient(circle, rgba(201,153,63,0.5) 0%, transparent 70%)' }} />
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/women_signature/05_Arabic_Glam.png" alt="AI result" className="relative h-[240px] w-[160px] rounded-[1.4rem] object-cover shadow-2xl shadow-fuchsia-950/50" />
+        <img src="/women_signature/05_Arabic_Glam.png" alt="AI result" className="relative h-[240px] w-[160px] rounded-[1.4rem] object-cover shadow-2xl shadow-amber-950/50" />
         <div className="absolute inset-x-0 bottom-0 rounded-b-[1.4rem] bg-gradient-to-t from-black/95 to-transparent px-3 pb-3 pt-8">
-          <p className="text-[9px] font-semibold uppercase tracking-[0.22em] text-fuchsia-300">{d.aiGenerated}</p>
+          <p className="text-[9px] font-semibold uppercase tracking-[0.22em] text-amber-300">{d.aiGenerated}</p>
           <p className="mt-0.5 text-xs font-semibold text-white">{d.resultName}</p>
         </div>
       </motion.div>
       {[{ x: -16, y: -14, d: 0.15 }, { x: 14, y: -18, d: 0.3 }, { x: 20, y: 18, d: 0.45 }].map((sp, i) => (
         <motion.span key={i} initial={{ opacity: 0, scale: 0 }} animate={{ opacity: [0, 1, 0], scale: [0, 1.4, 0] }} transition={{ delay: sp.d, duration: 0.7 }}
-          className="absolute text-fuchsia-300" style={{ left: `calc(50% + ${sp.x}px)`, top: sp.y, fontSize: 12 }}>✦</motion.span>
+          className="absolute text-amber-300" style={{ left: `calc(50% + ${sp.x}px)`, top: sp.y, fontSize: 12 }}>✦</motion.span>
       ))}
       <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.4 }} className="mt-3 text-[11px] font-semibold text-emerald-400">
         {d.previewReady}
@@ -548,7 +548,7 @@ function LandingNav() {
             className="rounded-xl border border-white/10 bg-white/[0.06] px-3 py-2 text-xs font-semibold text-zinc-300 transition hover:bg-white/[0.12] hover:text-white">
             {c.langBtn}
           </button>
-          <Link href="/login" className="rounded-2xl bg-gradient-to-r from-fuchsia-200 via-white to-sky-100 px-5 py-2.5 text-sm font-bold text-zinc-950 shadow-lg shadow-fuchsia-950/30 transition hover:brightness-110">
+          <Link href="/login" className="rounded-2xl bg-gradient-to-r from-amber-200 via-white to-amber-100 px-5 py-2.5 text-sm font-bold text-zinc-950 shadow-lg shadow-amber-950/30 transition hover:brightness-110">
             {c.signIn}
           </Link>
           <button type="button" onClick={() => setMenuOpen(v => !v)} aria-label="Menu"
@@ -565,7 +565,7 @@ function LandingNav() {
               {[['#reel', c.reel], ['#compare', c.compare], ['#features', c.features], ['#pricing', c.pricing]].map(([href, label]) => (
                 <a key={href} href={href} onClick={close} className="rounded-xl px-4 py-3 text-sm text-zinc-400 transition hover:bg-white/[0.06] hover:text-white">{label}</a>
               ))}
-              <Link href="/login" onClick={close} className="mt-2 rounded-xl px-4 py-3 text-sm font-bold text-fuchsia-200 transition hover:bg-white/[0.06]">{c.signIn} →</Link>
+              <Link href="/login" onClick={close} className="mt-2 rounded-xl px-4 py-3 text-sm font-bold text-amber-200 transition hover:bg-white/[0.06]">{c.signIn} →</Link>
             </div>
           </motion.div>
         )}
@@ -609,7 +609,7 @@ function BeforeAfterSlider({ left, right, leftLabel, rightLabel }: { left: strin
       <div className="absolute inset-y-0" style={{ left: `${pos}%`, transform: 'translateX(-50%)', zIndex: 20 }}>
         <div className="h-full w-px bg-white/80 shadow-[0_0_8px_rgba(255,255,255,0.5)]" />
         <button type="button" aria-label="Drag to compare"
-          className="absolute top-1/2 left-1/2 flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 cursor-ew-resize items-center justify-center rounded-full bg-white shadow-2xl text-zinc-900 text-base font-bold ring-2 ring-fuchsia-200/40"
+          className="absolute top-1/2 left-1/2 flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 cursor-ew-resize items-center justify-center rounded-full bg-white shadow-2xl text-zinc-900 text-base font-bold ring-2 ring-amber-300/40"
           onMouseDown={() => { dragging.current = true }} onTouchStart={() => { dragging.current = true }}>↔</button>
       </div>
       <span className="pointer-events-none absolute bottom-3 left-3 z-30 rounded-full bg-black/70 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm">{leftLabel}</span>
@@ -648,7 +648,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
     <div className="border-b border-white/10 last:border-0">
       <button type="button" onClick={() => setOpen(v => !v)} className="flex w-full items-center justify-between py-5 text-start">
         <span className="text-sm font-semibold text-white">{q}</span>
-        <span className={`ms-4 shrink-0 text-fuchsia-300 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}>↓</span>
+        <span className={`ms-4 shrink-0 text-amber-300 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}>↓</span>
       </button>
       <AnimatePresence initial={false}>
         {open && (
@@ -679,9 +679,9 @@ export default function LandingPage() {
               {/* Logo icon with glow */}
               <motion.div {...mount(0)} className="mb-6 flex justify-center lg:justify-start">
                 <div className="relative">
-                  <div className="absolute inset-0 rounded-full opacity-60" style={{ boxShadow: '0 0 48px 12px rgba(240,171,252,0.35)' }} />
+                  <div className="absolute inset-0 rounded-full opacity-60" style={{ boxShadow: '0 0 48px 12px rgba(201,153,63,0.35)' }} />
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/icon.png" alt="SalonAI" className="relative h-20 w-20 rounded-full object-cover ring-2 ring-fuchsia-300/30" />
+                  <img src="/icon.png" alt="SalonAI" className="relative h-20 w-20 rounded-full object-cover ring-2 ring-amber-300/30" />
                 </div>
               </motion.div>
               <motion.p {...mount(0.05)} className="text-xs font-semibold uppercase tracking-[0.28em] text-zinc-500">
@@ -689,14 +689,14 @@ export default function LandingPage() {
               </motion.p>
               <motion.h1 {...mount(0.15)} className="mt-5 text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
                 {c.hero.h1a}{' '}
-                <span className="bg-gradient-to-r from-fuchsia-200 via-white to-sky-200 bg-clip-text text-transparent">{c.hero.h1b}</span>
+                <span className="bg-gradient-to-r from-amber-200 via-white to-amber-100 bg-clip-text text-transparent">{c.hero.h1b}</span>
                 <br />{c.hero.h1c}
               </motion.h1>
               <motion.p {...mount(0.25)} className="mx-auto mt-5 max-w-md text-base leading-7 text-zinc-400 lg:mx-0">
                 {c.hero.sub}
               </motion.p>
               <motion.div {...mount(0.35)} className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
-                <Link href="/contact" className="rounded-2xl bg-gradient-to-r from-fuchsia-200 via-white to-sky-100 px-8 py-3.5 text-sm font-bold text-zinc-950 shadow-xl shadow-fuchsia-950/30 transition hover:brightness-110">
+                <Link href="/contact" className="rounded-2xl bg-gradient-to-r from-amber-200 via-white to-amber-100 px-8 py-3.5 text-sm font-bold text-zinc-950 shadow-xl shadow-amber-950/30 transition hover:brightness-110">
                   {c.hero.cta1}
                 </Link>
                 <a href="#reel" className="rounded-2xl border border-white/10 bg-white/[0.06] px-8 py-3.5 text-sm font-semibold text-white transition hover:bg-white/[0.1]">
@@ -706,7 +706,7 @@ export default function LandingPage() {
               <motion.div {...mount(0.4)} className="mt-10 flex items-center justify-center gap-8 lg:justify-start">
                 {c.stats.map(s => (
                   <div key={s.label} className="text-center">
-                    <p className="text-xl font-semibold tracking-tight text-fuchsia-200">{s.value}</p>
+                    <p className="text-xl font-semibold tracking-tight text-amber-200">{s.value}</p>
                     <p className="mt-0.5 text-xs text-zinc-500">{s.label}</p>
                   </div>
                 ))}
@@ -721,11 +721,11 @@ export default function LandingPage() {
                 <img src="/women_signature/07_Smokey_Evening.png" alt="Smokey Evening" className="h-full w-full object-cover" />
               </motion.div>
               <motion.div animate={{ y: [0, -14, 0] }} transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
-                className="absolute left-1/2 top-0 h-[340px] w-[210px] -translate-x-1/2 overflow-hidden rounded-3xl border border-fuchsia-200/20 shadow-2xl shadow-fuchsia-950/30" style={{ zIndex: 3 }}>
+                className="absolute left-1/2 top-0 h-[340px] w-[210px] -translate-x-1/2 overflow-hidden rounded-3xl border border-amber-300/20 shadow-2xl shadow-amber-950/30" style={{ zIndex: 3 }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/women_signature/05_Arabic_Glam.png" alt="Arabic Glam" className="h-full w-full object-cover" />
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-4 pb-4 pt-10">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-fuchsia-200">{c.hero.aiPreview}</p>
+                  <p className="text-xs font-semibold uppercase tracking-widest text-amber-200">{c.hero.aiPreview}</p>
                   <p className="mt-0.5 text-sm font-semibold text-white">{c.demo.resultName}</p>
                 </div>
               </motion.div>
@@ -735,7 +735,7 @@ export default function LandingPage() {
                 <img src="/women_signature/06_Red_Carpet_Red_Lip.png" alt="Red Carpet" className="h-full w-full object-cover" />
               </motion.div>
               <div className="pointer-events-none absolute left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full"
-                style={{ background: 'radial-gradient(circle, rgba(240,171,252,0.5) 0%, transparent 70%)', zIndex: 0 }} />
+                style={{ background: 'radial-gradient(circle, rgba(201,153,63,0.5) 0%, transparent 70%)', zIndex: 0 }} />
             </motion.div>
           </div>
         </section>
@@ -748,11 +748,11 @@ export default function LandingPage() {
             <div className="absolute inset-0 bg-gradient-to-r from-[#07070a]/60 via-transparent to-[#07070a]/60" />
           </div>
           <div className="relative z-10 mx-auto flex max-w-6xl flex-col items-center justify-center px-4 py-36 text-center">
-            <motion.p {...reveal(0)} className="text-xs font-semibold uppercase tracking-[0.28em] text-fuchsia-300">{c.reel.label}</motion.p>
+            <motion.p {...reveal(0)} className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-300">{c.reel.label}</motion.p>
             <motion.h2 {...reveal(0.1)} className="mt-4 text-4xl font-semibold tracking-tight text-white sm:text-5xl">{c.reel.h2}</motion.h2>
             <motion.p {...reveal(0.2)} className="mx-auto mt-5 max-w-lg text-base leading-7 text-zinc-300">{c.reel.sub}</motion.p>
             <motion.div {...reveal(0.3)} className="mt-9">
-              <Link href="/contact" className="rounded-2xl bg-gradient-to-r from-fuchsia-200 via-white to-sky-100 px-10 py-4 text-sm font-bold text-zinc-950 shadow-2xl shadow-fuchsia-950/50 transition hover:brightness-110">
+              <Link href="/contact" className="rounded-2xl bg-gradient-to-r from-amber-200 via-white to-amber-100 px-10 py-4 text-sm font-bold text-zinc-950 shadow-2xl shadow-amber-950/50 transition hover:brightness-110">
                 {c.reel.cta}
               </Link>
             </motion.div>
@@ -772,13 +772,13 @@ export default function LandingPage() {
                 <motion.ul {...reveal(0.25)} className="mt-6 space-y-3 text-sm text-zinc-400">
                   {c.demo.steps.map((step, i) => (
                     <li key={i} className="flex items-start gap-2.5">
-                      <span className="mt-0.5 text-fuchsia-300">✦</span>
+                      <span className="mt-0.5 text-amber-300">✦</span>
                       {step}
                     </li>
                   ))}
                 </motion.ul>
                 <motion.div {...reveal(0.35)} className="mt-8">
-                  <Link href="/contact" className="rounded-2xl bg-gradient-to-r from-fuchsia-200 via-white to-sky-100 px-7 py-3.5 text-center text-sm font-bold text-zinc-950 shadow-xl shadow-fuchsia-950/30 transition hover:brightness-110">
+                  <Link href="/contact" className="rounded-2xl bg-gradient-to-r from-amber-200 via-white to-amber-100 px-7 py-3.5 text-center text-sm font-bold text-zinc-950 shadow-xl shadow-amber-950/30 transition hover:brightness-110">
                     {c.demo.cta}
                   </Link>
                 </motion.div>
@@ -815,7 +815,7 @@ export default function LandingPage() {
             </div>
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
               <motion.div {...reveal(0)} className="relative z-10 rounded-3xl border border-white/10 bg-black/60 px-10 py-8 text-center backdrop-blur-xl">
-                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-fuchsia-300">{c.splitMorph.label}</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-300">{c.splitMorph.label}</p>
                 <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">{c.splitMorph.h2[0]}<br />{c.splitMorph.h2[1]}</h2>
                 <p className="mt-3 text-sm text-zinc-400">{c.splitMorph.sub}</p>
               </motion.div>
@@ -853,7 +853,7 @@ export default function LandingPage() {
               {c.features.cards.map((f, i) => (
                 <motion.div key={i} {...reveal(i * 0.1)} whileHover={{ y: -4, transition: { duration: 0.2 } }}
                   className="rounded-3xl border border-white/10 bg-white/[0.055] p-6 shadow-2xl shadow-black/25 backdrop-blur-xl">
-                  <p className="mb-5 text-3xl text-fuchsia-300">{f.icon}</p>
+                  <p className="mb-5 text-3xl text-amber-300">{f.icon}</p>
                   <h3 className="text-base font-semibold text-white">{f.title}</h3>
                   <p className="mt-3 text-sm leading-6 text-zinc-400">{f.body}</p>
                 </motion.div>
@@ -868,7 +868,7 @@ export default function LandingPage() {
             <div className="grid gap-5 md:grid-cols-3">
               {c.testimonials.map((t, i) => (
                 <motion.div key={i} {...reveal(i * 0.1)}>
-                  <div className="h-full rounded-3xl border border-fuchsia-200/20 bg-fuchsia-200/10 p-6">
+                  <div className="h-full rounded-3xl border border-amber-300/20 bg-amber-300/10 p-6">
                     <p className="text-sm leading-6 text-zinc-300">"{t.quote}"</p>
                     <div className="mt-5">
                       <p className="text-sm font-semibold text-white">{t.author}</p>
@@ -892,7 +892,7 @@ export default function LandingPage() {
             <div className="grid gap-5 md:grid-cols-3">
               {c.pricing.tiers.map((tier, i) => (
                 <motion.div key={i} {...reveal(i * 0.1)}>
-                  <div className={`relative flex h-full flex-col rounded-3xl border p-6 ${tier.featured ? 'border-fuchsia-300/40 bg-white/[0.08]' : 'border-white/10 bg-white/[0.055]'}`}>
+                  <div className={`relative flex h-full flex-col rounded-3xl border p-6 ${tier.featured ? 'border-amber-300/40 bg-white/[0.08]' : 'border-white/10 bg-white/[0.055]'}`}>
                     {tier.featured && (
                       <div className="absolute -top-3 start-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-fuchsia-200/30 bg-fuchsia-300 px-3 py-1 text-xs font-bold text-zinc-950">{tier.tag}</div>
                     )}

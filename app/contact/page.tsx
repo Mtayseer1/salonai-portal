@@ -33,7 +33,7 @@ export default function ContactPage() {
       >
         {/* Free trial badge */}
         <motion.div {...mount(0.1)}>
-          <span className="inline-block rounded-full border border-fuchsia-300/30 bg-fuchsia-300/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.24em] text-fuchsia-300">
+          <span className="inline-block rounded-full border border-amber-300/30 bg-amber-300/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.24em] text-amber-300">
             Free Trial Available
           </span>
         </motion.div>
@@ -53,7 +53,7 @@ export default function ContactPage() {
               href={c.href}
               target={c.href.startsWith('mailto') ? undefined : '_blank'}
               rel="noopener noreferrer"
-              className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.05] px-5 py-4 text-left transition hover:border-fuchsia-300/30 hover:bg-fuchsia-300/5"
+              className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.05] px-5 py-4 text-left transition hover:border-amber-300/30 hover:bg-amber-300/5"
             >
               <span className="text-2xl">{c.icon}</span>
               <div>

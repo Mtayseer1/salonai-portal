@@ -167,7 +167,7 @@ export function AppBar({
 export function Brand({ compact = false }: { compact?: boolean }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="grid h-11 w-11 place-items-center overflow-hidden rounded-2xl border border-white/10 bg-zinc-900 shadow-2xl shadow-fuchsia-950/30">
+      <div className="grid h-11 w-11 place-items-center overflow-hidden rounded-2xl border border-white/10 bg-zinc-900 shadow-2xl shadow-amber-950/30">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/icon.png" alt="SalonAI" className="h-full w-full object-cover" />
       </div>
@@ -215,7 +215,7 @@ export function StatCard({
       ? 'text-emerald-300'
       : tone === 'danger'
         ? 'text-red-300'
-        : 'text-fuchsia-200'
+        : 'text-amber-200'
 
   return (
     <Card>
@@ -245,7 +245,7 @@ export function Field({
 }
 
 export const inputClass =
-  'w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-white outline-none transition placeholder:text-zinc-600 focus:border-fuchsia-300/60 focus:bg-white/[0.06]'
+  'w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-white outline-none transition placeholder:text-zinc-600 focus:border-amber-300/60 focus:bg-white/[0.06]'
 
 export function Button({
   children,
@@ -257,7 +257,7 @@ export function Button({
 }) {
   const styles = {
     primary:
-      'bg-gradient-to-r from-fuchsia-200 via-white to-sky-100 text-zinc-950 shadow-lg shadow-fuchsia-950/30 hover:brightness-110',
+      'bg-gradient-to-r from-amber-200 via-white to-amber-100 text-zinc-950 shadow-lg shadow-amber-950/30 hover:brightness-110',
     secondary:
       'border border-white/10 bg-white/[0.06] text-white hover:bg-white/[0.1]',
     danger:
@@ -300,7 +300,7 @@ export function LoadingScreen({ label = 'Loading workspace...' }: { label?: stri
   return (
     <main className="page-bg flex items-center justify-center px-4">
       <div className="w-full max-w-sm rounded-3xl border border-white/10 bg-white/[0.055] p-8 text-center shadow-2xl shadow-black/30 backdrop-blur-xl">
-        <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-zinc-700 border-t-fuchsia-300" />
+        <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-zinc-700 border-t-amber-300" />
         <p className="mt-4 text-sm text-zinc-400">{label}</p>
         <p className="mt-2 font-mono text-xs text-zinc-600">
           {formatElapsedTime(elapsedSeconds)}
