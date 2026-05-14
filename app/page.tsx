@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { AnimatePresence, motion, useScroll, useTransform } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { Brand } from './components/ui'
 
@@ -519,88 +519,85 @@ function StyleDemo() {
   )
 }
 
-// ─── Salon Door Reveal (scroll-linked) ───────────────────────────────────────
+// ─── Salon CTA Reveal ─────────────────────────────────────────────────────────
 
-function SalonDoorReveal() {
+const CTA_LOOKS = [
+  { src: '/women_signature/03_Bridal_Rose_Glam.png',   label: 'Bridal Glam',   rotate: -9,  featured: false },
+  { src: '/women_signature/05_Arabic_Glam.png',         label: 'Arabic Glam',   rotate: 0,   featured: true  },
+  { src: '/women_signature/09_Korean_Soft_Makeup.png',  label: 'Korean Glow',   rotate: 9,   featured: false },
+]
+
+function SalonCTAReveal() {
   const { lang } = useContext(LangCtx)
-  const ref = useRef<HTMLDivElement>(null)
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] })
-
-  const leftRotate     = useTransform(scrollYProgress, [0, 0.55], [0, -95])
-  const rightRotate    = useTransform(scrollYProgress, [0, 0.55], [0, 95])
-  const contentOpacity = useTransform(scrollYProgress, [0.3, 0.62], [0, 1])
-  const contentScale   = useTransform(scrollYProgress, [0.3, 0.62], [0.88, 1])
-
   return (
-    <div ref={ref} style={{ height: '200vh' }} className="relative">
-      <div className="sticky top-0 h-screen overflow-hidden" style={{ perspective: '1400px' }}>
-        {/* Content revealed behind doors */}
-        <motion.div
-          style={{ opacity: contentOpacity, scale: contentScale }}
-          className="absolute inset-0 flex items-center justify-center px-4"
-        >
-          <div className="text-center">
-            <div className="relative mx-auto mb-8 h-24 w-24">
-              <div className="absolute inset-0 rounded-full"
-                style={{ boxShadow: '0 0 60px 18px rgba(201,153,63,0.38)' }} />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/icon.png" alt="SalonAI" className="relative h-24 w-24 rounded-full object-cover ring-2 ring-amber-300/40" />
-            </div>
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-300">
-              {lang === 'en' ? 'Try It Free' : 'جرّبيه مجاناً'}
-            </p>
-            <h2 className="mt-4 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-              {lang === 'en' ? 'Your salon. Elevated.' : 'صالونك. بمستوى آخر.'}
-            </h2>
-            <p className="mx-auto mt-4 max-w-md text-base leading-7 text-zinc-400">
-              {lang === 'en'
-                ? 'AI previews that clients love and salons trust. Start your free trial — no credit card needed.'
-                : 'معاينات ذكاء اصطناعي يعشقها العملاء وتثق بها الصالونات. ابدأ تجربتك المجانية بدون بطاقة ائتمان.'}
-            </p>
-            <Link
-              href="/contact"
-              className="mt-8 inline-block rounded-2xl bg-gradient-to-r from-amber-200 via-white to-amber-100 px-10 py-4 text-sm font-bold text-zinc-950 shadow-2xl shadow-amber-950/50 transition hover:brightness-110"
+    <section className="relative overflow-hidden px-4 py-28">
+      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[700px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+        style={{ background: 'radial-gradient(circle, rgba(201,153,63,0.1) 0%, transparent 68%)' }} />
+
+      <div className="relative mx-auto max-w-3xl text-center">
+        <motion.div {...reveal(0)} className="mb-8 flex justify-center">
+          <div className="relative">
+            <div className="absolute inset-0 rounded-full"
+              style={{ boxShadow: '0 0 55px 16px rgba(201,153,63,0.38)' }} />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/icon.png" alt="SalonAI" className="relative h-20 w-20 rounded-full object-cover ring-2 ring-amber-300/40" />
+          </div>
+        </motion.div>
+
+        <motion.p {...reveal(0.05)} className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-300">
+          {lang === 'en' ? 'Try It Free' : 'جرّبيه مجاناً'}
+        </motion.p>
+        <motion.h2 {...reveal(0.1)} className="mt-4 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+          {lang === 'en' ? 'Your salon. Elevated.' : 'صالونك. بمستوى آخر.'}
+        </motion.h2>
+        <motion.p {...reveal(0.15)} className="mx-auto mt-5 max-w-md text-base leading-7 text-zinc-400">
+          {lang === 'en'
+            ? 'AI previews that clients love and salons trust. Start your free trial — no credit card needed.'
+            : 'معاينات ذكاء اصطناعي يعشقها العملاء وتثق بها الصالونات. ابدأ تجربتك المجانية بدون بطاقة ائتمان.'}
+        </motion.p>
+
+        {/* Fanned look cards */}
+        <div className="mt-12 flex items-end justify-center gap-3">
+          {CTA_LOOKS.map((look, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 60, rotate: 0 }}
+              whileInView={{ opacity: 1, y: 0, rotate: look.rotate }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.05 + i * 0.12, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+              className={`relative overflow-hidden rounded-2xl border shadow-2xl ${
+                look.featured
+                  ? 'h-[230px] w-[150px] border-amber-300/30 shadow-amber-950/50'
+                  : 'h-[190px] w-[120px] border-white/10 shadow-black/50'
+              }`}
             >
-              {lang === 'en' ? 'Start Free Trial →' : '← ابدأ التجربة المجانية'}
-            </Link>
-          </div>
-        </motion.div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={look.src} alt={look.label} className="h-full w-full object-cover" loading="lazy" />
+              {look.featured && (
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent px-3 pb-3 pt-10">
+                  <p className="text-[8px] font-semibold uppercase tracking-widest text-amber-300">AI Preview</p>
+                  <p className="mt-0.5 text-xs font-semibold text-white">{look.label}</p>
+                </div>
+              )}
+              {look.featured && (
+                <div className="absolute right-2 top-2 rounded-full bg-amber-300/20 px-2 py-0.5 text-[8px] font-bold tracking-widest text-amber-200 backdrop-blur-sm">
+                  ✦ AI
+                </div>
+              )}
+            </motion.div>
+          ))}
+        </div>
 
-        {/* Left door */}
-        <motion.div
-          style={{ rotateY: leftRotate, transformOrigin: 'right center' }}
-          className="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-br from-zinc-950 via-[#0c0b09] to-zinc-950"
-        >
-          <div className="absolute inset-6 rounded-2xl border border-white/[0.05]" />
-          <div className="absolute inset-0 flex items-center justify-end pe-10 opacity-[0.035]">
-            <p className="text-right text-[72px] font-black leading-none tracking-tighter text-white">
-              SALON<br />AI
-            </p>
-          </div>
-          {/* Gold seam */}
-          <div className="absolute inset-y-0 right-0 w-px bg-gradient-to-b from-transparent via-amber-300/50 to-transparent" />
-          {/* Handle */}
-          <div className="absolute top-1/2 right-0 h-14 w-[14px] -translate-y-1/2 translate-x-1/2 rounded-full border border-amber-300/30 bg-gradient-to-b from-amber-200/20 to-amber-400/20 shadow-lg shadow-amber-950/40" />
-        </motion.div>
-
-        {/* Right door */}
-        <motion.div
-          style={{ rotateY: rightRotate, transformOrigin: 'left center' }}
-          className="absolute inset-y-0 right-0 w-1/2 bg-gradient-to-bl from-zinc-950 via-[#0c0b09] to-zinc-950"
-        >
-          <div className="absolute inset-6 rounded-2xl border border-white/[0.05]" />
-          <div className="absolute inset-0 flex items-center justify-start ps-10 opacity-[0.035]">
-            <p className="text-left text-[72px] font-black leading-none tracking-tighter text-white">
-              STYLE<br />IT
-            </p>
-          </div>
-          {/* Gold seam */}
-          <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-amber-300/50 to-transparent" />
-          {/* Handle */}
-          <div className="absolute top-1/2 left-0 h-14 w-[14px] -translate-y-1/2 -translate-x-1/2 rounded-full border border-amber-300/30 bg-gradient-to-b from-amber-200/20 to-amber-400/20 shadow-lg shadow-amber-950/40" />
+        <motion.div {...reveal(0.45)} className="mt-10">
+          <Link
+            href="/contact"
+            className="inline-block rounded-2xl bg-gradient-to-r from-amber-200 via-white to-amber-100 px-10 py-4 text-sm font-bold text-zinc-950 shadow-2xl shadow-amber-950/50 transition hover:brightness-110"
+          >
+            {lang === 'en' ? 'Start Free Trial →' : '← ابدأ التجربة المجانية'}
+          </Link>
         </motion.div>
       </div>
-    </div>
+    </section>
   )
 }
 
@@ -608,20 +605,34 @@ function SalonDoorReveal() {
 
 function ScissorsDivider() {
   return (
-    <div className="overflow-hidden px-4 py-6">
-      <div className="mx-auto flex max-w-6xl items-center">
-        <div className="h-px flex-1 border-t border-dashed border-white/15" />
+    <div className="px-4 py-8">
+      <div className="mx-auto flex max-w-6xl items-center gap-0">
+        <motion.div
+          initial={{ scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.55, ease: 'easeInOut', delay: 0.25 }}
+          style={{ transformOrigin: 'right center', background: 'repeating-linear-gradient(to right, rgba(201,153,63,0.25) 0, rgba(201,153,63,0.25) 6px, transparent 6px, transparent 12px)' }}
+          className="h-px flex-1"
+        />
         <motion.span
-          initial={{ x: '-70vw' }}
-          whileInView={{ x: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.75, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="mx-4 shrink-0 text-xl text-amber-300"
-          style={{ filter: 'drop-shadow(0 0 8px rgba(201,153,63,0.55))' }}
+          initial={{ opacity: 0, scale: 0, rotate: -60 }}
+          whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.45, delay: 0.1, type: 'spring', bounce: 0.4 }}
+          className="mx-4 shrink-0 select-none text-2xl text-amber-300"
+          style={{ filter: 'drop-shadow(0 0 10px rgba(201,153,63,0.65))' }}
         >
           ✂
         </motion.span>
-        <div className="h-px flex-1 border-t border-dashed border-white/15" />
+        <motion.div
+          initial={{ scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.55, ease: 'easeInOut', delay: 0.25 }}
+          style={{ transformOrigin: 'left center', background: 'repeating-linear-gradient(to right, rgba(201,153,63,0.25) 0, rgba(201,153,63,0.25) 6px, transparent 6px, transparent 12px)' }}
+          className="h-px flex-1"
+        />
       </div>
     </div>
   )
@@ -867,8 +878,8 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ── Salon Door Reveal ── */}
-        <SalonDoorReveal />
+        {/* ── Salon CTA Reveal ── */}
+        <SalonCTAReveal />
 
         {/* ── Style Demo ── */}
         <section id="demo" className="px-4 py-24">
